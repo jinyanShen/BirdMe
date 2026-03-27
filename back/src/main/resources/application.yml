@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/birdme?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/birdme?useSSL=false&serverTimezone=UTC
     username: root
-    password: Sjy20031101@
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 #mybatis

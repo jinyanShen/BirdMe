@@ -176,7 +176,15 @@ export default {
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
                 this.$message.success("Login successful")
-                this.$router.push({ path: '/identification' })
+                
+                // Redirect based on user role
+                if (res.data.role === 1) {
+                  // Admin user - redirect to admin panel
+                  this.$router.push({ path: '/admin/users' })
+                } else {
+                  // Regular user - redirect to identification page
+                  this.$router.push({ path: '/identification' })
+                }
               } else {
                 this.loading = false
                 this.$message.error(res.msg)
