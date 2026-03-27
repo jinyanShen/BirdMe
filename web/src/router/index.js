@@ -3,14 +3,15 @@ import Router from 'vue-router'
 
 Vue.use(Router)
 
-/* 布局 */
+/* Layouts */
 import Layout from '@/layout'
+import AdminLayout from '@/layout/admin'
 
 export const constantRoutes = [
   {
     path: '/login',
     component: () => import('@/views/login/index'),
-    meta: { title: '登录' },
+    meta: { title: 'Login' },
     hidden: true
   },
   {
@@ -23,7 +24,7 @@ export const constantRoutes = [
         path: 'identification',
         component: () => import('@/views/identification/index'),
         name: 'identification',
-        meta: { title: '鸟类识别', icon: 'user', noCache: true }
+        meta: { title: 'Bird Identification', icon: 'user', noCache: true }
       }
     ]
   },
@@ -37,7 +38,28 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/center/index'),
         name: 'Center',
-        meta: { title: '个人中心', icon: 'user', noCache: true }
+        meta: { title: 'Personal Center', icon: 'user', noCache: true }
+      }
+    ]
+  },
+
+  {
+    path: '/admin',
+    component: AdminLayout,
+    redirect: '/admin/users',
+    hidden: true,
+    children: [
+      {
+        path: 'users',
+        component: () => import('@/views/admin/users'),
+        name: 'AdminUsers',
+        meta: { title: 'User Management', icon: 'user', noCache: true }
+      },
+      {
+        path: 'addresses',
+        component: () => import('@/views/admin/addresses'),
+        name: 'AdminAddresses',
+        meta: { title: 'Address Management', icon: 'user', noCache: true }
       }
     ]
   },
