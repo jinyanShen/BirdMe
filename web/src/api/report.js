@@ -29,7 +29,7 @@ export function getReportByStatus(status) {
 // Query by submitter ID
 export function getReportsBySubmitter(submitterId) {
   return request({
-    url: '/report/by-submitter',
+    url: '/api/report/by-submitter',
     method: 'get',
     params: { submitterId: submitterId}
   })

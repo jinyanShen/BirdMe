@@ -6,7 +6,7 @@
         <h1>Personal Center</h1>
         <p>Manage your personal information</p>
       </div>
-      
+
       <!-- Personal Information Card -->
       <div class="profile-card">
         <div class="card-header">
@@ -22,7 +22,19 @@
               </el-col>
               <el-col :span="12">
                 <el-form-item label="Password" prop="password">
-                  <el-input v-model="form.password" class="custom-input" />
+                  <el-input
+                    v-model="form.password"
+                    :type="passwordFieldType"
+                    class="custom-input"
+                  >
+                    <template #suffix>
+                      <i
+                        :class="passwordFieldType === 'password' ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                        style="cursor: pointer; color: #999;"
+                        @click="togglePassword"
+                      ></i>
+                    </template>
+                  </el-input>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -95,11 +107,15 @@ export default {
         phone: sessionStorage.getItem("phone"),
         avatarUrl: sessionStorage.getItem("avatarUrl"),
       },
-      pictureList: []
+      pictureList: [],
+      passwordFieldType: 'password'
     };
   },
 
   methods: {
+    togglePassword() {
+      this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
+    },
     handleUploadSuccess(response, file) {
       this.form.avatarUrl = "http://localhost:8080/file/download?id=" + response.data.id
       this.pictureList.push(response.data);
@@ -256,27 +272,27 @@ export default {
   .profile-page {
     padding: 40px 0;
   }
-  
+
   .section-title h1 {
     font-size: 28px;
   }
-  
+
   .card-body {
     padding: 20px;
   }
-  
+
   .card-header {
     padding: 15px 20px;
   }
-  
+
   .card-header h2 {
     font-size: 18px;
   }
-  
+
   .el-form-item {
     margin-bottom: 15px;
   }
-  
+
   .submit-btn {
     padding: 10px 30px;
     font-size: 14px;
@@ -287,23 +303,23 @@ export default {
   .section-title h1 {
     font-size: 24px;
   }
-  
+
   .card-body {
     padding: 15px;
   }
-  
+
   .el-form-item {
     margin-bottom: 10px;
   }
-  
+
   .upload-content {
     padding: 30px 15px;
   }
-  
+
   .upload-icon {
     font-size: 30px;
   }
-  
+
   .upload-text {
     font-size: 14px;
   }
