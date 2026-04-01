@@ -8,17 +8,35 @@
       <nav class="sidebar-nav">
         <ul class="nav-list">
           <li class="nav-item">
+            <router-link to="/admin/dashboard" class="nav-link" :class="{ active: $route.path === '/admin/dashboard' }">
+              <i class="fas fa-chart-pie"></i>
+              <span>Dashboard</span>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/admin/reports" class="nav-link" :class="{ active: $route.path === '/admin/reports' }">
+              <i class="fas fa-file-alt"></i>
+              <span>Reports</span>
+            </router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/admin/rescue-stations" class="nav-link" :class="{ active: $route.path === '/admin/rescue-stations' }">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Rescue Stations</span>
+            </router-link>
+          </li>
+          <li class="nav-item">
             <router-link to="/admin/users" class="nav-link" :class="{ active: $route.path === '/admin/users' }">
               <i class="fas fa-users"></i>
               <span>Users</span>
             </router-link>
           </li>
-<!--          <li class="nav-item">-->
-<!--            <router-link to="/admin/addresses" class="nav-link" :class="{ active: $route.path === '/admin/addresses' }">-->
-<!--              <i class="fas fa-map-marker-alt"></i>-->
-<!--              <span>Addresses</span>-->
-<!--            </router-link>-->
-<!--          </li>-->
+          <li class="nav-item">
+            <router-link to="/admin/profile" class="nav-link" :class="{ active: $route.path === '/admin/profile' }">
+              <i class="fas fa-user-circle"></i>
+              <span>Profile</span>
+            </router-link>
+          </li>
         </ul>
       </nav>
     </aside>
@@ -60,8 +78,11 @@ export default {
   computed: {
     pageTitle() {
       const path = this.$route.path
+      if (path === '/admin/dashboard') return 'Dashboard'
+      if (path === '/admin/reports') return 'Report Management'
+      if (path === '/admin/rescue-stations') return 'Rescue Station Management'
       if (path === '/admin/users') return 'User Management'
-      if (path === '/admin/addresses') return 'Address Management'
+      if (path === '/admin/profile') return 'Personal Profile'
       return 'Admin Panel'
     }
   },

@@ -42,13 +42,33 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/report',
+    component: Layout,
+    redirect: '/report/index',
+    hidden: true,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/report/index'),
+        name: 'report',
+        meta: { title: 'Report', icon: 'user', noCache: true }
+      }
+    ]
+  },
 
   {
     path: '/admin',
     component: AdminLayout,
-    redirect: '/admin/users',
+    redirect: '/admin/dashboard',
     hidden: true,
     children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/admin/dashboard'),
+        name: 'AdminDashboard',
+        meta: { title: 'Dashboard', icon: 'dashboard', noCache: true }
+      },
       {
         path: 'users',
         component: () => import('@/views/admin/users'),
@@ -56,11 +76,23 @@ export const constantRoutes = [
         meta: { title: 'User Management', icon: 'user', noCache: true }
       },
       {
-        path: 'addresses',
-        component: () => import('@/views/admin/addresses'),
-        name: 'AdminAddresses',
-        meta: { title: 'Address Management', icon: 'user', noCache: true }
-      }
+        path: 'profile',
+        component: () => import('@/views/admin/profile'),
+        name: 'AdminProfile',
+        meta: { title: 'Personal Profile', icon: 'user', noCache: true }
+      },
+      {
+        path: 'reports',
+        component: () => import('@/views/admin/reports'),
+        name: 'AdminReports',
+        meta: { title: 'Report Management', icon: 'document', noCache: true }
+      },
+      {
+        path: 'rescue-stations',
+        component: () => import('@/views/admin/rescue_stations'),
+        name: 'AdminRescueStations',
+        meta: { title: 'Rescue Station Management', icon: 'location', noCache: true }
+      },
     ]
   },
 ]

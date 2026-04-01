@@ -94,8 +94,15 @@
             <el-option label="Admin" :value="1" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Avatar URL" prop="avatarUrl">
-          <el-input v-model="form.avatarUrl" placeholder="Please enter avatar URL" />
+        <el-form-item label="Avatar">
+          <div v-if="currentAvatarUrl" class="current-avatar">
+            <img :src="currentAvatarUrl" alt="Current Avatar">
+          </div>
+          <UploadImg
+            ref="uploadImg"
+            buttonText="Upload Avatar"
+            @image-uploaded="handleAvatarUploaded"
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -108,8 +115,12 @@
 
 <script>
 import { pageUser, insertUser, updateUser, delUser } from '@/api/user'
+import UploadImg from '@/components/UploadImg/index.vue'
 
 export default {
+  components: {
+    UploadImg
+  },
   name: 'UserManagement',
   data() {
     return {
@@ -120,6 +131,7 @@ export default {
       dialogVisible: false,
       isEdit: false,
       dialogTitle: 'Add User',
+      currentAvatarUrl: '',
       form: {
         id: null,
         username: '',
@@ -158,6 +170,29 @@ export default {
     this.fetchUserList()
   },
   methods: {
+    handleAvatarUploaded(data) {
+      const { file } = data;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('http://localhost:8080/file/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.code === 200){
+          this.form.avatarUrl = 'http://localhost:8080/file/download?id=' + data.data.id;
+          this.$message.success('Avatar uploaded successfully');
+        }else{
+          this.$message.error(data.msg);
+        }
+      })
+      .catch(error => {
+        this.$message.error('Avatar upload failed');
+      });
+    },
+
     async fetchUserList() {
       this.loading = true
       try {
@@ -189,12 +224,23 @@ export default {
       this.isEdit = false
       this.dialogTitle = 'Add User'
       this.resetForm()
+      this.$nextTick(() => {
+        if (this.$refs.uploadImg) {
+          this.$refs.uploadImg.reset()
+        }
+      })
       this.dialogVisible = true
     },
     handleEdit(row) {
       this.isEdit = true
       this.dialogTitle = 'Edit User'
       this.form = { ...row }
+      this.currentAvatarUrl = row.avatarUrl || ''
+      this.$nextTick(() => {
+        if (this.$refs.uploadImg) {
+          this.$refs.uploadImg.reset()
+        }
+      })
       this.dialogVisible = true
     },
     async handleDelete(row) {
@@ -256,6 +302,7 @@ export default {
         role: 0,
         avatarUrl: ''
       }
+      this.currentAvatarUrl = ''
       if (this.$refs.userForm) {
         this.$refs.userForm.resetFields()
       }
@@ -388,5 +435,18 @@ export default {
 
 .dialog-footer {
   text-align: right;
+}
+
+.current-avatar {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.current-avatar img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #22b3c1;
 }
 </style>

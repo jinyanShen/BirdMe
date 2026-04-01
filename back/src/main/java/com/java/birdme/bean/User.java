@@ -1,8 +1,8 @@
 package com.java.birdme.bean;
 
-import com.baomidou.mybatisplus.annotations.TableId;
-import com.baomidou.mybatisplus.annotations.TableName;
-import com.baomidou.mybatisplus.enums.IdType;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
@@ -25,7 +25,7 @@ public class User {
      */
     private String username;
     /**
-     * User password (encrypted storage)
+     * User password
      */
     private String password;
     /**

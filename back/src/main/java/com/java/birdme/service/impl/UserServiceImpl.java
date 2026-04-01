@@ -1,11 +1,11 @@
 package com.java.birdme.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
-import com.java.birdme.bean.User;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.birdme.bean.PageReq;
 import com.java.birdme.bean.PageResp;
 import com.java.birdme.bean.ReturnResp;
+import com.java.birdme.bean.User;
 import com.java.birdme.dao.UserMapper;
 import com.java.birdme.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ReturnResp insert(User user) {
-        // valid
         if (user == null) {
             return ReturnResp.fail("Required parameters missing");
         }
@@ -34,9 +33,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public ReturnResp update(User user) {
         int ret = mapper.updateById(user);
-        return ret>0? ReturnResp.success(): ReturnResp.fail();
+        return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }
-
 
     @Override
     public ReturnResp getOne(Integer userId) {
@@ -44,17 +42,18 @@ public class UserServiceImpl implements UserService {
         return ReturnResp.success(user);
     }
 
-
     @Override
     public PageResp page(PageReq<User> pageReq) {
         Page<User> page = new Page<>(pageReq.getOffset(), pageReq.getPageSize());
 
-        EntityWrapper<User> wrapper = new EntityWrapper<>();
-        wrapper.like("name", "%" + pageReq.getData().getName() + "%");
-        List<User> list = mapper.selectPage(page, wrapper);
-        Integer total = mapper.selectCount(wrapper);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        if (pageReq.getData() != null && pageReq.getData().getName() != null) {
+            wrapper.like(User::getName, pageReq.getData().getName());
+        }
+        Page<User> userPage = mapper.selectPage(page, wrapper);
+        List<User> records = userPage.getRecords();
 
-        return PageResp.page(pageReq.getOffset(), pageReq.getPageSize(), total, list);
+        return PageResp.page(pageReq.getOffset(), pageReq.getPageSize(), (int) userPage.getTotal(), records);
     }
 
     @Override
@@ -65,14 +64,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public ReturnResp delete(List<Integer> ids) {
         Integer ret = mapper.deleteBatchIds(ids);
-        return ret>0? ReturnResp.success(): ReturnResp.fail();
+        return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }
 
     @Override
     public User login(User user) {
-        EntityWrapper<User> wrapper = new EntityWrapper<>();
-        wrapper.eq("username", user.getUsername()).eq("password", user.getPassword());
-        List<User> patientList = mapper.selectList(wrapper);
-        return CollectionUtils.isEmpty(patientList) ? null : patientList.get(0);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, user.getUsername()).eq(User::getPassword, user.getPassword());
+        List<User> userList = mapper.selectList(wrapper);
+        return CollectionUtils.isEmpty(userList) ? null : userList.get(0);
     }
 }
