@@ -533,7 +533,7 @@ export default {
   justify-content: center;
   padding: 20px;
   background:
-    linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0.25)),
+    linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),
     url("~@/assets/images/login_bg.jpg");
   background-size: cover;
   background-position: center;
