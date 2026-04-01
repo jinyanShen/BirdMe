@@ -88,7 +88,7 @@ export default {
   --text-color: #333;
   --text-light: #666;
   --background-light: #e0f7fa;
-  --white: #fff;
+  --white: #ffffff;
   --border-color: #b2ebf2;
 }
 

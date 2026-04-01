@@ -5,7 +5,7 @@
       <div class="login-left">
         <div class="brand-section">
           <h1 class="brand-name">BIRDME</h1>
-          <p class="brand-slogan">Intelligent Bird Identification System</p>
+          <p class="brand-slogan">A Website for Bird Rescue and Migration Monitoring</p>
           <div class="brand-image">
             <img src="@/assets/images/bg.jpg" alt="Bird">
           </div>
@@ -16,7 +16,7 @@
       <div class="login-right">
         <div class="login-card">
           <div class="login-header">
-            <h2>Welcome Back</h2>
+            <h2>Welcome Back :)</h2>
             <p>Please log in to your account</p>
           </div>
 
@@ -176,7 +176,7 @@ export default {
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
                 this.$message.success("Login successful")
-                
+
                 // Redirect based on user role
                 if (res.data.role === 1) {
                   // Admin user - redirect to admin panel
@@ -341,11 +341,11 @@ export default {
     .brand-name {
       font-size: 52px;
       font-weight: 800;
-      color: var(--white);
+      color: #111439;
       margin-bottom: 20px;
       letter-spacing: 5px;
       text-transform: uppercase;
-      text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      text-shadow: 0 4px 15px rgb(255, 255, 255);
       animation: slideInLeft 0.8s ease;
     }
 
