@@ -74,7 +74,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <i class="input-icon">🔒</i>
+                <i class="input-icon fas fa-lock"></i> <!-- 锁图标 -->
                 <el-input
                   ref="password"
                   v-model="loginForm.password"
@@ -87,15 +87,12 @@
                   @input="onFieldInput('password')"
                   @keyup.enter.native="handleLogin"
                 >
-                  <template slot="suffix">
-                    <button
-                      class="password-toggle"
-                      type="button"
-                      :aria-label="passwordVisible ? 'Hide password' : 'Show password'"
+                  <template #suffix>
+                    <i
+                      :class="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                      style="cursor: pointer; color: #999; font-size: 16px;"
                       @click="togglePasswordVisible"
-                    >
-                      {{ passwordVisible ? '🙈' : '👁️' }}
-                    </button>
+                    ></i>
                   </template>
                 </el-input>
               </div>
@@ -243,8 +240,8 @@ export default {
           isMain: false,
           variant: 'yellow',
           shape: 'semicircle', // 半圆
-          offsetX: -160,
-          offsetY: 40,
+          offsetX: -140,
+          offsetY: 20,
           scale: 0.9,
           height: 200,
           eyeTop: 50
@@ -262,6 +259,9 @@ export default {
         }
       ]
     }
+  },
+  mounted() {
+    this.normalizeCharacterHeight();
   },
   methods: {
     // 鼠标在整个面板移动
@@ -517,13 +517,13 @@ export default {
 <style lang="scss" scoped>
 /* 全局样式变量 */
 :root {
-  --primary-color: #22b3c1;
-  --secondary-color: #4dd0e1;
+  --primary-color: #8aa8e2;
+  --secondary-color: #9ab5e2;
   --text-color: #333;
   --text-light: #666;
   --background-light: #e0f7fa;
   --white: #fff;
-  --border-color: #b2ebf2;
+  --border-color: #949bca;
 }
 
 .login-page {
@@ -531,9 +531,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
   padding: 20px;
-  font-family: 'Poppins', sans-serif;
+  background:
+    linear-gradient(rgba(255,255,255,0.25), rgba(255,255,255,0.25)),
+    url("~@/assets/images/login_bg.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .login-wrapper {
@@ -544,14 +548,14 @@ export default {
   background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
   border-radius: 30px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(34, 179, 193, 0.25);
+  box-shadow: 0 20px 60px rgb(81, 73, 117);
   animation: fadeIn 0.5s ease;
 }
 
 /* 左侧品牌区域 */
 .login-left {
   flex: 1;
-  background: linear-gradient(135deg, #2284c1 0%, #5ca9da 50%, #b9e8f3 100%);
+  background: linear-gradient(135deg, #7295e3 0%, #90afe3 50%, #f1f4f8 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -583,7 +587,7 @@ export default {
     .brand-name {
       font-size: 52px;
       font-weight: 800;
-      color: #111439;
+      color: #303351;
       margin-bottom: 20px;
       letter-spacing: 5px;
       text-transform: uppercase;
@@ -644,10 +648,10 @@ export default {
       left: 50%;
       bottom: 0;
       transform: translate(-50%, 0)
-        translate(var(--char-x, 0px), var(--char-y, 0px))
-        scale(var(--char-scale, 1))
-        translate(var(--head-x, 0px), var(--head-y, 0px))
-        translateZ(0);
+      translate(var(--char-x, 0px), var(--char-y, 0px))
+      scale(var(--char-scale, 1))
+      translate(var(--head-x, 0px), var(--head-y, 0px))
+      translateZ(0);
       transform-origin: 50% 100%; // 固定底部中心，确保底边不动
       will-change: transform, filter;
       user-select: none;
@@ -720,9 +724,10 @@ export default {
       overflow: visible;
 
       // 伸脖子：仅向上拉伸，底边不动
-      transform:
-        scaleY(calc(1 + var(--stretch, 0) * 0.12))
-        skewY(calc(var(--stretch, 0) * -6deg));
+      --skew: calc(var(--stretch) * -6deg);
+      --scale: calc(1 + var(--stretch) * 0.12);
+
+      transform: scaleY(var(--scale)) skewY(var(--skew));
     }
 
     .character.is-away .monster {
@@ -811,29 +816,29 @@ export default {
       border-radius: 50%;
       background: rgba(35, 35, 35, 0.95);
       transform: translate(-50%, -50%)
-        translate(calc(var(--gaze-x, 0) * 6px), calc(var(--gaze-y, 0) * 4px));
+      translate(calc(var(--gaze-x, 0) * 6px), calc(var(--gaze-y, 0) * 4px));
       transition: transform 120ms ease;
     }
 
     .character.is-away .pupil {
       transform: translate(-50%, -50%)
-        translate(calc(var(--gaze-x, 0) * 9px), calc(var(--gaze-y, 0) * 6px));
+      translate(calc(var(--gaze-x, 0) * 9px), calc(var(--gaze-y, 0) * 6px));
     }
 
     .character--purple {
-      --char-body: #6a4cff;
+      --char-body: #836fe6;
     }
 
     .character--black {
-      --char-body: #1f2328;
+      --char-body: #77b3dd;
     }
 
     .character--yellow {
-      --char-body:rgb(183, 242, 74);
+      --char-body: rgb(241, 217, 119);
     }
 
     .character--orange {
-      --char-body: #ff9a56;
+      --char-body: #f1a482;
     }
   }
 }
@@ -853,13 +858,13 @@ export default {
     background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
     border-radius: 20px;
     padding: 40px;
-    box-shadow: 0 10px 30px rgba(34, 179, 193, 0.12);
+    box-shadow: 0 10px 30px rgb(52, 55, 104);
     transition: transform 0.3s ease;
-    border: 2px solid #b2ebf2;
+    border: 2px solid #98b4e4;
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 0 15px 35px rgba(34, 179, 193, 0.2);
+      box-shadow: 0 15px 35px rgba(48, 51, 99, 0.2);
     }
 
     .login-header {
@@ -904,18 +909,31 @@ export default {
           z-index: 1;
         }
 
+        ::v-deep .el-input {
+          .el-input__suffix {
+            display: flex;
+            align-items: center;
+            right: 12px; // 与右边距保持距离
+          }
+
+          .el-input__suffix-inner {
+            display: flex;
+            align-items: center;
+          }
+        }
+
         ::v-deep .el-input__inner {
           padding-left: 50px;
           height: 55px;
           border-radius: 12px;
-          border: 2px solid #b2ebf2;
+          border: 2px solid #b2bff2;
           font-size: 14px;
           transition: all 0.3s ease;
           background: #e0f7fa;
 
           &:focus {
-            border-color: #4dd0e1;
-            box-shadow: 0 0 0 4px rgba(77, 208, 225, 0.2);
+            border-color: #4d66e1;
+            box-shadow: 0 0 0 4px rgba(77, 97, 225, 0.2);
             background: #ffffff;
           }
         }
@@ -989,7 +1007,7 @@ export default {
       display: flex;
       align-items: center;
       margin: 30px 0;
-      color: #22b3c1;
+      color: #4d7cd6;
       font-size: 14px;
       font-weight: 500;
 
@@ -998,7 +1016,7 @@ export default {
         content: '';
         flex: 1;
         height: 2px;
-        background: linear-gradient(90deg, transparent, #4dd0e1, transparent);
+        background: linear-gradient(90deg, transparent, #4d77e1, transparent);
       }
 
       span {
@@ -1016,7 +1034,7 @@ export default {
 
 /* 按钮样式 */
 .main-button {
-  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
+  background: linear-gradient(135deg, #465ccd 0%, #5885e4 100%);
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -1024,13 +1042,13 @@ export default {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 6px 20px rgba(34, 179, 193, 0.35);
+  box-shadow: 0 6px 20px rgba(34, 79, 193, 0.35);
   width: 100%;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(34, 179, 193, 0.45);
-    background: linear-gradient(135deg, #0097a7 0%, #80deea 100%);
+    box-shadow: 0 10px 25px rgba(34, 90, 193, 0.45);
+    background: linear-gradient(135deg, #4559c6 0%, #80a5ea 100%);
   }
 
   &:disabled {
@@ -1043,8 +1061,8 @@ export default {
 
 .border-button {
   background: transparent;
-  color: #22b3c1;
-  border: 2px solid #22b3c1;
+  color: #226cc1;
+  border: 2px solid #2d66ba;
   border-radius: 12px;
   padding: 13px 30px;
   font-weight: 600;
@@ -1053,10 +1071,10 @@ export default {
   width: 100%;
 
   &:hover {
-    background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
+    background: linear-gradient(135deg, #225ac1 0%, #6499df 100%);
     color: #ffffff;
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(34, 179, 193, 0.35);
+    box-shadow: 0 6px 20px rgba(34, 98, 193, 0.35);
   }
 }
 
@@ -1122,21 +1140,21 @@ export default {
     ::v-deep .el-input__inner {
       height: 50px;
       border-radius: 10px;
-      border: 2px solid #b2ebf2;
+      border: 2px solid #b2d2f2;
       font-size: 14px;
       transition: all 0.3s ease;
       background: #e0f7fa;
 
       &:focus {
-        border-color: #4dd0e1;
-        box-shadow: 0 0 0 4px rgba(77, 208, 225, 0.2);
+        border-color: #4d8de1;
+        box-shadow: 0 0 0 4px rgba(77, 112, 225, 0.2);
         background: #ffffff;
       }
     }
   }
 
   .upload-area {
-    border: 2px dashed #b2ebf2;
+    border: 2px dashed #b2d0f2;
     border-radius: 15px;
     padding: 35px 20px;
     text-align: center;
@@ -1150,8 +1168,8 @@ export default {
 
     &:hover,
     &.drag-over {
-      border-color: #4dd0e1;
-      background-color: rgba(77, 208, 225, 0.1);
+      border-color: #4d92e1;
+      background-color: rgba(56, 83, 172, 0.1);
     }
 
     .upload-placeholder {
@@ -1219,7 +1237,7 @@ export default {
   justify-content: flex-end;
   gap: 15px;
   padding: 20px 30px;
-  border-top: 1px solid #b2ebf2;
+  border-top: 1px solid #b2d7f2;
 
   button {
     padding: 12px 35px;
@@ -1271,27 +1289,27 @@ export default {
 @keyframes floatBob {
   0% {
     transform: translate(-50%, 0)
-      translate(var(--char-x, 0px), var(--char-y, 0px))
-      scale(var(--char-scale, 1))
-      translate(var(--head-x, 0px), var(--head-y, 0px))
-      translateY(0)
-      translateZ(0);
+    translate(var(--char-x, 0px), var(--char-y, 0px))
+    scale(var(--char-scale, 1))
+    translate(var(--head-x, 0px), var(--head-y, 0px))
+    translateY(0)
+    translateZ(0);
   }
   50% {
     transform: translate(-50%, 0)
-      translate(var(--char-x, 0px), var(--char-y, 0px))
-      scale(var(--char-scale, 1))
-      translate(var(--head-x, 0px), var(--head-y, 0px))
-      translateY(-8px)
-      translateZ(0);
+    translate(var(--char-x, 0px), var(--char-y, 0px))
+    scale(var(--char-scale, 1))
+    translate(var(--head-x, 0px), var(--head-y, 0px))
+    translateY(-8px)
+    translateZ(0);
   }
   100% {
     transform: translate(-50%, 0)
-      translate(var(--char-x, 0px), var(--char-y, 0px))
-      scale(var(--char-scale, 1))
-      translate(var(--head-x, 0px), var(--head-y, 0px))
-      translateY(0)
-      translateZ(0);
+    translate(var(--char-x, 0px), var(--char-y, 0px))
+    scale(var(--char-scale, 1))
+    translate(var(--head-x, 0px), var(--head-y, 0px))
+    translateY(0)
+    translateZ(0);
   }
 }
 
