@@ -91,9 +91,7 @@ export default {
   methods: {
     loadReports() {
       this.loading = true
-      const userId = sessionStorage.getItem('id')
-
-      getReportsBySubmitter(userId).then(response => {
+      getReportsBySubmitter("user").then(response => {
         if (response.code === 200) {
           this.reports = response.data || []
         } else {
