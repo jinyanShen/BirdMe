@@ -1,7 +1,7 @@
 package com.java.birdme.service.impl;
 
-import com.baomidou.mybatisplus.mapper.EntityWrapper;
-import com.baomidou.mybatisplus.plugins.Page;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.birdme.bean.Address;
 import com.java.birdme.bean.PageReq;
 import com.java.birdme.bean.PageResp;
@@ -11,6 +11,8 @@ import com.java.birdme.service.AddressService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 
 import java.util.List;
 
@@ -33,7 +35,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public ReturnResp update(Address address) {
         int ret = mapper.updateById(address);
-        return ret>0? ReturnResp.success(): ReturnResp.fail();
+        return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }
 
     @Override
@@ -42,26 +44,31 @@ public class AddressServiceImpl implements AddressService {
         return ReturnResp.success(address);
     }
 
+
     @Override
     public PageResp page(PageReq<Address> pageReq) {
         Page<Address> page = new Page<>(pageReq.getOffset(), pageReq.getPageSize());
 
-        EntityWrapper<Address> wrapper = new EntityWrapper<>();
+        QueryWrapper<Address> wrapper = new QueryWrapper<>();
         if (pageReq.getData() != null && pageReq.getData().getUserId() != null) {
             wrapper.eq("user_id", pageReq.getData().getUserId());
         }
-        List<Address> list = mapper.selectPage(page, wrapper);
-        Integer total = mapper.selectCount(wrapper);
+
+        mapper.selectPage(page, wrapper);
+
+        List<Address> list = page.getRecords();
+        Integer total = (int) page.getTotal();
 
         return PageResp.page(pageReq.getOffset(), pageReq.getPageSize(), total, list);
     }
 
     @Override
     public ReturnResp getByUserId(Integer userId) {
-        EntityWrapper<Address> wrapper = new EntityWrapper<>();
+        QueryWrapper<Address> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
-        wrapper.orderBy("is_default", false);
-        wrapper.orderBy("created_at", false);
+        wrapper.orderByDesc("is_default");
+        wrapper.orderByDesc("created_at");
+
         List<Address> list = mapper.selectList(wrapper);
         return ReturnResp.success(list);
     }
@@ -69,15 +76,16 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public ReturnResp delete(List<Integer> ids) {
         Integer ret = mapper.deleteBatchIds(ids);
-        return ret>0? ReturnResp.success(): ReturnResp.fail();
+        return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }
 
     @Override
     @Transactional
     public ReturnResp setDefault(Integer addressId, Integer userId) {
         // Set all addresses of this user to non-default
-        EntityWrapper<Address> wrapper = new EntityWrapper<>();
+        QueryWrapper<Address> wrapper = new QueryWrapper<>();
         wrapper.eq("user_id", userId);
+
         Address updateObj = new Address();
         updateObj.setIsDefault(0);
         mapper.update(updateObj, wrapper);
