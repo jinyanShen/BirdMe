@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import MainMenu from '@/views/mainmenu/mainmenu.vue'  // 导入你的首页组件
 
 Vue.use(Router)
 
@@ -8,6 +9,14 @@ import Layout from '@/layout'
 import AdminLayout from '@/layout/admin'
 
 export const constantRoutes = [
+  // 添加首页路由 - 放在最前面
+  {
+    path: '/',
+    component: MainMenu,  // 直接使用你的 mainmenu 组件
+    name: 'MainMenu',
+    meta: { title: '鸟类保护主页' },
+    hidden: true  // 不在菜单中显示
+  },
   {
     path: '/login',
     component: () => import('@/views/login/index'),
@@ -28,6 +37,7 @@ export const constantRoutes = [
       }
     ]
   },
+  // ... 其他路由保持不变，不用动
   {
     path: '/center',
     component: Layout,
@@ -56,7 +66,6 @@ export const constantRoutes = [
       }
     ]
   },
-
   {
     path: '/admin',
     component: AdminLayout,
@@ -98,12 +107,10 @@ export const constantRoutes = [
 ]
 
 export const errorRoutes = [
-  // 404页必须放在末尾！
   { path: '*', redirect: '/404', hidden: true }
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })

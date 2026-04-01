@@ -1,0 +1,898 @@
+<script>
+import bgGif from '@/assets/images/bg.gif'
+
+export default {
+  name: 'MainMenu',
+  data() {
+    return {
+      showAnimation: true,
+      leftClouds: [],
+      rightClouds: [],
+      bgGif: bgGif,
+      showNavbar: false,
+
+      newsList: [
+        {
+          id: 1,
+          title: '春季鸟类迁徙保护行动',
+          description: '全国多地开展鸟类迁徙通道保护工作，志愿者招募中',
+          image: 'https://picsum.photos/800/400?random=1'
+        },
+        {
+          id: 2,
+          title: '新增3个鸟类自然保护区',
+          description: '保护面积扩大2000公顷，为候鸟提供更多栖息地',
+          image: 'https://picsum.photos/800/400?random=2'
+        },
+        {
+          id: 3,
+          title: 'AI鸟类识别系统上线',
+          description: '拍照即可识别500+种鸟类，准确率达95%',
+          image: 'https://picsum.photos/800/400?random=3'
+        }
+      ]
+    }
+  },
+  mounted() {
+    this.generateClouds()
+    this.initScrollAnimation()
+    // setTimeout(() => {
+    //   const elements = document.querySelectorAll('.fade-in-up')
+    //   elements.forEach(el => {
+    //     el.classList.add('visible')
+    //   })
+    // }, 2000)
+  },
+  methods: {
+    goToNews(id) {
+      console.log('点击新闻', id)
+      // 跳转到新闻详情页
+      // this.$router.push(`/news/${id}`)
+      // 或者打开新窗口
+      // window.open(`https://example.com/news/${id}`, '_blank')
+    },
+
+    generateClouds() {
+      const leftClouds = []
+      const rightClouds = []
+
+      // 左边云朵配置
+      const leftPositions = [-10,-20,-30,-10,-20,-30,-10,-20,-30,0]
+      // 右边云朵配置
+      const rightPositions = [40,50,50,30,50,20,40,50,60,30]
+      // 垂直位置
+      const leftTopPositions = [-40, -20, 0, 20, 40, -30, -10, 10, 30, 50]
+      const rightTopPositions = [-35, -15, 5, 25, 45, -25, -5, 15, 35, 55]
+
+      for (let i = 0; i < 10; i++) {
+        leftClouds.push({
+          id: `left-${i}`,
+          left: leftPositions[i],
+          top: leftTopPositions[i],
+          delay: i * 0.3,
+          duration: 5,
+          width:1200,
+          height: 750,
+          opacity: 0.95,
+          direction: 'left',
+          image: require('@/assets/images/cloud1.png')
+        })
+      }
+
+      for (let i = 0; i < 10; i++) {
+        rightClouds.push({
+          id: `right-${i}`,
+          left: rightPositions[i],
+          top: rightTopPositions[i],
+          delay: i * 0.3,
+          duration: 5,
+          width: 1200,
+          height: 750,
+          opacity: 0.95,
+          direction: 'right',
+          image: require('@/assets/images/cloud1.png')
+        })
+      }
+
+      this.leftClouds = leftClouds
+      this.rightClouds = rightClouds
+    },
+    onCloudAnimationEnd() {
+      setTimeout(() => {
+        this.showAnimation = false
+        this.$nextTick(() => {
+          this.handleScroll()
+        })
+      }, 1000)
+    },
+
+    initScrollAnimation() {
+      // 获取滚动容器
+      const scrollContainer = document.querySelector('.main-content')
+      if (scrollContainer) {
+        scrollContainer.addEventListener('scroll', this.handleScroll)
+      }
+      this.handleScroll()
+    },
+
+    handleScroll() {
+      const scrollContainer = document.querySelector('.main-content')
+      const scrollTop = scrollContainer ? scrollContainer.scrollTop : 0
+
+      // 控制顶栏显示
+      this.showNavbar = scrollTop > 100
+
+      // 控制 content-below 内部内容的逐渐显示
+      const contentBelowChildren = document.querySelectorAll('.content-below > *')
+      if (contentBelowChildren.length > 0) {
+        const maxScroll = 1200
+        let opacity = scrollTop / maxScroll
+
+        opacity = Math.min(opacity, 1)
+
+        // 为每个子元素设置不同的偏移距离
+        contentBelowChildren.forEach((child, index) => {
+          child.style.opacity = opacity
+          let translateY = 50 - (scrollTop / maxScroll) * 50
+          translateY = Math.max(translateY, 0)
+          child.style.transform = `translateY(${translateY * (1 - index * 0.2)}px)`
+        })
+      }
+
+      // 下面的 fade-in-up 逻辑保持不变
+      const elements = document.querySelectorAll('.fade-in-up')
+      const windowHeight = window.innerHeight
+
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect()
+        if (rect.top < windowHeight + 100) {
+          el.classList.add('visible')
+        }
+      })
+    }
+  },
+
+  beforeDestroy() {
+    const scrollContainer = document.querySelector('.main-content')
+    if (scrollContainer) {
+      scrollContainer.removeEventListener('scroll', this.handleScroll)
+    }
+  }
+}
+</script>
+
+<template>
+  <div class="bird-home-container">
+    <!-- 开场动画遮罩层 -->
+    <div v-if="showAnimation" class="opening-animation">
+      <div class="sky-bg"></div>
+
+      <!-- 文字内容 -->
+      <div class="welcome-text">
+        <h1>BirdME</h1>
+        <p>Group2_TOT</p>
+      </div>
+
+      <!-- 左边云朵层 -->
+      <div class="clouds-layer">
+        <div
+          v-for="cloud in leftClouds"
+          :key="cloud.id"
+          class="cloud cloud-left"
+          :style="{
+            left: cloud.left + '%',
+            top: cloud.top + '%',
+            width: cloud.width + 'px',
+            height: cloud.height + 'px',
+            opacity: cloud.opacity,
+            animationDelay: cloud.delay + 's',
+            animationDuration: cloud.duration + 's'
+          }"
+          @animationend="onCloudAnimationEnd"
+        >
+          <img :src="cloud.image" alt="cloud" style="width: 100%; height: 100%; object-fit: fill;">
+        </div>
+      </div>
+
+      <!-- 右边云朵层 -->
+      <div class="clouds-layer">
+        <div
+          v-for="cloud in rightClouds"
+          :key="cloud.id"
+          class="cloud cloud-right"
+          :style="{
+            left: cloud.left + '%',
+            top: cloud.top + '%',
+            width: cloud.width + 'px',
+            height: cloud.height + 'px',
+            opacity: cloud.opacity,
+            animationDelay: cloud.delay + 's',
+            animationDuration: cloud.duration + 's'
+          }"
+          @animationend="onCloudAnimationEnd"
+        >
+          <img :src="cloud.image" alt="cloud" style="width: 100%; height: 100%; object-fit: contain; transform: scaleX(-1);">        </div>
+      </div>
+    </div>
+
+    <!-- 主页面内容，开场动画结束后显示 -->
+    <div class="main-content" :class="{ 'visible': !showAnimation }">
+      <!-- 顶部导航栏 -->
+      <div class="top-navbar" :class="{ 'navbar-visible': showNavbar }">
+        <div class="navbar-container">
+          <div class="logo">
+            <h3>BirdME</h3>
+          </div>
+          <div class="nav-menu">
+            <router-link to="/" class="nav-item">Homepage</router-link>
+            <a href="#knowledge" class="nav-item">Knowledge</a>
+            <a href="#rescur" class="nav-item">Rescue</a>
+            <a href="#forum" class="nav-item">Forum</a>
+            <a href="#game" class="nav-item">Game</a>
+            <router-link to="/login" class="nav-item login-btn">Login</router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-container">
+        <img :src="bgGif" alt="background" class="top-image">
+        <div class="overlay-text">
+          <h2>没想好写什么</h2>
+          <p>没想好写什么你们快想想呀><</p>
+        </div>
+      </div>
+
+      <div class="content-below">
+
+        <!-- 轮播图容器 -->
+        <div class="carousel-section fade-in-up">
+          <h3>鸟类保护新闻</h3>
+          <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
+            <el-carousel-item v-for="(item, index) in newsList" :key="index">
+              <div class="carousel-item" @click="goToNews(item.id)">
+                <img :src="item.image" :alt="item.title">
+                <div class="carousel-overlay">
+                  <h4>{{ item.title }}</h4>
+                  <p>{{ item.description }}</p>
+                  <span class="read-more">点击查看详情 →</span>
+                </div>
+              </div>
+            </el-carousel-item>
+          </el-carousel>
+        </div>
+
+        <div class="knowledge-cards-wrapper">
+          <div class="section fade-in-up">
+            <h3>Knowledge Part</h3>
+            <p>简介还没写</p>
+            <div class="section-divider"></div>
+          </div>
+
+          <div class="cards-container">
+            <div class="card fade-in-up">
+              <i class="el-icon-camera"></i>
+              <h4>Identification</h4>
+              <p>AI智能识别鸟类品种</p>
+              <button class="btn">开始识别</button>
+            </div>
+
+            <div class="card fade-in-up">
+              <i class="el-icon-location-information"></i>
+              <h4>MigrationMap</h4>
+              <p>鸟类迁徙路线地图</p>
+              <button class="btn">查看地图</button>
+            </div>
+
+            <div class="card fade-in-up">
+              <i class="el-icon-info"></i>
+              <h4>Tips</h4>
+              <p>鸟类保护小贴士</p>
+              <button class="btn">了解更多</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+/* 根容器 */
+.bird-home-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* 开场动画容器 */
+.opening-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  overflow: hidden;
+
+  /* 蓝天背景 */
+  .sky-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #bfd2f8 0%, #d2d9f4 50%, #dadff6 100%);
+  }
+
+  /* 欢迎文字 */
+  .welcome-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    opacity: 0;
+    animation: textReveal 0.6s ease-out 3s forwards;
+    pointer-events: none;
+
+    h1 {
+      font-size: 56px;
+      margin-bottom: 20px;
+      font-weight: bold;
+
+      @media (max-width: 768px) {
+        font-size: 32px;
+      }
+    }
+
+    p {
+      font-size: 24px;
+
+      @media (max-width: 768px) {
+        font-size: 18px;
+      }
+    }
+  }
+
+  /* 云朵层 */
+  .clouds-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+  }
+
+  /* 云朵基础样式 */
+  .cloud {
+    position: absolute;
+    pointer-events: none;
+    filter: drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.2));
+  }
+
+  /* 左边云朵动画 - 向左散开 */
+  .cloud-left {
+    animation: cloudMoveLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* 右边云朵动画 - 向右散开 */
+  .cloud-right {
+    animation: cloudMoveRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+}
+
+/* 主页面内容 */
+.main-content {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  z-index: 1;
+  overflow-y: auto;  /* 允许滚动 */
+  overflow-x: hidden;
+
+  &.visible {
+    opacity: 1;
+  }
+}
+
+/* 顶部图片容器 */
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+
+  .top-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+
+    h2 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+  }
+}
+
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.content-below {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 60px 20px;
+  color: white;
+
+  > * {
+    transition: opacity 0.2s linear, transform 0.2s linear;
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  .section {
+    max-width: 1200px;
+    margin: 0 auto 60px;
+    text-align: center;
+
+    h3 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+    }
+  }
+
+  .cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    margin: 0 auto 60px;
+
+    .card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      width: 280px;
+      text-align: center;
+      transition: transform 0.3s, opacity 0.6s ease-out, transform 0.6s ease-out;
+
+      &:hover {
+        transform: translateY(-10px);
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      i {
+        font-size: 48px;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      h4 {
+        font-size: 24px;
+        margin-bottom: 15px;
+      }
+
+      p {
+        font-size: 14px;
+        margin-bottom: 20px;
+        opacity: 0.9;
+      }
+
+      .btn {
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid white;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background: white;
+          color: #667eea;
+        }
+      }
+    }
+  }
+  /*每部分的框*/
+  .knowledge-cards-wrapper {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 24px;
+    padding: 40px 30px;
+    margin: 0 auto 60px;
+    max-width: 1200px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: all 0.3s;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+      border-radius: 26px;
+      z-index: -1;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    .section {
+      max-width: 1200px;
+      margin: 0 auto 40px;
+      text-align: center;
+
+      h3 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        color: white;
+      }
+
+      p {
+        font-size: 18px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .section-divider {
+        width: 1000px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+        margin: 0 auto;
+        border-radius: 2px;
+      }
+
+
+    }
+
+    .cards-container {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      .card {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 30px;
+        width: 280px;
+        text-align: center;
+        transition: transform 0.3s;
+
+        &:hover {
+          transform: translateY(-10px);
+          background: rgba(255, 255, 255, 0.25);
+        }
+
+        i {
+          font-size: 48px;
+          margin-bottom: 20px;
+          display: block;
+          color: white;
+        }
+
+        h4 {
+          font-size: 24px;
+          margin-bottom: 15px;
+          color: white;
+        }
+
+        p {
+          font-size: 14px;
+          margin-bottom: 20px;
+          opacity: 0.9;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn {
+          background: rgba(255, 255, 255, 0.3);
+          border: 1px solid white;
+          color: white;
+          padding: 8px 20px;
+          border-radius: 25px;
+          cursor: pointer;
+          transition: all 0.3s;
+
+          &:hover {
+            background: white;
+            color: #667eea;
+          }
+        }
+      }
+    }
+  }
+
+  /*轮播图容器*/
+  .carousel-section {
+    max-width: 1200px;
+    margin: 0 auto 80px;
+
+    h3 {
+      font-size: 36px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .news-carousel {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+      .carousel-item {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .carousel-overlay {
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+          padding: 40px 30px 30px;
+          color: white;
+          text-align: left;
+
+          h4 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            font-weight: bold;
+          }
+
+          p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+          }
+
+          .read-more {
+            display: inline-block;
+            font-size: 14px;
+            color: #ffd966;
+            transition: transform 0.3s;
+
+            &:hover {
+              transform: translateX(5px);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* 轮播图指示器样式 */
+::v-deep .el-carousel__indicators {
+  bottom: 20px;
+
+  .el-carousel__button {
+    width: 30px;
+    height: 3px;
+    background-color: rgba(255, 255, 255, 0.5);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+  }
+
+  .is-active .el-carousel__button {
+    background-color: #ffd966;
+  }
+}
+
+::v-deep .el-carousel__arrow {
+  background-color: rgba(0, 0, 0, 0.5);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* 左边云朵向左移动动画 */
+@keyframes cloudMoveLeft {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(-500px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 右边云朵向右移动动画 */
+@keyframes cloudMoveRight {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateX(500px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 顶部导航栏 */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+
+  &.navbar-visible {
+    transform: translateY(0);
+  }
+
+  .navbar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .logo {
+      h3 {
+        margin: 0;
+        font-size: 24px;
+        color: #8fa0ca;
+        font-weight: bold;
+      }
+    }
+
+    .nav-menu {
+      display: flex;
+      gap: 30px;
+      align-items: center;
+
+      .nav-item {
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        transition: color 0.3s;
+        cursor: pointer;
+
+        &:hover {
+          color: #f4f4f8;
+        }
+      }
+
+      .login-btn {
+        background: #6f5bb8;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+
+        &:hover {
+          background: #d4dcf6;
+          color: white;
+        }
+      }
+    }
+  }
+}
+
+/* 文字显现动画 */
+@keyframes textReveal {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .top-navbar {
+    .navbar-container {
+      padding: 10px 15px;
+
+      .logo h3 {
+        font-size: 18px;
+      }
+
+      .nav-menu {
+        gap: 15px;
+
+        .nav-item {
+          font-size: 14px;
+        }
+
+        .login-btn {
+          padding: 5px 12px;
+        }
+      }
+    }
+  }
+
+  .cloud-left {
+    animation: cloudMoveLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  }
+
+  .cloud-right {
+    animation: cloudMoveRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+  }
+
+  @keyframes cloudMoveLeft {
+    100% {
+      transform: translateX(-250px) scale(0.8);
+    }
+  }
+
+  @keyframes cloudMoveRight {
+    100% {
+      transform: translateX(250px) scale(0.8);
+    }
+  }
+}
+</style>
