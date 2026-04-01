@@ -206,7 +206,20 @@ public class FileController {
     public ResponseEntity<InputStreamResource> downloadFile(@RequestParam("id") String id, HttpServletRequest request, HttpServletResponse response) {
         try {
             String dir = UPLOAD_PATH + File.separator + id;
-            File file = Objects.requireNonNull(new File(dir).listFiles())[0];
+            File directory = new File(dir);
+            
+            // Check if directory exists
+            if (!directory.exists() || !directory.isDirectory()) {
+                return ResponseEntity.status(404).build();
+            }
+            
+            // Get files in directory
+            File[] files = directory.listFiles();
+            if (files == null || files.length == 0) {
+                return ResponseEntity.status(404).build();
+            }
+            
+            File file = files[0];
 
             // Create InputStreamResource object
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));

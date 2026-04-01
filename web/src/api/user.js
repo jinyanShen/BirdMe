@@ -52,3 +52,12 @@ export function delUser(ids) {
     data: ids
   })
 }
+
+// Get current user info
+export function getCurrentUser(id) {
+  return request({
+    url: '/user/getOne',
+    method: 'get',
+    params: { id: id}
+  })
+}

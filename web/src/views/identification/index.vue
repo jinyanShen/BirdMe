@@ -7,7 +7,7 @@
           <div class="sidebar-header">
             <h3>Bird Migration Flow</h3>
           </div>
-          
+
           <div class="filter-section">
             <label>Select Bird Species:</label>
             <el-select
@@ -44,29 +44,10 @@
           </div>
 
           <!-- Upload Section -->
-          <div class="upload-section">
-            <h4>Upload Image</h4>
-            <div class="upload-card" 
-                 :class="{ 'dragover': isDragover }"
-                 @dragover.prevent="onDragOver"
-                 @dragleave.prevent="onDragLeave"
-                 @drop.prevent="onDrop"
-                 @click="triggerFileInput">
-              <input ref="fileInput" 
-                     type="file" 
-                     class="file-input" 
-                     @change="handleImageUpload" 
-                     accept="image/*">
-              <div v-if="imageSrc" class="preview-image">
-                <img :src="imageSrc" alt="Uploaded Image">
-              </div>
-              <div v-else class="upload-content">
-                <el-button type="primary" class="upload-button">
-                  Upload Image
-                </el-button>
-              </div>
-            </div>
-          </div>
+          <UploadImg
+            @image-uploaded="handleImageUploaded"
+          />
+
 
           <!-- Identification Result -->
           <div v-if="form.name" class="result-section">
@@ -74,6 +55,91 @@
             <div class="result-card">
               <h5 class="bird-name">{{ form.name }}</h5>
               <p class="bird-description">{{ form.description }}</p>
+              <div class="protection-level" v-if="form.protectionLevel">
+                <span class="label">Protection Level:</span>
+                <span class="value">{{ form.protectionLevel }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rescue Station Search -->
+          <div v-if="form.name" class="rescue-section">
+            <h4>Nearby Rescue Stations</h4>
+            <div class="rescue-card">
+              <div class="location-input">
+                <el-input
+                  v-model="userLocation"
+                  placeholder="Enter your location or enable GPS"
+                  class="location-input"
+                >
+                  <el-button slot="append" icon="el-icon-position" @click="getCurrentLocation"></el-button>
+                </el-input>
+              </div>
+              <el-button type="primary" @click="searchNearbyStations" class="search-button">
+                Find Rescue Stations
+              </el-button>
+              <div v-if="nearbyStations.length > 0" class="stations-list">
+                <div v-for="station in nearbyStations" :key="station.id" class="station-item">
+                  <h6>{{ station.name }}</h6>
+                  <p>{{ station.address }}</p>
+                  <p>Phone: {{ station.phone }}</p>
+                  <el-button type="info" size="small" @click="selectRescueStation(station)">
+                    Select
+                  </el-button>
+                </div>
+              </div>
+              <div v-else-if="searchingStations" class="loading">
+                <el-icon class="is-loading"><i class="el-icon-loading"></i></el-icon> Searching...
+              </div>
+              <div v-else-if="!searchingStations && form.name" class="no-stations">
+                Click "Find Rescue Stations" to search nearby rescue stations
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Generation -->
+          <div v-if="form.name && selectedStation" class="report-section">
+            <h4>Generate Rescue Report</h4>
+            <div class="report-card">
+              <el-form :model="reportForm" label-width="100px">
+                <el-form-item label="Injury Type">
+                  <el-select v-model="reportForm.injuryType" placeholder="Select injury type">
+                    <el-option label="Broken Wing" value="Broken Wing"></el-option>
+                    <el-option label="Injured Leg" value="Injured Leg"></el-option>
+                    <el-option label="Illness" value="Illness"></el-option>
+                    <el-option label="Other" value="Other"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="Description">
+                  <el-input
+                    v-model="reportForm.injuryDescription"
+                    type="textarea"
+                    placeholder="Describe the bird's condition"
+                  ></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="submitReport">
+                    Submit Report
+                  </el-button>
+                </el-form-item>
+              </el-form>
+              <div v-if="reportSubmitted" class="report-success">
+                <el-alert
+                  title="Report submitted successfully!"
+                  type="success"
+                  :closable="false"
+                >
+                  <div slot="default">
+                    <p>Your report has been sent to {{ selectedStation.name }}</p>
+                    <p>They will contact you soon.</p>
+                    <div class="report-actions">
+                      <el-button type="text" @click="goToMyReports">
+                        View My Reports
+                      </el-button>
+                    </div>
+                  </div>
+                </el-alert>
+              </div>
             </div>
           </div>
 
@@ -89,12 +155,19 @@
 </template>
 
 <script>
+import UploadImg from '@/components/UploadImg/index.vue';
+import { getNearbyStations } from '@/api/rescueStation';
+import { identifyBird } from '@/api/file';
+import { submitReport } from '@/api/report';
+
 export default {
+  components: {
+    UploadImg
+  },
   data() {
     return {
       imageSrc: '',
       form: {},
-      isDragover: false,
       migrationData: null,
       velocityData: null,
       birdList: null,
@@ -114,63 +187,46 @@ export default {
       animationId: null,
       field: null,
       bounds: null,
-      baseLayer: null
+      baseLayer: null,
+      // Rescue station and report related data
+      userLocation: '',
+      nearbyStations: [],
+      searchingStations: false,
+      selectedStation: null,
+      reportForm: {
+        injuryType: '',
+        injuryDescription: ''
+      },
+      reportSubmitted: false,
+      userLatitude: null,
+      userLongitude: null,
+      userId: sessionStorage.getItem("id")
     }
   },
   methods: {
-    handleImageUpload(event) {
-      const file = event.target.files[0];
+    handleImageUploaded(data) {
+      const { file, imageSrc } = data;
+      this.imageSrc = imageSrc;
       this.processFile(file);
-    },
-    onDragOver() {
-      this.isDragover = true;
-    },
-    onDragLeave() {
-      this.isDragover = false;
-    },
-    onDrop(event) {
-      this.isDragover = false;
-      const file = event.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        this.processFile(file);
-      } else {
-        this.$message.error("Please upload image file");
-      }
-    },
-    triggerFileInput() {
-      this.$refs.fileInput.click();
     },
     processFile(file) {
       if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.imageSrc = reader.result;
-        };
-        reader.readAsDataURL(file);
-
-        const formData = new FormData();
-        formData.append('file', file); 
-        fetch('http://localhost:8080/file/identification', {
-          method: 'POST',
-          body: formData,
-        })
-        .then(response => response.json())
-        .then(data => {
+        identifyBird(file).then(data => {
           if(data.code === 200){
             this.form = data.data
             const birdName = data.data.name
             this.selectedBird = birdName
-            
+
             console.log('Identified bird:', birdName);
-            
+
             // 确保迁移数据已加载
             this.ensureMigrationDataLoaded().then(() => {
               console.log('Migration data available:', this.migrationData);
-              
+
               // 尝试直接匹配
               this.selectedBirdData = this.migrationData[birdName];
               this.selectedVelocityData = this.velocityData[birdName];
-              
+
               // 如果直接匹配失败，尝试模糊匹配
               if (!this.selectedBirdData) {
                 console.log('Direct match failed, trying fuzzy match...');
@@ -185,9 +241,9 @@ export default {
                   }
                 }
               }
-              
+
               console.log('Selected bird data:', this.selectedBirdData);
-              
+
               if (this.selectedBirdData) {
                 console.log('Updating map...');
                 setTimeout(() => {
@@ -209,6 +265,7 @@ export default {
         this.$message.error("Please upload image");
       }
     },
+
     ensureMigrationDataLoaded() {
       return new Promise((resolve) => {
         if (this.migrationData) {
@@ -254,23 +311,23 @@ export default {
         console.error('Leaflet is not loaded');
         return;
       }
-      
+
       const mapContainer = document.getElementById('migrationMap');
       if (!mapContainer) {
         console.error('Map container not found');
         return;
       }
-      
+
       // Set explicit size for map container
       mapContainer.style.width = '100%';
       mapContainer.style.height = '500px';
       mapContainer.style.display = 'block';
       mapContainer.style.position = 'relative';
       mapContainer.style.zIndex = '1';
-      
+
       console.log('Initializing map...');
       console.log('Map container size:', mapContainer.clientWidth, 'x', mapContainer.clientHeight);
-      
+
       // 创建地图实例
       this.map = L.map('migrationMap', {
         zoomControl: false,
@@ -282,19 +339,19 @@ export default {
         boxZoom: false,
         keyboard: false
       }).setView([20, 0], 2);
-      
+
       // 添加底图图层
       // 使用Bing Maps作为底图
       this.baseLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         attribution: 'Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012',
         maxZoom: 18
       }).addTo(this.map);
-      
+
       // 监听图层加载事件
       this.baseLayer.on('load', function() {
         console.log('Map tiles loaded successfully');
       });
-      
+
       this.baseLayer.on('error', function(err) {
         console.error('Error loading map tiles:', err);
       });
@@ -311,11 +368,13 @@ export default {
         this.canvas.style.height = '100%';
         this.canvas.style.pointerEvents = 'none';
         this.canvas.style.zIndex = '1000';
-        
+        this.canvas.style.background = 'transparent';
+
         this.resizeCanvas();
         window.addEventListener('resize', this.resizeCanvas);
+        window.addEventListener('scroll', this.handleScroll);
       }
-      
+
       console.log('Map initialized successfully');
     },
     resizeCanvas() {
@@ -325,34 +384,40 @@ export default {
         this.canvas.height = container.clientHeight;
       }
     },
+    handleScroll() {
+      // 当滚动时，重新绘制粒子
+      if (this.ctx && this.canvas) {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+    },
     updateMap() {
       if (!this.selectedBirdData) return;
-      
+
       console.log('Updating map for bird:', this.selectedBird);
       console.log('Bird data:', this.selectedBirdData);
-      
+
       // 确保地图已初始化
       if (!this.map) {
         this.initMap();
       }
-      
+
       // 检查地图是否初始化成功
       if (!this.map) {
         console.error('Map not initialized, cannot update');
         return;
       }
-      
+
       this.clearMap();
-      
+
       const allPoints = [];
       const allCountries = new Set();
-      
+
       Object.keys(this.selectedBirdData.routes).forEach((routeKey, routeIndex) => {
         const route = this.selectedBirdData.routes[routeKey];
         const points = route.points;
-        
 
-        
+
+
         points.forEach((point, pointIndex) => {
           allPoints.push([point.lat, point.lng]);
           if (point.country) {
@@ -365,22 +430,44 @@ export default {
         console.log('All points:', allPoints);
         this.bounds = L.latLngBounds(allPoints);
         console.log('Bounds:', this.bounds);
-        
+
         // 确保地图容器存在且有大小
         const mapContainer = document.getElementById('migrationMap');
+        const flowCanvas = document.getElementById('flowCanvas');
         if (mapContainer && mapContainer.clientWidth > 0 && mapContainer.clientHeight > 0) {
+          console.log('Map container size:', mapContainer.clientWidth, 'x', mapContainer.clientHeight);
+          console.log('Map container position:', mapContainer.getBoundingClientRect());
+          if (flowCanvas) {
+            console.log('Canvas size:', flowCanvas.width, 'x', flowCanvas.height);
+            console.log('Canvas position:', flowCanvas.getBoundingClientRect());
+          }
+
           // 自动调整地图视图到迁徙区域
           this.map.fitBounds(this.bounds, { padding: [50, 50] });
-          
+
           // 强制地图重绘
           setTimeout(() => {
             if (this.map) {
               this.map.invalidateSize();
+              // 再次调整地图视图，确保完全适应
+              this.map.fitBounds(this.bounds, { padding: [50, 50] });
+
+              setTimeout(() => {
+                // 重新调整画布大小
+                this.resizeCanvas();
+                // 清除画布
+                if (this.ctx) {
+                  this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                }
+                // 再次检查画布大小
+                if (flowCanvas) {
+                  console.log('Canvas size after resize:', flowCanvas.width, 'x', flowCanvas.height);
+                }
+                this.createVelocityField();
+                this.startAnimation();
+              }, 100);
             }
-          }, 100);
-          
-          this.createVelocityField();
-          this.startAnimation();
+          }, 200);
         } else {
           console.error('Map container has no size:', mapContainer ? mapContainer.clientWidth + 'x' + mapContainer.clientHeight : 'container not found');
         }
@@ -407,7 +494,7 @@ export default {
       this.regionLayers = [];
       this.particles = [];
       this.field = null;
-      
+
       if (this.ctx) {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       }
@@ -417,7 +504,7 @@ export default {
 
       const velocityPoints = this.selectedVelocityData.velocityPoints;
       const bounds = this.selectedBirdData.bounds;
-      
+
       this.field = {
         velocityPoints: velocityPoints,
         bounds: bounds,
@@ -429,11 +516,11 @@ export default {
     },
     startAnimation() {
       this.particles = [];
-      
+
       for (let i = 0; i < this.particleCount; i++) {
         this.particles.push(this.createParticle());
       }
-      
+
       this.isPlaying = true;
       this.animate();
     },
@@ -461,45 +548,59 @@ export default {
 
       this.particles.forEach((particle, index) => {
         particle.age++;
-        
+
         if (particle.age > particle.maxAge) {
           this.particles[index] = this.createParticle();
           return;
         }
 
         const velocity = this.getVelocityAtPoint(particle.lat, particle.lng);
-        
+
         if (velocity) {
           const speed = this.animationSpeed * 0.0005;
           particle.lat += velocity.v * speed;
           particle.lng += velocity.u * speed;
-          
-          const point = this.map.latLngToContainerPoint([particle.lat, particle.lng]);
-          
-          // Check if point is within canvas bounds
-          if (point.x >= 0 && point.x <= this.canvas.width && point.y >= 0 && point.y <= this.canvas.height) {
-            const alpha = Math.sin((particle.maxAge - particle.age) / particle.maxAge * Math.PI);
-            
-            // Draw particle
-            this.ctx.beginPath();
-            this.ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
-            this.ctx.fillStyle = `rgba(14, 100, 143, ${alpha * 0.8})`;
-            this.ctx.fill();
-            
-            // Draw particle trail
-            const prevPoint = this.map.latLngToContainerPoint([
-              particle.lat - velocity.v * speed * 3,
-              particle.lng - velocity.u * speed * 3
-            ]);
-            
-            if (prevPoint.x >= 0 && prevPoint.x <= this.canvas.width && prevPoint.y >= 0 && prevPoint.y <= this.canvas.height) {
-              this.ctx.beginPath();
-              this.ctx.moveTo(prevPoint.x, prevPoint.y);
-              this.ctx.lineTo(point.x, point.y);
-              this.ctx.strokeStyle = `rgba(14, 100, 143, ${alpha * 0.5})`;
-              this.ctx.lineWidth = 1.5;
-              this.ctx.stroke();
+
+          try {
+            // 确保地图存在且已初始化
+            if (!this.map) {
+              console.error('Map not initialized');
+              return;
             }
+
+            const point = this.map.latLngToContainerPoint([particle.lat, particle.lng]);
+
+            // 检查点是否在画布范围内
+            if (point && typeof point.x === 'number' && typeof point.y === 'number') {
+              if (point.x >= 0 && point.x <= this.canvas.width && point.y >= 0 && point.y <= this.canvas.height) {
+                const alpha = Math.sin((particle.maxAge - particle.age) / particle.maxAge * Math.PI);
+
+                // Draw particle
+                this.ctx.beginPath();
+                this.ctx.arc(point.x, point.y, 2, 0, 2 * Math.PI);
+                this.ctx.fillStyle = `rgba(14, 100, 143, ${alpha * 0.8})`;
+                this.ctx.fill();
+
+                // Draw particle trail
+                const prevPoint = this.map.latLngToContainerPoint([
+                  particle.lat - velocity.v * speed * 3,
+                  particle.lng - velocity.u * speed * 3
+                ]);
+
+                if (prevPoint && typeof prevPoint.x === 'number' && typeof prevPoint.y === 'number') {
+                  if (prevPoint.x >= 0 && prevPoint.x <= this.canvas.width && prevPoint.y >= 0 && prevPoint.y <= this.canvas.height) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(prevPoint.x, prevPoint.y);
+                    this.ctx.lineTo(point.x, point.y);
+                    this.ctx.strokeStyle = `rgba(14, 100, 143, ${alpha * 0.5})`;
+                    this.ctx.lineWidth = 1.5;
+                    this.ctx.stroke();
+                  }
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error drawing particle:', error);
           }
         }
       });
@@ -513,14 +614,14 @@ export default {
       let totalWeight = 0;
       let weightedU = 0;
       let weightedV = 0;
-      
+
       const maxDistance = 10;
 
       velocityPoints.forEach(point => {
         const dLat = lat - point.lat;
         const dLng = lng - point.lng;
         const distance = Math.sqrt(dLat * dLat + dLng * dLng);
-        
+
         if (distance < maxDistance && distance > 0) {
           const weight = 1 / (distance * distance);
           totalWeight += weight;
@@ -535,20 +636,122 @@ export default {
           v: weightedV / totalWeight
         };
       }
-      
+
       return null;
+    },
+
+    /**
+     * Get user's current location using browser's geolocation API
+     */
+    getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.userLatitude = position.coords.latitude;
+            this.userLongitude = position.coords.longitude;
+            this.userLocation = `${this.userLatitude.toFixed(6)}, ${this.userLongitude.toFixed(6)}`;
+            this.$message.success('Location obtained successfully');
+          },
+          (error) => {
+            console.error('Error getting location:', error);
+            this.$message.error('Failed to get location. Please enter your location manually.');
+          }
+        );
+      } else {
+        this.$message.error('Geolocation is not supported by your browser.');
+      }
+    },
+
+    /**
+     * Search for nearby rescue stations
+     */
+    searchNearbyStations() {
+      if (!this.userLatitude || !this.userLongitude) {
+        // Use default location if user location not available
+        this.userLatitude = 40.7128; // New York
+        this.userLongitude = -74.0060;
+      }
+
+      this.searchingStations = true;
+
+      getNearbyStations(this.userLatitude, this.userLongitude, 50)
+        .then(response => {
+          if (response.code === 200) {
+            this.nearbyStations = response.data;
+          } else {
+            this.$message.error('Failed to search rescue stations');
+          }
+          this.searchingStations = false;
+        })
+        .catch(error => {
+          console.error('Error searching rescue stations:', error);
+          this.$message.error('Failed to search rescue stations');
+          this.searchingStations = false;
+        });
+    },
+
+    /**
+     * Select a rescue station
+     */
+    selectRescueStation(station) {
+      this.selectedStation = station;
+      this.$message.success(`Selected ${station.name}`);
+    },
+
+    /**
+     * Submit rescue report
+     */
+    submitReport() {
+      if (!this.selectedStation || !this.reportForm.injuryType) {
+        this.$message.error('Please select a rescue station and injury type');
+        return;
+      }
+
+      const reportData = {
+        birdName: this.form.name,
+        species: this.form.species || this.form.name,
+        latitude: this.userLatitude || 40.7128,
+        longitude: this.userLongitude || -74.0060,
+        location: this.userLocation,
+        injuryType: this.reportForm.injuryType,
+        injuryDescription: this.reportForm.injuryDescription,
+        imageUrl: this.imageSrc,
+        submitterId: this.userId,
+        rescueStationId: this.selectedStation.id
+      };
+
+      submitReport(reportData)
+      .then(data => {
+        if (data.code === 200) {
+          this.reportSubmitted = true;
+          this.$message.success('Report submitted successfully');
+        } else {
+          this.$message.error('Failed to submit report');
+        }
+      })
+      .catch(error => {
+        console.error('Error submitting report:', error);
+        this.$message.error('Failed to submit report');
+      });
+    },
+
+    /**
+     * Navigate to my reports page
+     */
+    goToMyReports() {
+      this.$router.push('/report');
     }
   },
   mounted() {
     console.log('Component mounted, initializing map...');
-    
+
     // Load migration data
     this.loadMigrationData().then(() => {
       console.log('Migration data loaded on mount');
     }).catch(error => {
       console.error('Failed to load migration data on mount:', error);
     });
-    
+
     if (typeof L !== 'undefined') {
       this.initMap();
     } else {
@@ -567,6 +770,7 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.resizeCanvas);
+    window.removeEventListener('scroll', this.handleScroll);
     this.stopAnimation();
   }
 }
@@ -609,27 +813,27 @@ export default {
   .identification-page {
     padding: 40px 0;
   }
-  
+
   .section-title h1 {
     font-size: 28px;
   }
-  
+
   .upload-card {
     padding: 40px 20px;
   }
-  
+
   .upload-icon {
     font-size: 40px;
   }
-  
+
   .upload-content h3 {
     font-size: 20px;
   }
-  
+
   .result-card {
     padding: 20px;
   }
-  
+
   .bird-name {
     font-size: 24px;
   }
@@ -639,11 +843,11 @@ export default {
   .section-title h1 {
     font-size: 24px;
   }
-  
+
   .upload-content h3 {
     font-size: 18px;
   }
-  
+
   .file-input {
     padding: 10px 20px;
     font-size: 14px;
@@ -851,10 +1055,149 @@ export default {
   margin: 0;
 }
 
+.protection-level {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+
+  .label {
+    color: #8492a6;
+    font-weight: 500;
+  }
+
+  .value {
+    color: #333;
+    text-align: right;
+    flex: 1;
+    margin-left: 10px;
+  }
+}
+
+/* Rescue Station Section */
+.rescue-section {
+  padding: 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.rescue-section h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.rescue-card {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.location-input {
+  margin-bottom: 15px;
+
+  .location-input {
+    width: 100%;
+  }
+}
+
+.search-button {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.stations-list {
+  margin-top: 15px;
+}
+
+.station-item {
+  padding: 10px;
+  border: 1px solid #eaeaea;
+  border-radius: 4px;
+  margin-bottom: 10px;
+
+  h6 {
+    margin: 0 0 5px 0;
+    color: #22b3c1;
+    font-size: 14px;
+  }
+
+  p {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+    color: #666;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.no-stations {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 13px;
+}
+
+/* Report Section */
+.report-section {
+  padding: 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.report-section h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.report-card {
+  background: white;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.report-success {
+  margin-top: 15px;
+}
+
+.report-actions {
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .station-item {
+    padding: 8px;
+
+    h6 {
+      font-size: 13px;
+    }
+
+    p {
+      font-size: 12px;
+    }
+  }
+
+  .report-card {
+    padding: 10px;
+  }
+}
+
 .map-container {
   flex: 1;
   position: relative;
   min-height: 500px;
+  height: 100%;
 
   .map {
     width: 100%;
@@ -891,12 +1234,12 @@ export default {
     flex-direction: column;
     min-height: 800px;
   }
-  
+
   .sidebar {
     width: 100%;
     max-height: 300px;
   }
-  
+
   .map-container {
     height: 500px;
   }
@@ -906,11 +1249,11 @@ export default {
   .migration-container {
     min-height: 700px;
   }
-  
+
   .sidebar {
     max-height: 250px;
   }
-  
+
   .map-container {
     height: 400px;
   }
@@ -920,11 +1263,11 @@ export default {
   .migration-container {
     min-height: 600px;
   }
-  
+
   .sidebar {
     max-height: 200px;
   }
-  
+
   .map-container {
     height: 300px;
   }
