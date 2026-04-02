@@ -340,11 +340,11 @@ export default {
     // 跳转到 Knowledge 页面
     goToKnowledge() {
       if (this.isLoggedIn) {
-        this.$router.push('/identification')
+        this.$router.push('/knowledge')
       } else {
         // 未登录，弹出登录弹窗
         if (window.$showLoginDialog) {
-          window.$showLoginDialog('/identification')
+          window.$showLoginDialog('/knowledge')
         }
       }
     },

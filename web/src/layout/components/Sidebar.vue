@@ -35,7 +35,7 @@ export default {
   methods: {
     handleSelect(key) {
         if(key==='1'){
-          this.$router.replace("/identification");
+          this.$router.replace("/knowledge");
         }
         else if(key==='2'){
           this.$router.replace("/center");

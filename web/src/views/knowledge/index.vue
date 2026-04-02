@@ -1,4 +1,366 @@
 <template>
+  <div class="knowledge-page">
+    <div class="top-navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
+        </div>
+        <div class="nav-menu">
+          <span class="nav-item" @click="goToHome">Homepage</span>
+          <span class="nav-item active" @click="goToKnowledge">Knowledge</span>
+          <span class="nav-item" @click="goToRescue">Rescue</span>
+          <span class="nav-item" @click="goToForum">Forum</span>
+          <span class="nav-item" @click="goToGame">Game</span>
+          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
+          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
+          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <!-- 子页面标签页 -->
+      <div class="knowledge-tabs">
+        <div
+          class="tab-item"
+          :class="{ active: currentTab === 'migration' }"
+          @click="switchTab('migration')"
+        >
+          <i class="el-icon-location"></i>
+          <span>Bird Migration</span>
+        </div>
+        <div
+          class="tab-item"
+          :class="{ active: currentTab === 'identification' }"
+          @click="switchTab('identification')"
+        >
+          <i class="el-icon-picture"></i>
+          <span>Bird Identification</span>
+        </div>
+      </div>
+
+      <!-- 子页面路由出口 -->
+      <router-view />
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Knowledge',
+  data() {
+    return {
+      isLoggedIn: false,
+      currentTab: 'migration'
+    }
+  },
+  methods: {
+    checkLoginStatus() {
+      this.isLoggedIn = sessionStorage.getItem('id') !== null
+    },
+
+    handleStorageChange(e) {
+      if (e.key === 'id') {
+        this.checkLoginStatus()
+      }
+    },
+
+    handleLogout() {
+      sessionStorage.removeItem('id')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('password')
+      sessionStorage.removeItem('name')
+      sessionStorage.removeItem('age')
+      sessionStorage.removeItem('phone')
+      sessionStorage.removeItem('avatarUrl')
+      sessionStorage.removeItem('role')
+
+      this.isLoggedIn = false
+      this.$message.success('Logged out successfully')
+      this.$router.push('/')
+    },
+
+    goToHome() {
+      if (this.$route.path === '/') {
+        return
+      }
+      this.$router.push('/')
+    },
+
+    goToKnowledge() {
+      // 已经在knowledge页面，刷新当前标签页
+      this.$router.go(0)
+    },
+
+    goToRescue() {
+      console.log('Rescue page - to be implemented')
+    },
+
+    goToForum() {
+      console.log('Forum page - to be implemented')
+    },
+
+    goToGame() {
+      console.log('Game page - to be implemented')
+    },
+
+    goToPersonalPage() {
+      console.log('Personal page - to be implemented')
+    },
+
+    goToLogin() {
+      if (window.$loginDialog) {
+        window.$loginDialog.show('/')
+      }
+    },
+
+    switchTab(tab) {
+      this.currentTab = tab
+      this.$router.push(`/knowledge/${tab}`)
+    }
+  },
+
+  mounted() {
+    this.checkLoginStatus()
+    window.addEventListener('storage', this.handleStorageChange)
+
+    // 根据当前路由设置currentTab
+    const path = this.$route.path
+    if (path.includes('migration')) {
+      this.currentTab = 'migration'
+    } else if (path.includes('identification')) {
+      this.currentTab = 'identification'
+    }
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('storage', this.handleStorageChange)
+  },
+
+  watch: {
+    '$route.path'(newPath) {
+      if (newPath.includes('migration')) {
+        this.currentTab = 'migration'
+      } else if (newPath.includes('identification')) {
+        this.currentTab = 'identification'
+      }
+    }
+  }
+}
+</script>
+
+<style scoped>
+.knowledge-page {
+  padding-top: 70px;
+  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  min-height: 100vh;
+}
+
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #22b3c1;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.logo h3:hover {
+  color: #1a9aa8;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  transition: color 0.3s;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+}
+
+.nav-item:hover {
+  color: #22b3c1;
+}
+
+.nav-item.active {
+  color: #22b3c1;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #22b3c1;
+  animation: slideIn 0.3s ease-out;
+}
+
+.login-btn {
+  background: #22b3c1;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+}
+
+.login-btn:hover {
+  background: #1a9aa8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+  color: white !important;
+}
+
+.logout-btn {
+  background: #ff6b6b;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  color: white !important;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.knowledge-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 16px;
+  color: #666;
+  background: #f5f7fa;
+}
+
+.tab-item i {
+  font-size: 18px;
+}
+
+.tab-item:hover {
+  background: #e0f7fa;
+  color: #22b3c1;
+}
+
+.tab-item.active {
+  background: linear-gradient(135deg, #22b3c1 0%, #1a9aa8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+}
+
+@media (max-width: 768px) {
+  .knowledge-page {
+    padding-top: 60px;
+  }
+
+  .navbar-container {
+    padding: 10px 15px;
+  }
+
+  .logo h3 {
+    font-size: 20px;
+  }
+
+  .nav-menu {
+    gap: 15px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+  }
+
+  .login-btn,
+  .logout-btn {
+    padding: 6px 15px;
+  }
+
+  .container {
+    padding: 0 15px;
+  }
+
+  .knowledge-tabs {
+    gap: 10px;
+  }
+
+  .tab-item {
+    padding: 8px 15px;
+    font-size: 14px;
+  }
+
+  .tab-item i {
+    font-size: 16px;
+  }
+}
+</style>
+
+
+<!--
+<template>
   <div class="identification-page">
     <div class="top-navbar">
       <div class="navbar-container">
@@ -18,7 +380,7 @@
     </div>
 
     <div class="container">
-      <!-- Bird Migration Flow -->
+      &lt;!&ndash; Bird Migration Flow &ndash;&gt;
       <div class="migration-container">
         <div class="sidebar">
           <div class="sidebar-header">
@@ -60,13 +422,13 @@
             </div>
           </div>
 
-          <!-- Upload Section -->
+          &lt;!&ndash; Upload Section &ndash;&gt;
           <UploadImg
             @image-uploaded="handleImageUploaded"
           />
 
 
-          <!-- Identification Result -->
+          &lt;!&ndash; Identification Result &ndash;&gt;
           <div v-if="form.name" class="result-section">
             <h4>Identification Result</h4>
             <div class="result-card">
@@ -79,7 +441,7 @@
             </div>
           </div>
 
-          <!-- Rescue Station Search -->
+          &lt;!&ndash; Rescue Station Search &ndash;&gt;
           <div v-if="form.name" class="rescue-section">
             <h4>Nearby Rescue Stations</h4>
             <div class="rescue-card">
@@ -114,7 +476,7 @@
             </div>
           </div>
 
-          <!-- Report Generation -->
+          &lt;!&ndash; Report Generation &ndash;&gt;
           <div v-if="form.name && selectedStation" class="report-section">
             <h4>Generate Rescue Report</h4>
             <div class="report-card">
@@ -1476,3 +1838,4 @@ export default {
   }
 }
 </style>
+-->
