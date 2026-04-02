@@ -436,44 +436,6 @@ export default {
       this.setNeckStretch(0)
     },
 
-    // // 登录方法
-    // handleLogin() {
-    //   this.$refs.loginForm.validate(valid => {
-    //     if (valid) {
-    //       this.loading = true
-    //       login(this.loginForm.username, this.loginForm.password)
-    //         .then(res => {
-    //           if (res.code === 200) {
-    //             sessionStorage.setItem('id', res.data.id)
-    //             sessionStorage.setItem('username', res.data.username)
-    //             sessionStorage.setItem('password', res.data.password)
-    //             sessionStorage.setItem('name', res.data.name)
-    //             sessionStorage.setItem('age', res.data.age)
-    //             sessionStorage.setItem('phone', res.data.phone)
-    //             sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
-    //             sessionStorage.setItem('role', res.data.role)
-    //             this.$message.success("Login successful")
-    //
-    //             this.dialogVisible = false
-    //
-    //             if (this.redirectPath) {
-    //               this.$router.push(this.redirectPath)
-    //             } else if (res.data.role === 1) {
-    //               this.$router.push({ path: '/admin/users' })
-    //             } else {
-    //               this.$router.push({ path: '/identification' })
-    //             }
-    //           } else {
-    //             this.loading = false
-    //             this.$message.error(res.msg)
-    //           }
-    //         })
-    //         .catch(() => {
-    //           this.loading = false
-    //         })
-    //     }
-    //   })
-    // },
     handleLogin() {
       const savedRedirectPath = this.redirectPath
       console.log('=== handleLogin called ===')
@@ -606,29 +568,36 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 /* 弹窗外层样式 */
-::v-deep .login-dialog {
-  .el-dialog {
-    background: transparent;
-    box-shadow: none;
-    border-radius: 30px;
-    overflow: hidden;
-  }
-
-  .el-dialog__header {
-    display: none;
-  }
-
-  .el-dialog__body {
-    padding: 0;
-  }
+.login-dialog.el-dialog {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 30px !important;
+  overflow: hidden !important;
+  width: fit-content !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.login-dialog .el-dialog__body {
+  padding: 0 !important;
+  background: transparent !important;
+  border-radius: 30px !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+.login-dialog .el-dialog__header {
+  display: none !important;
 }
 
 /* 所有样式从原 login 页面复制过来，去掉 .login-page 外层，保留 .login-wrapper 及内部所有样式 */
 .login-wrapper {
   display: flex;
-  width: 100%;
+  width: 1200px;        /* 固定宽度，让外壳贴合 */
   max-width: 1200px;
   min-height: 700px;
   background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
@@ -636,6 +605,8 @@ export default {
   overflow: hidden;
   box-shadow: 0 20px 60px rgb(81, 73, 117);
   animation: fadeIn 0.5s ease;
+  position: relative;   /* 必须加 */
+  margin: 0 auto;       /* 居中 */
 }
 
 /* 左侧品牌区域 */
