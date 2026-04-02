@@ -59,6 +59,19 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/game',
+    component: () => import('@/views/game/game'),
+    name: 'Game',
+    meta: { title: 'Game' }
+  },
+  {
+    path: '/game/:gameKey',
+    component: () => import('@/views/game/gameSubpage'),
+    name: 'GameSubpage',
+    hidden: true,
+    meta: { title: 'Game' }
+  },
+  {
     path: '/admin',
     component: AdminLayout,
     redirect: '/admin/dashboard',
