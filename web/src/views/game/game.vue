@@ -40,7 +40,7 @@
 
         <div class="cards-container" id="game-flappy-card">
           <div class="card">
-            <i class="el-icon-sunrise"></i>
+            <img :src="flappyImg" class="game-icon" alt="Flappy Bird">
             <h4>Flappy Bird</h4>
             <p>Easy to start, perfect your rhythm fast.</p>
             <button class="btn" @click="selectGame('flappy')">Start Game</button>
@@ -57,7 +57,7 @@
 
         <div class="cards-container" id="game-2048-card">
           <div class="card">
-            <i class="el-icon-data-analysis"></i>
+            <img :src="img2048" class="game-icon" alt="2048 Bird">
             <h4>2048 Bird</h4>
             <p>Plan your moves and climb the score ladder.</p>
             <button class="btn" @click="selectGame('2048')">Start Game</button>
@@ -74,7 +74,7 @@
 
         <div class="cards-container" id="game-merge-card">
           <div class="card">
-            <i class="el-icon-upload"></i>
+            <img :src="mergeImg" class="game-icon" alt="Merge To Giant Bird">
             <h4>Merge To Giant Bird</h4>
             <p>Strategic merges, satisfying evolution.</p>
             <button class="btn" @click="selectGame('merge')">Start Game</button>
@@ -86,11 +86,18 @@
 </template>
 
 <script>
+import flappyImg from '@/assets/images/flappy.png'
+import img2048 from '@/assets/images/2048.png'
+import mergeImg from '@/assets/images/merge.png'
+
 export default {
   name: 'Game',
   data() {
     return {
-      isLoggedIn: false
+      isLoggedIn: false,
+      flappyImg,
+      img2048,
+      mergeImg
     }
   },
   mounted() {
@@ -377,11 +384,14 @@ export default {
       background: rgba(255, 255, 255, 0.25);
     }
 
-    i {
-      font-size: 48px;
-      margin-bottom: 20px;
+    .game-icon {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin: 0 auto 24px;
       display: block;
-      color: white;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
     }
 
     h4 {
