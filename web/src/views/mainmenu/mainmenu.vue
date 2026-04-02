@@ -77,7 +77,7 @@
 <!--      this.$message.success('Logged out successfully')-->
 
 <!--      // 如果当前在需要登录的页面，跳转到首页-->
-<!--      const needAuthPages = ['/identification', '/center', '/report']-->
+<!--      const needAuthPages = ['/identification', '/center', '/report'，'/game']-->
 <!--      if (needAuthPages.includes(this.$route.path)) {-->
 <!--        this.$router.push('/')-->
 <!--      }-->
@@ -287,7 +287,7 @@ export default {
         {
           id: 3,
           title: 'AI鸟类识别系统上线',
-          description: '拍照即可识别500+种鸟类，准确率达95%',
+          description: '拍照即可识别500+种鸟类',
           image: 'https://picsum.photos/800/400?random=3'
         }
       ]
@@ -340,11 +340,11 @@ export default {
     // 跳转到 Knowledge 页面
     goToKnowledge() {
       if (this.isLoggedIn) {
-        this.$router.push('/identification')
+        this.$router.push('/knowledge')
       } else {
         // 未登录，弹出登录弹窗
         if (window.$showLoginDialog) {
-          window.$showLoginDialog('/identification')
+          window.$showLoginDialog('/knowledge')
         }
       }
     },
@@ -380,6 +380,14 @@ export default {
           window.$showLoginDialog('/game')
         }
       }
+    },
+
+    // 顶部 Game 下拉子项点击（当前先做占位提示）
+    selectGameFromNav(gameKey) {
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+
+      this.$router.push(targetPath)
     },
 
     // 跳转到 Personal Profile 页面
@@ -578,7 +586,14 @@ export default {
             <span class="nav-item" @click="goToKnowledge">Knowledge</span>
             <span class="nav-item" @click="goToRescue">Rescue</span>
             <span class="nav-item" @click="goToForum">Forum</span>
-            <span class="nav-item" @click="goToGame">Game</span>
+            <div class="nav-item game-dropdown" @click="goToGame">
+              Game
+              <div class="game-dropdown-menu">
+                <div class="game-dropdown-item" @click.stop="selectGameFromNav('flappy')">Flappy Bird</div>
+                <div class="game-dropdown-item" @click.stop="selectGameFromNav('2048')">2048 Bird</div>
+                <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
+              </div>
+            </div>
             <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
             <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>          </div>
@@ -1172,6 +1187,57 @@ export default {
 
         &:hover {
           color: #f4f4f8;
+        }
+      }
+
+      /* Game 顶部下拉菜单（hover 展开，不依赖点击） */
+      .game-dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+
+        .game-dropdown-menu {
+          position: absolute;
+          /* 让下拉菜单紧贴 Game，避免鼠标从文字移动到菜单时“穿过空隙”导致菜单消失 */
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(0);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+          z-index: 1001;
+
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 12px;
+          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+          min-width: 200px;
+          padding: 8px 0;
+
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .game-dropdown-item {
+          padding: 10px 20px;
+          font-size: 14px;
+          color: #333;
+          cursor: pointer;
+          transition: background 0.2s ease, color 0.2s ease;
+
+          &:hover {
+            background: #f2f3ff;
+            color: #6f5bb8;
+          }
+        }
+
+        &:hover {
+          .game-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+          }
         }
       }
 

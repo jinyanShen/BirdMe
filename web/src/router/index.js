@@ -23,10 +23,28 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/identification',
-    component: () => import('@/views/identification/index'),
-    name: 'identification',
-    meta: { title: 'Bird Identification', requiresAuth: true }
+    path: '/knowledge',
+    component: () => import('@/views/knowledge/index'),
+    name: 'knowledge',
+    meta: { title: 'Bird knowledge', requiresAuth: true },
+    children: [
+      {
+        path: 'migration',
+        component: () => import('@/views/knowledge/BirdMigration'),
+        name: 'BirdMigration',
+        meta: { title: 'Bird Migration', requiresAuth: true }
+      },
+      {
+        path: 'identification',
+        component: () => import('@/views/knowledge/BirdIdentification'),
+        name: 'BirdIdentification',
+        meta: { title: 'Bird Identification', requiresAuth: true }
+      },
+      {
+        path: '',
+        redirect: 'migration'  // 默认显示迁徙页面
+      }
+    ]
   },
   {
     path: '/center',
@@ -57,6 +75,19 @@ export const constantRoutes = [
         meta: { title: 'Report', icon: 'user', noCache: true }
       }
     ]
+  },
+  {
+    path: '/game',
+    component: () => import('@/views/game/game'),
+    name: 'Game',
+    meta: { title: 'Game' }
+  },
+  {
+    path: '/game/:gameKey',
+    component: () => import('@/views/game/gameSubpage'),
+    name: 'GameSubpage',
+    hidden: true,
+    meta: { title: 'Game' }
   },
   {
     path: '/admin',
