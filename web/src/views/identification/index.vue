@@ -1,5 +1,22 @@
 <template>
   <div class="identification-page">
+    <div class="top-navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
+        </div>
+        <div class="nav-menu">
+          <span class="nav-item" @click="goToHome">Homepage</span>
+          <span class="nav-item active" @click="goToKnowledge">Knowledge</span>
+          <span class="nav-item" @click="goToRescue">Rescue</span>
+          <span class="nav-item" @click="goToForum">Forum</span>
+          <span class="nav-item" @click="goToGame">Game</span>
+          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
+          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
+          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>          </div>
+      </div>
+    </div>
+
     <div class="container">
       <!-- Bird Migration Flow -->
       <div class="migration-container">
@@ -188,6 +205,7 @@ export default {
       field: null,
       bounds: null,
       baseLayer: null,
+      isLoggedIn: false,
       // Rescue station and report related data
       userLocation: '',
       nearbyStations: [],
@@ -204,6 +222,67 @@ export default {
     }
   },
   methods: {
+    checkLoginStatus() {
+      this.isLoggedIn = sessionStorage.getItem('id') !== null
+    },
+
+    // 处理 storage 变化
+    handleStorageChange(e) {
+      if (e.key === 'id') {
+        this.checkLoginStatus()
+      }
+    },
+
+    // 登出
+    handleLogout() {
+      sessionStorage.removeItem('id')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('password')
+      sessionStorage.removeItem('name')
+      sessionStorage.removeItem('age')
+      sessionStorage.removeItem('phone')
+      sessionStorage.removeItem('avatarUrl')
+      sessionStorage.removeItem('role')
+
+      this.isLoggedIn = false
+      this.$message.success('Logged out successfully')
+      this.$router.push('/')
+    },
+    goToHome() {
+      console.log('goToHome called')
+      // 如果已经在首页，不做任何操作
+      if (this.$route.path === '/') {
+        console.log('Already on homepage, skip navigation')
+        return
+      }
+      this.$router.push('/')
+    },
+
+    goToPersonalPage() {
+      console.log('Rescue page - to be implemented')
+      // this.$router.push('/rescue')
+    },
+    goToLogin() {
+      if (window.$loginDialog) {
+        window.$loginDialog.show('/')
+      }
+    },
+    goToKnowledge() {
+      this.$router.go(0)
+    },
+    goToRescue() {
+      console.log('Rescue page - to be implemented')
+      // this.$router.push('/rescue')
+    },
+    goToForum() {
+      console.log('Forum page - to be implemented')
+      // this.$router.push('/forum')
+    },
+    goToGame() {
+      console.log('Game page - to be implemented')
+      // this.$router.push('/game')
+    },
+
     handleImageUploaded(data) {
       const { file, imageSrc } = data;
       this.imageSrc = imageSrc;
@@ -743,6 +822,9 @@ export default {
     }
   },
   mounted() {
+    this.isLoggedIn = sessionStorage.getItem('id') !== null
+    // this.checkLoginStatus()
+    // window.addEventListener('storage', this.handleStorageChange)
     console.log('Component mounted, initializing map...');
 
     // Load migration data
@@ -768,20 +850,141 @@ export default {
       document.head.appendChild(script);
     }
   },
+  // beforeDestroy() {
+  //   window.removeEventListener('resize', this.resizeCanvas);
+  //   window.removeEventListener('scroll', this.handleScroll);
+  //   this.stopAnimation();
+  // }
+  watch: {
+    '$route'() {
+      this.checkLoginStatus()
+    }
+  },
+
   beforeDestroy() {
-    window.removeEventListener('resize', this.resizeCanvas);
-    window.removeEventListener('scroll', this.handleScroll);
-    this.stopAnimation();
+    window.removeEventListener('storage', this.handleStorageChange)
+    // ... 其他清理代码
   }
 }
 </script>
 
 <style scoped>
+.logout-btn {
+  background: #ff6b6b;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  color: white !important;
+}
+
 .identification-page {
-  padding: 60px 0;
+  padding-top: 70px;
   background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
   min-height: 100vh;
 }
+/* 添加导航栏样式（与首页保持一致） */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #22b3c1;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.logo h3:hover {
+  color: #1a9aa8;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  transition: color 0.3s;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+}
+
+.nav-item:hover {
+  color: #22b3c1;
+}
+
+.nav-item.active {
+  color: #22b3c1;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #22b3c1;
+  animation: slideIn 0.3s ease-out;
+}
+
+.login-btn {
+  background: #22b3c1;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+}
+
+.login-btn:hover {
+  background: #1a9aa8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+  color: white !important;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
 
 .container {
   max-width: 1200px;
