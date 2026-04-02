@@ -1,5 +1,13 @@
 <template>
-  <div class="login-page">
+  <el-dialog
+    :visible.sync="dialogVisible"
+    :close-on-click-modal="false"
+    :show-close="true"
+    width="1200px"
+    custom-class="login-dialog"
+    append-to-body
+    @close="handleClose"
+  >
     <div class="login-wrapper" ref="panel" @mousemove="onPanelMouseMove" @mouseleave="onPanelMouseLeave">
       <!-- 左侧品牌区域 -->
       <div class="login-left" ref="leftPanel">
@@ -24,11 +32,8 @@
               :style="getCharacterStyle(c)"
             >
               <div class="monster">
-                <!-- 鸟冠 -->
                 <div class="bird-crown"></div>
-                <!-- 倒三角鸟嘴 -->
                 <div class="bird-beak"></div>
-                <!-- 眼睛 -->
                 <div class="monster-eyes">
                   <div class="eye eye-left"><div class="pupil"></div></div>
                   <div class="eye eye-right"><div class="pupil"></div></div>
@@ -36,11 +41,6 @@
               </div>
             </div>
           </div>
-
-          <!-- 图片已注释 -->
-          <!-- <div class="brand-image" aria-hidden="true">
-            <img src="@/assets/images/bg.jpg" alt="Bird">
-          </div> -->
         </div>
       </div>
 
@@ -67,6 +67,7 @@
                   @focus="onFieldFocus('username')"
                   @blur="onFieldBlur"
                   @input="onFieldInput('username')"
+                  @keyup.enter.native="handleLogin"
                 />
               </div>
             </div>
@@ -74,7 +75,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <i class="input-icon fas fa-lock"></i> <!-- 锁图标 -->
+                <i class="input-icon fas fa-lock"></i>
                 <el-input
                   ref="password"
                   v-model="loginForm.password"
@@ -112,7 +113,7 @@
               <span>Or</span>
             </div>
 
-            <button class="register-btn border-button w-100" @click.prevent="register">
+            <button class="register-btn border-button w-100" @click.prevent="openRegister">
               Create New Account
             </button>
           </el-form>
@@ -121,31 +122,38 @@
     </div>
 
     <!-- Register Dialog -->
-    <el-dialog title="Create New Account" :visible.sync="open" width="600px" append-to-body custom-class="register-dialog">
+    <el-dialog
+      title="Create New Account"
+      :visible.sync="registerVisible"
+      width="600px"
+      append-to-body
+      custom-class="register-dialog"
+      :close-on-click-modal="false"
+    >
       <div class="register-form">
         <div class="form-row">
           <div class="form-group half">
             <label>Username</label>
-            <el-input v-model="form.username" placeholder="Please enter username" />
+            <el-input v-model="registerForm.username" placeholder="Please enter username" />
           </div>
           <div class="form-group half">
             <label>Password</label>
-            <el-input v-model="form.password" type="password" placeholder="Please enter password" />
+            <el-input v-model="registerForm.password" type="password" placeholder="Please enter password" />
           </div>
         </div>
         <div class="form-row">
           <div class="form-group half">
             <label>Name</label>
-            <el-input v-model="form.name" placeholder="Please enter name" />
+            <el-input v-model="registerForm.name" placeholder="Please enter name" />
           </div>
           <div class="form-group half">
             <label>Age</label>
-            <el-input v-model="form.age" type="number" placeholder="Please enter age" />
+            <el-input v-model="registerForm.age" type="number" placeholder="Please enter age" />
           </div>
         </div>
         <div class="form-group">
           <label>Contact</label>
-          <el-input v-model="form.phone" placeholder="Please enter contact information" />
+          <el-input v-model="registerForm.phone" placeholder="Please enter contact information" />
         </div>
         <div class="form-group">
           <label>User Avatar</label>
@@ -153,14 +161,14 @@
                @dragover.prevent="isDragOver = true"
                @dragleave.prevent="isDragOver = false"
                @drop.prevent="handleDrop">
-            <div v-if="!form.avatarUrl" class="upload-placeholder">
+            <div v-if="!registerForm.avatarUrl" class="upload-placeholder">
               <i class="upload-icon">📷</i>
               <p>Drag image here or click to upload</p>
               <input type="file" @change="handleImageUpload" accept="image/*" ref="fileInput" style="display: none;">
               <button class="border-button" @click="$refs.fileInput.click()">Select Image</button>
             </div>
             <div v-else class="image-preview">
-              <img :src="form.avatarUrl" alt="Avatar">
+              <img :src="registerForm.avatarUrl" alt="Avatar">
               <button class="remove-btn" @click="removeAvatar">
                 <i>×</i>
               </button>
@@ -170,19 +178,22 @@
       </div>
       <div slot="footer" class="dialog-footer">
         <button class="main-button" @click="doRegister">Confirm</button>
-        <button class="border-button" @click="cancel">Cancel</button>
+        <button class="border-button" @click="cancelRegister">Cancel</button>
       </div>
     </el-dialog>
-  </div>
+  </el-dialog>
 </template>
 
 <script>
 import { login, register } from '@/api/login'
+import router from '@/router'
 
 export default {
-  name: 'Login',
+  name: 'LoginDialog',
   data() {
     return {
+      dialogVisible: false,
+      redirectPath: null,
       loginForm: {
         username: '',
         password: '',
@@ -192,9 +203,9 @@ export default {
         password: [{ required: true, message: 'Please enter password', trigger: 'blur' }]
       },
       loading: false,
-      rememberMe: false,
-      open: false,
-      form: {
+      passwordVisible: false,
+      registerVisible: false,
+      registerForm: {
         username: '',
         password: '',
         name: '',
@@ -205,19 +216,17 @@ export default {
       isDragOver: false,
 
       // 动画角色状态
-      lookMode: 'mouse', // mouse | input | away
-      passwordVisible: false,
-      gaze: { x: 0, y: 0 }, // -1..1
-      head: { x: 0, y: 0 }, // px
-      neck: { stretch: 0 }, // 0..1
+      lookMode: 'mouse',
+      gaze: { x: 0, y: 0 },
+      head: { x: 0, y: 0 },
+      neck: { stretch: 0 },
 
-      // 4只角色：不同形状、高低错落、底边对齐、层级复刻参考图
       characters: [
         {
           id: 'main',
           isMain: true,
           variant: 'purple',
-          shape: 'rect', // 长方形（主角色，最下层）
+          shape: 'rect',
           offsetX: 0,
           offsetY: 0,
           scale: 1,
@@ -228,7 +237,7 @@ export default {
           id: 'buddy1',
           isMain: false,
           variant: 'black',
-          shape: 'rect-round', // 全圆角正方形
+          shape: 'rect-round',
           offsetX: 170,
           offsetY: 20,
           scale: 0.85,
@@ -239,7 +248,7 @@ export default {
           id: 'buddy2',
           isMain: false,
           variant: 'yellow',
-          shape: 'semicircle', // 半圆
+          shape: 'semicircle',
           offsetX: -140,
           offsetY: 20,
           scale: 0.9,
@@ -250,7 +259,7 @@ export default {
           id: 'buddy3',
           isMain: false,
           variant: 'orange',
-          shape: 'ellipse', // 椭圆（最上层）
+          shape: 'ellipse',
           offsetX: -20,
           offsetY: 70,
           scale: 0.95,
@@ -260,11 +269,43 @@ export default {
       ]
     }
   },
-  mounted() {
-    //this.normalizeCharacterHeight();
+  watch: {
+    redirectPath(newVal, oldVal) {
+      console.log('redirectPath changed from:', oldVal, 'to:', newVal)
+    }
   },
   methods: {
-    // 鼠标在整个面板移动
+    // 显示弹窗
+    // show(redirectPath) {
+    //   console.log('LoginDialog show called with:', redirectPath)
+    //   this.redirectPath = redirectPath
+    //   this.dialogVisible = true
+    //   this.loginForm = { username: '', password: '' }
+    //   if (this.$refs.loginForm) {
+    //     this.$refs.loginForm.clearValidate()
+    //   }
+    // },
+    // 在 LoginDialog 组件中，修改 show 方法，确保不会重置
+    show(redirectPath) {
+      console.log('=== LoginDialog show called ===')
+      console.log('Received redirectPath:', redirectPath)
+      this.redirectPath = redirectPath
+      console.log('this.redirectPath set to:', this.redirectPath)
+      this.dialogVisible = true
+      this.loginForm = { username: '', password: '' }
+      if (this.$refs.loginForm) {
+        this.$refs.loginForm.clearValidate()
+      }
+    },
+
+    // 关闭弹窗
+    handleClose() {
+      this.dialogVisible = false
+      // 不要清空 redirectPath，保留到登录完成
+      // this.redirectPath = null
+    },
+
+    // 动画相关方法
     onPanelMouseMove(e) {
       if (this.lookMode !== 'mouse') return;
       const rect = this.$refs.leftPanel?.getBoundingClientRect?.();
@@ -278,11 +319,11 @@ export default {
       this.setNeckStretch(Math.min(0.25, Math.hypot(nx, ny) * 0.18));
     },
 
-    // 鼠标移出整个面板 → 眼睛复位
     onPanelMouseLeave() {
       if (this.lookMode !== 'mouse') return;
       this.relaxPose();
     },
+
     getCharacterStyle(c) {
       const base = {
         '--char-x': `${c.offsetX}px`,
@@ -303,7 +344,6 @@ export default {
         }
       }
 
-      // 副角色：轻微眼睛跟随，无颈部拉伸
       const damp = 0.55
       return {
         ...base,
@@ -314,6 +354,7 @@ export default {
         '--stretch': '0'
       }
     },
+
     togglePasswordVisible() {
       this.passwordVisible = !this.passwordVisible
       if (this.passwordVisible) {
@@ -325,20 +366,7 @@ export default {
         this.onFieldInput('password')
       }
     },
-    onLeftMouseMove(e) {
-      if (this.lookMode !== 'mouse') return
-      const rect = this.$refs.leftPanel?.getBoundingClientRect?.()
-      if (!rect) return
-      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
-      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1
-      this.setGaze(nx, ny)
-      this.setHeadOffset(nx * 10, ny * 6)
-      this.setNeckStretch(Math.min(0.25, Math.hypot(nx, ny) * 0.18))
-    },
-    onLeftMouseLeave() {
-      if (this.lookMode !== 'mouse') return
-      this.relaxPose()
-    },
+
     onFieldFocus(field) {
       if (this.passwordVisible) {
         this.lookMode = 'away'
@@ -347,6 +375,7 @@ export default {
       this.lookMode = 'input'
       this.onFieldInput(field)
     },
+
     onFieldBlur() {
       if (this.passwordVisible) {
         this.lookMode = 'away'
@@ -355,6 +384,7 @@ export default {
       this.lookMode = 'mouse'
       this.relaxPose()
     },
+
     onFieldInput(field) {
       if (this.passwordVisible) return
       this.lookMode = 'input'
@@ -369,39 +399,44 @@ export default {
         const tx = tr.left + tr.width / 2
         const ty = tr.top + tr.height / 2
 
-        // 映射到左侧面板的归一化空间
         const nx = ((tx - sr.left) / sr.width) * 2 - 1
         const ny = ((ty - sr.top) / sr.height) * 2 - 1
 
-        // "扯脖子瞅"：更强的头部偏移 + 颈部拉伸
         this.setGaze(nx * 1.05, ny * 1.05)
         this.setHeadOffset(nx * 16, ny * 10)
         this.setNeckStretch(Math.min(1, 0.35 + Math.min(0.65, Math.abs(nx) * 0.3 + Math.max(0, -ny) * 0.5)))
       })
     },
+
     getInputEl(field) {
       const ref = field === 'username' ? this.$refs.username : this.$refs.password
       const rootEl = ref && (ref.$el || ref)
       if (!rootEl || !rootEl.querySelector) return null
       return rootEl.querySelector('input')
     },
+
     setGaze(x, y) {
       const clamp = (n) => Math.max(-1, Math.min(1, n))
       this.gaze.x = clamp(x)
       this.gaze.y = clamp(y)
     },
+
     setHeadOffset(x, y) {
       this.head.x = Math.max(-18, Math.min(18, x))
       this.head.y = Math.max(-12, Math.min(12, y))
     },
+
     setNeckStretch(v) {
       this.neck.stretch = Math.max(0, Math.min(1, v))
     },
+
     relaxPose() {
       this.setGaze(0, 0)
       this.setHeadOffset(0, 0)
       this.setNeckStretch(0)
     },
+
+    // // 登录方法
     // handleLogin() {
     //   this.$refs.loginForm.validate(valid => {
     //     if (valid) {
@@ -419,12 +454,13 @@ export default {
     //             sessionStorage.setItem('role', res.data.role)
     //             this.$message.success("Login successful")
     //
-    //             // 根据角色重定向
-    //             if (res.data.role === 1) {
-    //               // Admin user - redirect to admin panel
+    //             this.dialogVisible = false
+    //
+    //             if (this.redirectPath) {
+    //               this.$router.push(this.redirectPath)
+    //             } else if (res.data.role === 1) {
     //               this.$router.push({ path: '/admin/users' })
     //             } else {
-    //               // Regular user - redirect to identification page
     //               this.$router.push({ path: '/identification' })
     //             }
     //           } else {
@@ -435,12 +471,14 @@ export default {
     //         .catch(() => {
     //           this.loading = false
     //         })
-    //     } else {
-    //       return false
     //     }
     //   })
     // },
     handleLogin() {
+      const savedRedirectPath = this.redirectPath
+      console.log('=== handleLogin called ===')
+      console.log('savedRedirectPath:', savedRedirectPath)
+
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
@@ -455,34 +493,41 @@ export default {
                 sessionStorage.setItem('phone', res.data.phone)
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
-                this.$message.success("Login successful")
 
-                // 获取重定向地址
-                const redirect = this.$route.query.redirect
-                if (redirect) {
-                  this.$router.push(decodeURIComponent(redirect))
-                } else {
-                  // 默认跳转到首页
-                  this.$router.push('/')
-                }
+                this.$message.success("Login successful")
+                this.dialogVisible = false
+
+                console.log('跳转到:', savedRedirectPath)
+
+                setTimeout(() => {
+                  if (savedRedirectPath && savedRedirectPath !== '/' && savedRedirectPath !== '/login') {
+                    // 使用导入的 router，不是 this.$router
+                    router.push(savedRedirectPath)
+                  } else {
+                    router.push('/identification')
+                  }
+
+                  // 刷新页面确保登录状态更新
+                  setTimeout(() => {
+                    window.location.reload()
+                  }, 100)
+                }, 200)
               } else {
                 this.loading = false
                 this.$message.error(res.msg)
               }
             })
-            .catch(() => {
+            .catch((error) => {
+              console.error('Login error:', error)
               this.loading = false
             })
         }
       })
     },
-    cancel() {
-      this.open = false
-      this.form = {}
-    },
-    register() {
-      this.open = true
-      this.form = {
+    // 注册相关方法
+    openRegister() {
+      this.registerVisible = true
+      this.registerForm = {
         username: '',
         password: '',
         name: '',
@@ -491,15 +536,22 @@ export default {
         avatarUrl: ''
       }
     },
+
+    cancelRegister() {
+      this.registerVisible = false
+    },
+
     doRegister() {
-      if (!this.form.username || !this.form.password) {
+      if (!this.registerForm.username || !this.registerForm.password) {
         this.$message.error('Username and password cannot be empty')
         return
       }
-      register(this.form).then(res => {
+      register(this.registerForm).then(res => {
         if (res.code === 200) {
-          this.open = false
+          this.registerVisible = false
           this.$message.success("Registration successful")
+          this.loginForm.username = this.registerForm.username
+          this.loginForm.password = this.registerForm.password
         } else {
           this.$message.error(res.msg || 'Registration failed')
         }
@@ -507,12 +559,14 @@ export default {
         this.$message.error('Registration failed, please try again later')
       })
     },
+
     handleImageUpload(event) {
       const file = event.target.files[0]
       if (file) {
         this.uploadFile(file)
       }
     },
+
     handleDrop(event) {
       this.isDragOver = false
       const file = event.dataTransfer.files[0]
@@ -522,6 +576,7 @@ export default {
         this.$message.error('Please upload image file')
       }
     },
+
     uploadFile(file) {
       const formData = new FormData()
       formData.append('file', file)
@@ -533,7 +588,7 @@ export default {
         .then(response => response.json())
         .then(data => {
           if (data.code === 200) {
-            this.form.avatarUrl = "http://localhost:8080/file/download?id=" + data.data.id
+            this.registerForm.avatarUrl = "http://localhost:8080/file/download?id=" + data.data.id
             this.$message.success('Avatar uploaded successfully')
           } else {
             this.$message.error(data.msg || 'Upload failed')
@@ -543,39 +598,34 @@ export default {
           this.$message.error('Upload failed, please try again later')
         })
     },
+
     removeAvatar() {
-      this.form.avatarUrl = ''
+      this.registerForm.avatarUrl = ''
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-/* 全局样式变量 */
-:root {
-  --primary-color: #8aa8e2;
-  --secondary-color: #9ab5e2;
-  --text-color: #333;
-  --text-light: #666;
-  --background-light: #e0f7fa;
-  --white: #fff;
-  --border-color: #949bca;
+/* 弹窗外层样式 */
+::v-deep .login-dialog {
+  .el-dialog {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 30px;
+    overflow: hidden;
+  }
+
+  .el-dialog__header {
+    display: none;
+  }
+
+  .el-dialog__body {
+    padding: 0;
+  }
 }
 
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background:
-    linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)),
-    url("~@/assets/images/login_bg.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
+/* 所有样式从原 login 页面复制过来，去掉 .login-page 外层，保留 .login-wrapper 及内部所有样式 */
 .login-wrapper {
   display: flex;
   width: 100%;
@@ -641,31 +691,6 @@ export default {
       animation: slideInLeft 0.8s ease 0.2s both;
     }
 
-    .brand-image {
-      width: 100%;
-      max-width: 320px;
-      border-radius: 25px;
-      overflow: hidden;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.1);
-      padding: 25px;
-      margin-top: 30px;
-      animation: slideInLeft 0.8s ease 0.4s both;
-
-      img {
-        width: 100%;
-        height: auto;
-        border-radius: 15px;
-        object-fit: cover;
-        transition: transform 0.5s ease;
-
-        &:hover {
-          transform: scale(1.1);
-        }
-      }
-    }
-
     .character-stage {
       width: 100%;
       max-width: 520px;
@@ -688,7 +713,7 @@ export default {
       scale(var(--char-scale, 1))
       translate(var(--head-x, 0px), var(--head-y, 0px))
       translateZ(0);
-      transform-origin: 50% 100%; // 固定底部中心，确保底边不动
+      transform-origin: 50% 100%;
       will-change: transform, filter;
       user-select: none;
       transition: filter 180ms ease;
@@ -699,7 +724,6 @@ export default {
         filter: saturate(0.95) brightness(0.98);
       }
 
-      // 层级完全复刻参考图：橙色(最上) > 黑色 > 黄色 > 紫色(最下)
       &.character--orange {
         z-index: 4;
         animation-duration: 4.5s;
@@ -720,30 +744,18 @@ export default {
         animation-duration: 3.1s;
       }
 
-      // 不同形状样式
-      &.character--rect {
-        .monster {
-          border-radius: 26px 26px 0 0; // 长方形（仅顶部圆角）
-        }
+      &.character--rect .monster {
+        border-radius: 26px 26px 0 0;
       }
-
-      &.character--rect-round {
-        .monster {
-          border-radius: 26px; // 全圆角正方形
-        }
+      &.character--rect-round .monster {
+        border-radius: 26px;
       }
-
-      &.character--semicircle {
-        .monster {
-          border-radius: 100px 100px 0 0; // 半圆
-          height: 100%;
-        }
+      &.character--semicircle .monster {
+        border-radius: 100px 100px 0 0;
+        height: 100%;
       }
-
-      &.character--ellipse {
-        .monster {
-          border-radius: 50% / 30% 30% 0 0; // 椭圆
-        }
+      &.character--ellipse .monster {
+        border-radius: 50% / 30% 30% 0 0;
       }
     }
 
@@ -753,28 +765,21 @@ export default {
       background: var(--char-body, rgba(255, 255, 255, 0.22));
       box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
       position: relative;
-      transform-origin: 50% 100%; // 固定底部中心，伸缩只向上
+      transform-origin: 50% 100%;
       border: 1px solid rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(6px);
       transition: transform 140ms ease;
       overflow: visible;
 
-      // 伸脖子：仅向上拉伸，底边不动
       --skew: calc(var(--stretch) * -6deg);
       --scale: calc(1 + var(--stretch) * 0.12);
-
       transform: scaleY(var(--scale)) skewY(var(--skew));
     }
 
     .character.is-away .monster {
-      transform:
-        scaleY(1)
-        skewY(0deg)
-        rotate(-2deg);
+      transform: scaleY(1) skewY(0deg) rotate(-2deg);
     }
-    /* ======================
-      鸟冠（头顶）
-    ====================== */
+
     .bird-crown {
       position: absolute;
       top: -18px;
@@ -797,9 +802,6 @@ export default {
     .bird-crown::before { height: 28px; }
     .bird-crown::after { height: 22px; }
 
-    /* ======================
-      倒三角鸟嘴
-    ====================== */
     .bird-beak {
       position: absolute;
       top: 40%;
@@ -809,7 +811,7 @@ export default {
       height: 0;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
-      border-top: 13px solid #ffcc33; /* 黄色小鸟嘴 */
+      border-top: 13px solid #ffcc33;
       z-index: 10;
     }
 
@@ -835,13 +837,8 @@ export default {
       position: relative;
     }
 
-    .eye-left {
-      margin-right: 10px;
-    }
-
-    .eye-right {
-      margin-left: 10px;
-    }
+    .eye-left { margin-right: 10px; }
+    .eye-right { margin-left: 10px; }
 
     .pupil {
       position: absolute;
@@ -851,31 +848,18 @@ export default {
       height: 10px;
       border-radius: 50%;
       background: rgba(35, 35, 35, 0.95);
-      transform: translate(-50%, -50%)
-      translate(calc(var(--gaze-x, 0) * 6px), calc(var(--gaze-y, 0) * 4px));
+      transform: translate(-50%, -50%) translate(calc(var(--gaze-x, 0) * 6px), calc(var(--gaze-y, 0) * 4px));
       transition: transform 120ms ease;
     }
 
     .character.is-away .pupil {
-      transform: translate(-50%, -50%)
-      translate(calc(var(--gaze-x, 0) * 9px), calc(var(--gaze-y, 0) * 6px));
+      transform: translate(-50%, -50%) translate(calc(var(--gaze-x, 0) * 9px), calc(var(--gaze-y, 0) * 6px));
     }
 
-    .character--purple {
-      --char-body: #836fe6;
-    }
-
-    .character--black {
-      --char-body: #77b3dd;
-    }
-
-    .character--yellow {
-      --char-body: rgb(241, 217, 119);
-    }
-
-    .character--orange {
-      --char-body: #f1a482;
-    }
+    .character--purple { --char-body: #836fe6; }
+    .character--black { --char-body: #77b3dd; }
+    .character--yellow { --char-body: rgb(241, 217, 119); }
+    .character--orange { --char-body: #f1a482; }
   }
 }
 
@@ -887,6 +871,7 @@ export default {
   align-items: center;
   justify-content: center;
   animation: slideInRight 0.8s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
 
   .login-card {
     width: 100%;
@@ -909,13 +894,13 @@ export default {
 
       h2 {
         font-size: 32px;
-        color: var(--text-color);
+        color: #333;
         margin-bottom: 10px;
         font-weight: 700;
       }
 
       p {
-        color: var(--text-light);
+        color: #666;
         font-size: 16px;
         font-weight: 500;
       }
@@ -928,7 +913,7 @@ export default {
         display: block;
         margin-bottom: 10px;
         font-weight: 500;
-        color: var(--text-color);
+        color: #333;
         font-size: 14px;
       }
 
@@ -941,21 +926,8 @@ export default {
           top: 50%;
           transform: translateY(-50%);
           font-size: 18px;
-          color: var(--text-light);
+          color: #666;
           z-index: 1;
-        }
-
-        ::v-deep .el-input {
-          .el-input__suffix {
-            display: flex;
-            align-items: center;
-            right: 12px; // 与右边距保持距离
-          }
-
-          .el-input__suffix-inner {
-            display: flex;
-            align-items: center;
-          }
         }
 
         ::v-deep .el-input__inner {
@@ -973,58 +945,6 @@ export default {
             background: #ffffff;
           }
         }
-
-        .password-toggle {
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          padding: 0 10px;
-          height: 100%;
-          display: inline-flex;
-          align-items: center;
-          color: var(--text-light);
-          font-size: 16px;
-          line-height: 1;
-
-          &:hover {
-            color: var(--primary-color);
-          }
-        }
-      }
-    }
-
-    .form-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-
-      .remember-me {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-        font-size: 14px;
-        color: var(--text-color);
-        font-weight: 500;
-
-        input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          accent-color: var(--secondary-color);
-        }
-      }
-
-      .forgot-password {
-        font-size: 14px;
-        color: var(--secondary-color);
-        text-decoration: none;
-        transition: color 0.3s ease;
-        font-weight: 500;
-
-        &:hover {
-          color: var(--primary-color);
-        }
       }
     }
 
@@ -1032,10 +952,6 @@ export default {
       height: 55px;
       font-size: 16px;
       font-weight: 600;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
       margin-bottom: 25px;
     }
 
@@ -1114,38 +1030,34 @@ export default {
   }
 }
 
-/* 加载动画 */
 .spinner {
   width: 20px;
   height: 20px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: var(--white);
+  border-top-color: #fff;
   animation: spin 0.8s linear infinite;
+  display: inline-block;
 }
 
-/* 注册弹窗 */
-.register-dialog ::v-deep .el-dialog {
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
+/* 注册弹窗样式 */
+::v-deep .register-dialog {
+  .el-dialog {
+    border-radius: 20px;
+    overflow: hidden;
+  }
 
-.register-dialog ::v-deep .el-dialog__header {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-  padding: 25px 30px;
-  margin: 0;
-}
+  .el-dialog__header {
+    background: linear-gradient(135deg, #7295e3 0%, #90afe3 100%);
+    padding: 25px 30px;
+    margin: 0;
 
-.register-dialog ::v-deep .el-dialog__title {
-  color: var(--white);
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.register-dialog ::v-deep .el-dialog__headerbtn .el-dialog__close {
-  color: var(--white);
-  font-size: 20px;
+    .el-dialog__title {
+      color: white;
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
 }
 
 .register-form {
@@ -1169,7 +1081,7 @@ export default {
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
-      color: var(--text-color);
+      color: #333;
       font-size: 14px;
     }
 
@@ -1178,7 +1090,6 @@ export default {
       border-radius: 10px;
       border: 2px solid #b2d2f2;
       font-size: 14px;
-      transition: all 0.3s ease;
       background: #e0f7fa;
 
       &:focus {
@@ -1215,11 +1126,11 @@ export default {
         font-size: 48px;
         margin-bottom: 15px;
         display: block;
-        color: var(--text-light);
+        color: #666;
       }
 
       p {
-        color: var(--text-light);
+        color: #666;
         font-size: 14px;
         margin-bottom: 20px;
         font-weight: 500;
@@ -1249,7 +1160,7 @@ export default {
         height: 35px;
         border-radius: 50%;
         background-color: #ff4757;
-        color: var(--white);
+        color: white;
         border: none;
         cursor: pointer;
         font-size: 20px;
@@ -1282,44 +1193,24 @@ export default {
   }
 }
 
-/* 动画效果 */
+/* 动画 */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 @keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes floatBob {
@@ -1349,7 +1240,7 @@ export default {
   }
 }
 
-/* 响应式设计 */
+/* 响应式 */
 @media (max-width: 992px) {
   .login-wrapper {
     flex-direction: column;
@@ -1363,112 +1254,31 @@ export default {
     .brand-section {
       padding: 40px;
 
-      .brand-name {
-        font-size: 42px;
-      }
-
-      .brand-slogan {
-        font-size: 18px;
-      }
-
-      .brand-image {
-        max-width: 280px;
-      }
+      .brand-name { font-size: 42px; }
+      .brand-slogan { font-size: 18px; }
     }
   }
 
   .login-right {
     padding: 40px;
-
-    .login-card {
-      padding: 30px;
-
-      .login-header h2 {
-        font-size: 28px;
-      }
-    }
+    .login-card { padding: 30px; }
   }
 }
 
 @media (max-width: 576px) {
-  .login-page {
-    padding: 10px;
-  }
-
-  .login-wrapper {
-    border-radius: 20px;
-    min-height: 700px;
-  }
-
-  .login-left {
-    min-height: 300px;
-
-    .brand-section {
-      padding: 30px 20px;
-
-      .brand-name {
-        font-size: 36px;
-        letter-spacing: 3px;
-      }
-
-      .brand-slogan {
-        font-size: 16px;
-        margin-bottom: 30px;
-      }
-
-      .brand-image {
-        max-width: 200px;
-        padding: 15px;
-      }
-    }
+  .login-left .brand-section {
+    padding: 30px 20px;
+    .brand-name { font-size: 36px; }
+    .brand-slogan { font-size: 16px; }
   }
 
   .login-right {
     padding: 30px 20px;
-
-    .login-card {
-      padding: 25px;
-
-      .login-header h2 {
-        font-size: 24px;
-      }
-
-      .form-group {
-        margin-bottom: 20px;
-
-        .input-wrapper ::v-deep .el-input__inner {
-          height: 48px;
-        }
-      }
-
-      .login-btn,
-      .register-btn {
-        height: 48px;
-        font-size: 14px;
-      }
-    }
+    .login-card { padding: 25px; }
   }
 
-  .register-form {
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .upload-area {
-      min-height: 150px;
-      padding: 25px 20px;
-
-      .upload-placeholder {
-        .upload-icon {
-          font-size: 36px;
-        }
-      }
-
-      .image-preview img {
-        max-width: 150px;
-        max-height: 150px;
-      }
-    }
+  .register-form .form-row {
+    grid-template-columns: 1fr;
   }
 }
 </style>

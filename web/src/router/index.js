@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import MainMenu from '@/views/mainmenu/mainmenu.vue'  // 导入你的首页组件
+import MainMenu from '@/views/mainmenu/mainmenu.vue'
 
 Vue.use(Router)
 
@@ -9,13 +9,12 @@ import Layout from '@/layout'
 import AdminLayout from '@/layout/admin'
 
 export const constantRoutes = [
-  // 添加首页路由 - 放在最前面
   {
     path: '/',
-    component: MainMenu,  // 直接使用你的 mainmenu 组件
+    component: MainMenu,
     name: 'MainMenu',
     meta: { title: '鸟类保护主页' },
-    hidden: true  // 不在菜单中显示
+    hidden: true
   },
   {
     path: '/login',
@@ -24,25 +23,17 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/',
-    component: Layout,
-    redirect: '/identification',
-    hidden: true,
-    children: [
-      {
-        path: 'identification',
-        component: () => import('@/views/identification/index'),
-        name: 'identification',
-        meta: { title: 'Bird Identification', icon: 'user', noCache: true }
-      }
-    ]
+    path: '/identification',
+    component: () => import('@/views/identification/index'),
+    name: 'identification',
+    meta: { title: 'Bird Identification', requiresAuth: true }
   },
-  // ... 其他路由保持不变，不用动
   {
     path: '/center',
     component: Layout,
     redirect: '/center/index',
     hidden: true,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'index',
@@ -57,6 +48,7 @@ export const constantRoutes = [
     component: Layout,
     redirect: '/report/index',
     hidden: true,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'index',
@@ -71,6 +63,7 @@ export const constantRoutes = [
     component: AdminLayout,
     redirect: '/admin/dashboard',
     hidden: true,
+    meta: { requiresAuth: true },
     children: [
       {
         path: 'dashboard',
@@ -111,10 +104,12 @@ export const errorRoutes = [
 ]
 
 const createRouter = () => new Router({
+  mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
 
 const router = createRouter()
 
+// 删除所有路由守卫代码，让 permission.js 处理
 export default router
