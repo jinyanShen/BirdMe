@@ -802,7 +802,7 @@ export default {
 }
 
 .content-below {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #bbb4ea 0%, #6558d6 100%);
   padding: 60px 20px;
   color: white;
 
