@@ -16,8 +16,7 @@
               <!-- Navigation Menu -->
               <ul class="nav">
                 <li><a href="#" :class="{ active: $route.path === '/identification' }" @click="$router.push('/identification')">Bird Identification</a></li>
-                <li><a href="#" :class="{ active: $route.path === '/center' }" @click="$router.push('/center')">Personal Center</a></li>
-                <li><a href="#" :class="{ active: $route.path === '/report' }" @click="$router.push('/report')">My Reports</a></li>
+                <li><a href="#" :class="{ active: $route.path === '/settings' }" @click="$router.push('/settings')">Personal Settings & Rescue Reports</a></li>
               </ul>
 
               <!-- User Info -->

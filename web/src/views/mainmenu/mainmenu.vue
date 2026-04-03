@@ -1,262 +1,3 @@
-<!--<script>-->
-<!--import bgGif from '@/assets/images/bg.gif'-->
-
-<!--export default {-->
-<!--  name: 'MainMenu',-->
-<!--  data() {-->
-<!--    return {-->
-<!--      showAnimation: true,-->
-<!--      leftClouds: [],-->
-<!--      rightClouds: [],-->
-<!--      bgGif: bgGif,-->
-<!--      showNavbar: false,-->
-<!--      isLoggedIn: false,-->
-
-<!--      newsList: [-->
-<!--        {-->
-<!--          id: 1,-->
-<!--          title: '春季鸟类迁徙保护行动',-->
-<!--          description: '全国多地开展鸟类迁徙通道保护工作，志愿者招募中',-->
-<!--          image: 'https://picsum.photos/800/400?random=1'-->
-<!--        },-->
-<!--        {-->
-<!--          id: 2,-->
-<!--          title: '新增3个鸟类自然保护区',-->
-<!--          description: '保护面积扩大2000公顷，为候鸟提供更多栖息地',-->
-<!--          image: 'https://picsum.photos/800/400?random=2'-->
-<!--        },-->
-<!--        {-->
-<!--          id: 3,-->
-<!--          title: 'AI鸟类识别系统上线',-->
-<!--          description: '拍照即可识别500+种鸟类，准确率达95%',-->
-<!--          image: 'https://picsum.photos/800/400?random=3'-->
-<!--        }-->
-<!--      ]-->
-<!--    }-->
-<!--  },-->
-<!--  mounted() {-->
-<!--    this.generateClouds()-->
-<!--    this.initScrollAnimation()-->
-<!--    this.checkLoginStatus() // 检查登录状态-->
-<!--    // window.addEventListener('storage', this.handleStorageChange)-->
-<!--    //-->
-<!--    //this.isLoggedIn = sessionStorage.getItem('id') !== null-->
-<!--    // setTimeout(() => {-->
-<!--    //   const elements = document.querySelectorAll('.fade-in-up')-->
-<!--    //   elements.forEach(el => {-->
-<!--    //     el.classList.add('visible')-->
-<!--    //   })-->
-<!--    // }, 2000)-->
-<!--  },-->
-<!--  methods: {-->
-<!--    // 检查登录状态-->
-<!--    checkLoginStatus() {-->
-<!--      this.isLoggedIn = sessionStorage.getItem('id') !== null-->
-<!--    },-->
-
-<!--    // 处理 storage 变化（多标签页同步）-->
-<!--    handleStorageChange(e) {-->
-<!--      if (e.key === 'id') {-->
-<!--        this.checkLoginStatus()-->
-<!--      }-->
-<!--    },-->
-
-<!--    // 登出-->
-<!--    handleLogout() {-->
-<!--      // 清除所有登录信息-->
-<!--      sessionStorage.removeItem('id')-->
-<!--      sessionStorage.removeItem('username')-->
-<!--      sessionStorage.removeItem('password')-->
-<!--      sessionStorage.removeItem('name')-->
-<!--      sessionStorage.removeItem('age')-->
-<!--      sessionStorage.removeItem('phone')-->
-<!--      sessionStorage.removeItem('avatarUrl')-->
-<!--      sessionStorage.removeItem('role')-->
-
-<!--      this.isLoggedIn = false-->
-<!--      this.$message.success('Logged out successfully')-->
-
-<!--      // 如果当前在需要登录的页面，跳转到首页-->
-<!--      const needAuthPages = ['/identification', '/center', '/report'，'/game']-->
-<!--      if (needAuthPages.includes(this.$route.path)) {-->
-<!--        this.$router.push('/')-->
-<!--      }-->
-<!--    },-->
-<!--    goToNews(id) {-->
-<!--      console.log('点击新闻', id)-->
-<!--      // 跳转到新闻详情页-->
-<!--      // this.$router.push(`/news/${id}`)-->
-<!--      // 或者打开新窗口-->
-<!--      // window.open(`https://example.com/news/${id}`, '_blank')-->
-<!--    },-->
-
-<!--    goToHome() {-->
-<!--      this.$router.push('/')-->
-<!--    },-->
-
-<!--    // 跳转到 Knowledge 页面-->
-<!--    goToKnowledge() {-->
-<!--      console.log('=== goToKnowledge called ===')-->
-<!--      console.log('isLoggedIn:', this.isLoggedIn)-->
-<!--      if (this.isLoggedIn) {-->
-<!--        this.$router.push('/identification')-->
-<!--      } else {-->
-<!--        console.log('Not logged in, showing login dialog with redirect: /identification')-->
-<!--        if (window.$showLoginDialog) {-->
-<!--          window.$showLoginDialog('/identification')-->
-<!--        } else {-->
-<!--          console.error('window.$showLoginDialog is not defined')-->
-<!--        }-->
-<!--      }-->
-<!--    },-->
-<!--    // 跳转到其他页面（暂时占位）-->
-<!--    goToRescue() {-->
-<!--      console.log('Rescue page - to be implemented')-->
-<!--      // this.$router.push('/rescue')-->
-<!--    },-->
-
-<!--    goToForum() {-->
-<!--      console.log('Forum page - to be implemented')-->
-<!--      // this.$router.push('/forum')-->
-<!--    },-->
-
-<!--    goToGame() {-->
-<!--      console.log('Game page - to be implemented')-->
-<!--      // this.$router.push('/game')-->
-<!--    },-->
-
-<!--    goToPersonalPage() {-->
-<!--      console.log('Personal Profile page - to be implemented')-->
-<!--      // this.$router.push('/Personal profile')-->
-<!--    },-->
-
-<!--    goToLogin() {-->
-<!--      this.$router.push('/login')-->
-<!--    },-->
-
-
-<!--    generateClouds(){-->
-<!--      const leftClouds = []-->
-<!--      const rightClouds = []-->
-
-<!--      // 左边云朵配置-->
-<!--      const leftPositions = [-10,-20,-30,-10,-20,-30,-10,-20,-30,0]-->
-<!--      // 右边云朵配置-->
-<!--      const rightPositions = [40,50,50,30,50,20,40,50,60,30]-->
-<!--      // 垂直位置-->
-<!--      const leftTopPositions = [-40, -20, 0, 20, 40, -30, -10, 10, 30, 50]-->
-<!--      const rightTopPositions = [-35, -15, 5, 25, 45, -25, -5, 15, 35, 55]-->
-
-<!--      for (let i = 0; i < 10; i++) {-->
-<!--        leftClouds.push({-->
-<!--          id: `left-${i}`,-->
-<!--          left: leftPositions[i],-->
-<!--          top: leftTopPositions[i],-->
-<!--          delay: i * 0.3,-->
-<!--          duration: 5,-->
-<!--          width:1200,-->
-<!--          height: 750,-->
-<!--          opacity: 0.95,-->
-<!--          direction: 'left',-->
-<!--          image: require('@/assets/images/cloud1.png')-->
-<!--        })-->
-<!--      }-->
-
-<!--      for (let i = 0; i < 10; i++) {-->
-<!--        rightClouds.push({-->
-<!--          id: `right-${i}`,-->
-<!--          left: rightPositions[i],-->
-<!--          top: rightTopPositions[i],-->
-<!--          delay: i * 0.3,-->
-<!--          duration: 5,-->
-<!--          width: 1200,-->
-<!--          height: 750,-->
-<!--          opacity: 0.95,-->
-<!--          direction: 'right',-->
-<!--          image: require('@/assets/images/cloud1.png')-->
-<!--        })-->
-<!--      }-->
-
-<!--      this.leftClouds = leftClouds-->
-<!--      this.rightClouds = rightClouds-->
-<!--    },-->
-<!--    onCloudAnimationEnd() {-->
-<!--      setTimeout(() => {-->
-<!--        this.showAnimation = false-->
-<!--        this.$nextTick(() => {-->
-<!--          this.handleScroll()-->
-<!--        })-->
-<!--      }, 1000)-->
-<!--    },-->
-
-<!--    initScrollAnimation() {-->
-<!--      // 获取滚动容器-->
-<!--      const scrollContainer = document.querySelector('.main-content')-->
-<!--      if (scrollContainer) {-->
-<!--        scrollContainer.addEventListener('scroll', this.handleScroll)-->
-<!--      }-->
-<!--      this.handleScroll()-->
-<!--    },-->
-
-<!--    handleScroll() {-->
-<!--      const scrollContainer = document.querySelector('.main-content')-->
-<!--      const scrollTop = scrollContainer ? scrollContainer.scrollTop : 0-->
-
-<!--      // 控制顶栏显示-->
-<!--      this.showNavbar = scrollTop > 100-->
-
-<!--      // 控制 content-below 内部内容的逐渐显示-->
-<!--      const contentBelowChildren = document.querySelectorAll('.content-below > *')-->
-<!--      if (contentBelowChildren.length > 0) {-->
-<!--        const maxScroll = 1200-->
-<!--        let opacity = scrollTop / maxScroll-->
-
-<!--        opacity = Math.min(opacity, 1)-->
-
-<!--        // 为每个子元素设置不同的偏移距离-->
-<!--        contentBelowChildren.forEach((child, index) => {-->
-<!--          child.style.opacity = opacity-->
-<!--          let translateY = 50 - (scrollTop / maxScroll) * 50-->
-<!--          translateY = Math.max(translateY, 0)-->
-<!--          child.style.transform = `translateY(${translateY * (1 - index * 0.2)}px)`-->
-<!--        })-->
-<!--      }-->
-
-<!--      // 下面的 fade-in-up 逻辑保持不变-->
-<!--      const elements = document.querySelectorAll('.fade-in-up')-->
-<!--      const windowHeight = window.innerHeight-->
-
-<!--      elements.forEach(el => {-->
-<!--        const rect = el.getBoundingClientRect()-->
-<!--        if (rect.top < windowHeight + 100) {-->
-<!--          el.classList.add('visible')-->
-<!--        }-->
-<!--      })-->
-<!--    }-->
-<!--  },-->
-
-<!--//   beforeDestroy() {-->
-<!--//     const scrollContainer = document.querySelector('.main-content')-->
-<!--//     if (scrollContainer) {-->
-<!--//       scrollContainer.removeEventListener('scroll', this.handleScroll)-->
-<!--//     }-->
-<!--//   }-->
-<!--// }-->
-<!--  watch: {-->
-<!--    '$route'() {-->
-<!--      this.checkLoginStatus() // 路由变化时重新检查登录状态-->
-<!--    }-->
-<!--  },-->
-
-<!--  beforeDestroy() {-->
-<!--    window.removeEventListener('storage', this.handleStorageChange)-->
-<!--    const scrollContainer = document.querySelector('.main-content')-->
-<!--    if (scrollContainer) {-->
-<!--      scrollContainer.removeEventListener('scroll', this.handleScroll)-->
-<!--    }-->
-<!--  }-->
-<!--}-->
-<!--</script>-->
 <script>
 import bgGif from '@/assets/images/bg.gif'
 
@@ -293,7 +34,19 @@ export default {
       ]
     }
   },
+  // mounted() {
+  //   this.generateClouds()
+  //   this.initScrollAnimation()
+  //   this.checkLoginStatus()
+  // },
   mounted() {
+    // 修改了云朵动画，使其在会话内只播放一次动画--->每次打开网页都会播放，但是在网页间跳转则不会播放
+    if (sessionStorage.getItem('animationPlayed')) {
+      this.showAnimation = false
+    } else {
+      sessionStorage.setItem('animationPlayed', 'true')
+    }
+
     this.generateClouds()
     this.initScrollAnimation()
     this.checkLoginStatus()
@@ -320,7 +73,7 @@ export default {
       this.$message.success('Logged out successfully')
 
       // 如果当前在需要登录的页面，跳转到首页
-      const needAuthPages = ['/identification', '/center', '/report']
+      const needAuthPages = ['/identification', '/settings']
       if (needAuthPages.includes(this.$route.path)) {
         this.$router.push('/')
       }
@@ -393,10 +146,10 @@ export default {
     // 跳转到 Personal Profile 页面
     goToPersonalPage() {
       if (this.isLoggedIn) {
-        this.$router.push('/center')
+        this.$router.push('/settings')
       } else {
         if (window.$showLoginDialog) {
-          window.$showLoginDialog('/center')
+          window.$showLoginDialog('/settings')
         }
       }
     },
@@ -577,12 +330,6 @@ export default {
           </div>
           <div class="nav-menu">
             <router-link to="/" class="nav-item">Homepage</router-link>
-<!--            <a href="#knowledge" class="nav-item">Knowledge</a>-->
-<!--            <a href="#rescur" class="nav-item">Rescue</a>-->
-<!--            <a href="#forum" class="nav-item">Forum</a>-->
-<!--            <a href="#game" class="nav-item">Game</a>-->
-
-<!--            把my reports和personal center合到一起-->
             <span class="nav-item" @click="goToKnowledge">Knowledge</span>
             <span class="nav-item" @click="goToRescue">Rescue</span>
             <span class="nav-item" @click="goToForum">Forum</span>
@@ -594,17 +341,25 @@ export default {
                 <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
               </div>
             </div>
-            <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
+            <span class="nav-item" @click="goToPersonalPage">Personal Settings</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
             <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>          </div>
         </div>
       </div>
 
+<!--      <div class="image-container">-->
+<!--        <img :src="bgGif" alt="background" class="top-image">-->
+<!--        <div class="overlay-text">-->
+<!--          <h2>Welcome to BirdME<br>Here you can identify birds, track migrations, and submit rescue reports</h2>-->
+<!--          <p>Group2_TOT | AI Bird Identification & Rescue System</p>-->
+<!--        </div>-->
+<!--      </div>-->
       <div class="image-container">
         <img :src="bgGif" alt="background" class="top-image">
         <div class="overlay-text">
-          <h2>没想好写什么</h2>
-          <p>没想好写什么你们快想想呀><</p>
+          <h2>Welcome to <span>BirdME</span></h2>
+          <p class="desc">Here you can identify birds, track migrations, and submit rescue reports</p>
+          <p class="author">Group2_TOT | AI Bird Identification & Rescue System</p>
         </div>
       </div>
 
@@ -1333,6 +1088,49 @@ export default {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
   }
+}
+
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+
+  padding: 80px 120px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(101, 88, 214, 0.7), rgba(63, 51, 128, 0.7));
+  backdrop-filter: blur(5px);
+  box-shadow: 0 12px 40px rgba(63, 51, 128, 0.4);
+  z-index: 2;
+}
+
+.overlay-text h2 {
+  font-size: 144px; /* 原72px → 放大一倍 */
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  line-height: 1.1;
+}
+
+.overlay-text h2 span {
+  color: #ffd966;
+}
+
+.overlay-text .desc {
+  font-size: 60px; /* 原30px → 放大一倍 */
+  font-weight: 400;
+  color: rgba(255,255,255,0.95);
+  margin: 0 0 28px 0;
+  line-height: 1.3;
+}
+
+.overlay-text .author {
+  font-size: 44px; /* 原22px → 放大一倍 */
+  font-weight: 300;
+  color: rgba(255,255,255,0.75);
+  margin: 0;
 }
 
 </style>
