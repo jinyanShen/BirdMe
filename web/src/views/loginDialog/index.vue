@@ -10,7 +10,7 @@
   >
     <div class="login-wrapper" ref="panel" @mousemove="onPanelMouseMove" @mouseleave="onPanelMouseLeave">
 
-      <!-- 👇 这里加关闭按钮 -->
+      <!-- 关闭按钮 -->
       <div class="login-close-btn" @click="handleClose">×</div>
 
       <!-- 左侧品牌区域 -->
@@ -60,7 +60,6 @@
             <div class="form-group">
               <label>Username</label>
               <div class="input-wrapper">
-                <i class="input-icon">👤</i>
                 <el-input
                   ref="username"
                   v-model="loginForm.username"
@@ -73,14 +72,17 @@
                   @blur="onFieldBlur"
                   @input="onFieldInput('username')"
                   @keyup.enter.native="handleLogin"
-                />
+                >
+                  <template #prefix>
+                    <i class="input-icon">👤</i>
+                  </template>
+                </el-input>
               </div>
             </div>
 
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <i class="input-icon fas fa-lock"></i>
                 <el-input
                   ref="password"
                   v-model="loginForm.password"
@@ -93,6 +95,9 @@
                   @input="onFieldInput('password')"
                   @keyup.enter.native="handleLogin"
                 >
+                  <template #prefix>
+                    <i class="input-icon fas fa-lock"></i>
+                  </template>
                   <template #suffix>
                     <i
                       :class="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
@@ -220,7 +225,6 @@ export default {
       },
       isDragOver: false,
 
-      // 动画角色状态
       lookMode: 'mouse',
       gaze: { x: 0, y: 0 },
       head: { x: 0, y: 0 },
@@ -280,17 +284,6 @@ export default {
     }
   },
   methods: {
-    // 显示弹窗
-    // show(redirectPath) {
-    //   console.log('LoginDialog show called with:', redirectPath)
-    //   this.redirectPath = redirectPath
-    //   this.dialogVisible = true
-    //   this.loginForm = { username: '', password: '' }
-    //   if (this.$refs.loginForm) {
-    //     this.$refs.loginForm.clearValidate()
-    //   }
-    // },
-    // 在 LoginDialog 组件中，修改 show 方法，确保不会重置
     show(redirectPath) {
       console.log('=== LoginDialog show called ===')
       console.log('Received redirectPath:', redirectPath)
@@ -303,14 +296,10 @@ export default {
       }
     },
 
-    // 关闭弹窗
     handleClose() {
       this.dialogVisible = false
-      // 不要清空 redirectPath，保留到登录完成
-      // this.redirectPath = null
     },
 
-    // 动画相关方法
     onPanelMouseMove(e) {
       if (this.lookMode !== 'mouse') return;
       const rect = this.$refs.leftPanel?.getBoundingClientRect?.();
@@ -468,13 +457,11 @@ export default {
 
                 setTimeout(() => {
                   if (savedRedirectPath && savedRedirectPath !== '/' && savedRedirectPath !== '/login') {
-                    // 使用导入的 router，不是 this.$router
                     router.push(savedRedirectPath)
                   } else {
                     router.push('/identification')
                   }
 
-                  // 刷新页面确保登录状态更新
                   setTimeout(() => {
                     window.location.reload()
                   }, 100)
@@ -491,7 +478,7 @@ export default {
         }
       })
     },
-    // 注册相关方法
+
     openRegister() {
       this.registerVisible = true
       this.registerForm = {
@@ -574,7 +561,7 @@ export default {
 </script>
 
 <style lang="scss">
-/* 在 style 标签最开头添加这几行，覆盖变量 */
+/* 变量 */
 :root {
   --primary-color: #8aa8e2;
   --secondary-color: #9ab5e2;
@@ -585,8 +572,7 @@ export default {
   --border-color: #949bca;
 }
 
-
-/* 弹窗外层：完全贴合内容，不干扰样式 */
+/* 弹窗外层 */
 .login-dialog.el-dialog {
   box-shadow: none !important;
   border-radius: 30px !important;
@@ -595,8 +581,6 @@ export default {
   max-width: 1200px !important;
   padding: 0 !important;
   margin: 0 !important;
-
-  /* 👇 这三行实现 垂直 + 水平 居中 */
   position: absolute;
   top: 50%;
   left: 50%;
@@ -617,11 +601,9 @@ export default {
   width: 100%;
   max-width: 1200px;
   min-height: 700px;
-  /* 确保背景渐变存在 */
   background: linear-gradient(135deg, #ffffff 0%, #e0f7fa 100%);
   border-radius: 30px;
   overflow: hidden;
-  /* 确保阴影存在 */
   box-shadow: 0 20px 60px rgb(81, 73, 117);
   animation: fadeIn 0.5s ease;
   position: relative;
@@ -857,30 +839,37 @@ export default {
       label { display:block; margin-bottom:10px; font-weight:500; color:#333; font-size:14px; }
       .input-wrapper {
         position:relative;
-        .input-icon {
-          position:absolute;
-          left:20px; top:50%;
-          transform:translateY(-50%);
-          font-size:18px; color:#666;
-          z-index:1;
+
+        ::v-deep .el-input__prefix {
+          left: 20px !important;
+          display: flex !important;
+          align-items: center !important;
+          height: 50% !important;
+          top: 0 !important;
+          transform: none !important;
         }
-        ::v-deep .el-input {
-          .el-input__suffix { display:flex; align-items:center; right:12px; }
-          .el-input__suffix-inner { display:flex; align-items:center; }
-        }
+
         ::v-deep .el-input__inner {
-          padding-left:50px;
-          height:55px;
-          border-radius:12px;
-          border:2px solid #b2bff2;
-          font-size:14px;
-          transition:all 0.3s ease;
-          background:#e0f7fa;
+          padding-left: 50px !important;
+          padding-right: 50px;
+          height: 55px;
+          border-radius: 12px;
+          border: 2px solid #b2bff2;
+          font-size: 14px;
+          transition: all 0.3s ease;
+          background: #e0f7fa;
+
           &:focus {
-            border-color:#4d66e1;
-            box-shadow:0 0 0 4px rgba(77,97,225,0.2);
-            background:#fff;
+            border-color: #4d66e1;
+            box-shadow: 0 0 0 4px rgba(77,97,225,0.2);
+            background: #fff;
           }
+        }
+
+        .input-icon {
+          font-size: 18px;
+          color: #666;
+          line-height: 1;
         }
       }
     }
@@ -948,6 +937,7 @@ export default {
     ::v-deep .el-input__inner {
       height:50px; border-radius:10px; border:2px solid #b2d2f2;
       font-size:14px; background:#e0f7fa;
+      transition:all 0.3s ease;
       &:focus {
         border-color:#4d8de1;
         box-shadow:0 0 0 4px rgba(77,112,225,0.2);
@@ -1002,7 +992,7 @@ export default {
   width:36px; height:36px; border-radius:50%;
   background:rgba(255,255,255,0.2); backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,0.3);
-  font-size: 50px; /* 👈 这里放大了 */
+  font-size: 50px;
   color:#303351;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; z-index:9999; transition:all 0.2s ease;
@@ -1010,5 +1000,40 @@ export default {
 .login-close-btn:hover {
   background:rgba(255,255,255,0.4);
   transform:scale(1.1);
+}
+
+/* 响应式 */
+@media (max-width: 992px) {
+  .login-wrapper {
+    flex-direction: column;
+    max-width: 500px;
+    min-height: 800px;
+  }
+  .login-left {
+    min-height: 400px;
+    .brand-section {
+      padding: 40px;
+      .brand-name { font-size: 42px; }
+      .brand-slogan { font-size: 18px; }
+    }
+  }
+  .login-right {
+    padding: 40px;
+    .login-card { padding: 30px; }
+  }
+}
+@media (max-width: 576px) {
+  .login-left .brand-section {
+    padding: 30px 20px;
+    .brand-name { font-size: 36px; }
+    .brand-slogan { font-size: 16px; }
+  }
+  .login-right {
+    padding: 30px 20px;
+    .login-card { padding: 25px; }
+  }
+  .register-form .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>
