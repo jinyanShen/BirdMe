@@ -47,32 +47,17 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/center',
+    path: '/settings',
     component: Layout,
-    redirect: '/center/index',
+    redirect: '/settings/index',
     hidden: true,
     meta: { requiresAuth: true },
     children: [
       {
         path: 'index',
-        component: () => import('@/views/center/index'),
-        name: 'Center',
-        meta: { title: 'Personal Center', icon: 'user', noCache: true }
-      }
-    ]
-  },
-  {
-    path: '/report',
-    component: Layout,
-    redirect: '/report/index',
-    hidden: true,
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/report/index'),
-        name: 'report',
-        meta: { title: 'Report', icon: 'user', noCache: true }
+        component: () => import('@/views/settings/index'),
+        name: 'Settings',
+        meta: { title: 'Personal Settings', icon: 'user', noCache: true }
       }
     ]
   },

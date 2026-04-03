@@ -3,8 +3,8 @@
     <div class="container">
       <!-- Page Title -->
       <div class="section-title">
-        <h1>Personal Center</h1>
-        <p>Manage your personal information</p>
+        <h1>Personal Settings</h1>
+        <p>Manage your personal information & rescue reports</p>
       </div>
 
       <!-- Personal Information Card -->
@@ -88,14 +88,90 @@
           </div>
         </div>
       </div>
+
+      <!-- My Reports Section -->
+      <div class="reports-section">
+        <div class="page-header">
+          <h2>My Rescue Reports</h2>
+          <p>Track the status of your bird rescue reports</p>
+        </div>
+
+        <div class="reports-list">
+          <el-card v-if="reports.length === 0 && !loading" class="empty-card">
+            <div class="empty-content">
+              <i class="el-icon-folder-opened"></i>
+              <p class="no-data-text">No Data</p>
+            </div>
+          </el-card>
+
+          <div v-if="loading" class="loading-container">
+            <i class="el-icon-loading"></i>
+            <p>Loading reports...</p>
+          </div>
+
+          <el-card
+            v-for="report in reports"
+            :key="report.id"
+            class="report-card"
+            @click.native="viewDetails(report)">
+            <div class="report-header">
+              <div class="bird-info">
+                <h3>{{ report.birdName }}</h3>
+                <span class="species">{{ report.species || 'Unknown Species' }}</span>
+              </div>
+              <el-tag :type="getStatusType(report.status)" size="medium">
+                {{ report.status }}
+              </el-tag>
+            </div>
+
+            <div class="report-details">
+              <div class="detail-item">
+                <i class="el-icon-location"></i>
+                <span>{{ report.location || 'Location not specified' }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="el-icon-warning"></i>
+                <span>{{ report.injuryType || 'Unknown' }}</span>
+              </div>
+              <div class="detail-item">
+                <i class="el-icon-time"></i>
+                <span>{{ formatDate(report.createdAt) }}</span>
+              </div>
+            </div>
+
+            <div v-if="report.injuryDescription" class="description">
+              <p>{{ report.injuryDescription }}</p>
+            </div>
+
+            <div v-if="report.imageUrl" class="report-image">
+              <img :src="report.imageUrl" :alt="report.birdName">
+            </div>
+
+            <div class="card-footer">
+              <span class="click-hint">Click to view details</span>
+            </div>
+          </el-card>
+        </div>
+
+        <ReportDetail
+          :visible.sync="dialogVisible"
+          :report="selectedReport"
+          @close="dialogVisible = false"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import { pageUser, getUser, delUser, insertUser, updateUser } from "@/api/user";
+import { getReportsBySubmitter } from '@/api/report'
+import ReportDetail from '@/components/ReportDetail/index.vue'
 
 export default {
+  components: {
+    ReportDetail
+  },
   data() {
     return {
       form: {
@@ -108,11 +184,20 @@ export default {
         avatarUrl: sessionStorage.getItem("avatarUrl"),
       },
       pictureList: [],
-      passwordFieldType: 'password'
+      passwordFieldType: 'password',
+      reports: [],
+      loading: false,
+      dialogVisible: false,
+      selectedReport: null
     };
   },
 
+  mounted() {
+    this.loadReports();
+  },
+
   methods: {
+    // Profile methods
     togglePassword() {
       this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
     },
@@ -141,11 +226,47 @@ export default {
         }
       });
     },
+
+    // Report methods
+    loadReports() {
+      this.loading = true
+      getReportsBySubmitter("user").then(response => {
+        if (response.code === 200) {
+          this.reports = response.data || []
+        } else {
+          this.$message.error('Failed to load reports')
+        }
+        this.loading = false
+      }).catch(error => {
+        console.error('Error loading reports:', error)
+        this.$message.error('Failed to load reports')
+        this.loading = false
+      })
+    },
+    viewDetails(report) {
+      this.selectedReport = { ...report }
+      this.dialogVisible = true
+    },
+    getStatusType(status) {
+      switch (status) {
+        case 'PENDING': return 'warning'
+        case 'PROCESSING': return 'info'
+        case 'COMPLETED': return 'success'
+        case 'CANCELLED': return 'danger'
+        default: return 'info'
+      }
+    },
+    formatDate(dateString) {
+      if (!dateString) return 'N/A'
+      const date = new Date(dateString)
+      return date.toLocaleString()
+    }
   },
 };
 </script>
 
 <style scoped>
+/* Profile Page Styles */
 .profile-page {
   padding: 60px 0;
   background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
@@ -182,6 +303,7 @@ export default {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   overflow: hidden;
+  margin-bottom: 40px;
 }
 
 .profile-card:hover {
@@ -267,61 +389,183 @@ export default {
   background: linear-gradient(135deg, #22b3c1 0%, #0097a7 100%);
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .profile-page {
-    padding: 40px 0;
-  }
-
-  .section-title h1 {
-    font-size: 28px;
-  }
-
-  .card-body {
-    padding: 20px;
-  }
-
-  .card-header {
-    padding: 15px 20px;
-  }
-
-  .card-header h2 {
-    font-size: 18px;
-  }
-
-  .el-form-item {
-    margin-bottom: 15px;
-  }
-
-  .submit-btn {
-    padding: 10px 30px;
-    font-size: 14px;
-  }
+/* Reports Section Styles */
+.reports-section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 480px) {
-  .section-title h1 {
-    font-size: 24px;
-  }
+.page-header {
+  margin-bottom: 40px;
+  text-align: center;
+}
 
-  .card-body {
-    padding: 15px;
-  }
+.page-header h2 {
+  color: #22b3c1;
+  margin-bottom: 10px;
+  font-size: 32px;
+  font-weight: 700;
+}
 
-  .el-form-item {
-    margin-bottom: 10px;
-  }
+.page-header p {
+  color: #666;
+  margin: 0;
+  font-size: 16px;
+}
 
-  .upload-content {
-    padding: 30px 15px;
-  }
+.reports-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
 
-  .upload-icon {
-    font-size: 30px;
-  }
+.empty-card {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+}
 
-  .upload-text {
-    font-size: 14px;
-  }
+.empty-content i {
+  font-size: 80px;
+  color: #ddd;
+  margin-bottom: 25px;
+  display: block;
+}
+
+.no-data-text {
+  color: #999;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.loading-container {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-container i {
+  font-size: 50px;
+  color: #22b3c1;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.loading-container p {
+  color: #666;
+  font-size: 16px;
+}
+
+.report-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.report-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.report-card:hover .click-hint {
+  opacity: 1;
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.bird-info h3 {
+  margin: 0 0 6px 0;
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.species {
+  color: #8492a6;
+  font-size: 14px;
+}
+
+.report-details {
+  margin-bottom: 15px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #666;
+  font-size: 14px;
+}
+
+.detail-item i {
+  margin-right: 10px;
+  color: #22b3c1;
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+}
+
+.description {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 3px solid #22b3c1;
+}
+
+.description p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.report-image {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.report-image img {
+  max-width: 100%;
+  max-height: 180px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-footer {
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  text-align: center;
+}
+
+.click-hint {
+  color: #22b3c1;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-page { padding: 40px 0; }
+  .section-title h1 { font-size: 28px; }
+  .card-body { padding: 20px; }
+  .reports-list { grid-template-columns: 1fr; }
+  .page-header h2 { font-size: 26px; }
 }
 </style>
