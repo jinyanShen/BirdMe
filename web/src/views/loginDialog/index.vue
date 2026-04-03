@@ -74,7 +74,7 @@
                   @keyup.enter.native="handleLogin"
                 >
                   <template #prefix>
-                    <i class="input-icon">👤</i>
+                    <i class="input-icon fas fa-user"></i>
                   </template>
                 </el-input>
               </div>
@@ -83,6 +83,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
+
                 <el-input
                   ref="password"
                   v-model="loginForm.password"
@@ -98,14 +99,13 @@
                   <template #prefix>
                     <i class="input-icon fas fa-lock"></i>
                   </template>
-                  <template #suffix>
-                    <i
-                      :class="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
-                      style="cursor: pointer; color: #999; font-size: 16px;"
-                      @click="togglePasswordVisible"
-                    ></i>
-                  </template>
                 </el-input>
+
+                <!--眼睛独立放在这里，完全不受输入框影响 -->
+                <i class="eye-float-icon"
+                   :class="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
+                   @click="togglePasswordVisible"
+                ></i>
               </div>
             </div>
 
@@ -837,39 +837,54 @@ export default {
     .form-group {
       margin-bottom:25px;
       label { display:block; margin-bottom:10px; font-weight:500; color:#333; font-size:14px; }
-      .input-wrapper {
-        position:relative;
 
-        ::v-deep .el-input__prefix {
-          left: 20px !important;
-          display: flex !important;
-          align-items: center !important;
-          height: 50% !important;
-          top: 0 !important;
-          transform: none !important;
+      .input-wrapper {
+        position: relative;
+
+        /* 独立眼睛图标：永远固定，不受任何影响 */
+        .eye-float-icon {
+          position: absolute;
+          right: 20px;
+          top: 50%;
+          transform: translateY(-50%);
+          font-size: 16px;
+          color: #999;
+          cursor: pointer;
+          z-index: 20;
+          pointer-events: auto;
         }
 
         ::v-deep .el-input__inner {
-          padding-left: 50px !important;
-          padding-right: 50px;
-          height: 55px;
-          border-radius: 12px;
-          border: 2px solid #b2bff2;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          background: #e0f7fa;
-
-          &:focus {
-            border-color: #4d66e1;
-            box-shadow: 0 0 0 4px rgba(77,97,225,0.2);
-            background: #fff;
-          }
+          padding: 0 30px 0 50px !important;
+          height: 55px !important;
+          border-radius: 16px !important;
+          border: 2px solid #b2bff2 !important;
+          font-size: 16px !important;
+          background: #E0F7FA !important;
         }
 
         .input-icon {
-          font-size: 18px;
-          color: #666;
-          line-height: 1;
+          position: absolute;
+          left: 2px !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          font-size: 22px !important;
+          color: #666 !important;
+          z-index: 10 !important;
+        }
+
+        ::v-deep .el-input__suffix {
+          position: absolute !important;
+          left: calc(100% - 500px) !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          pointer-events: auto !important;
+          z-index: 15 !important;
+        }
+        .eye-icon {
+          font-size: 18px !important;
+          color: #666 !important;
+          cursor: pointer !important;
         }
       }
     }
