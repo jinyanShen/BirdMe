@@ -143,13 +143,26 @@ export default {
     },
 
     handleLogout() {
-      sessionStorage.clear()
+      // 清除所有登录信息
+      sessionStorage.removeItem('id')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('password')
+      sessionStorage.removeItem('name')
+      sessionStorage.removeItem('age')
+      sessionStorage.removeItem('phone')
+      sessionStorage.removeItem('avatarUrl')
+      sessionStorage.removeItem('role')
+
       this.isLoggedIn = false
-      if (this.$message && this.$message.success) {
-        this.$message.success('Logged out successfully')
+      this.$message.success('Logged out successfully')
+
+      // 如果当前在需要登录的页面，跳转到首页
+      const needAuthPages = ['/identification', '/settings']
+      if (needAuthPages.includes(this.$route.path)) {
+        this.$router.push('/')
       }
-      this.$router.push('/login')
     },
+
 
     selectGameFromNav(gameKey) {
       const targetPath = `/game/${gameKey}`

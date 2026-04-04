@@ -10,7 +10,15 @@
           <span class="nav-item active" @click="goToKnowledge">Knowledge</span>
           <span class="nav-item" @click="goToRescue">Rescue</span>
           <span class="nav-item" @click="goToForum">Forum</span>
-          <span class="nav-item" @click="goToGame">Game</span>
+          <div class="nav-item game-dropdown" @click="goToGame">
+            Game
+            <div class="game-dropdown-menu">
+              <div class="game-dropdown-item" @click.stop="selectGameFromNav('flappy')">Flappy Bird</div>
+              <div class="game-dropdown-item" @click.stop="selectGameFromNav('2048')">2048 Bird</div>
+              <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
+            </div>
+          </div>
+
           <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
           <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
           <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
@@ -37,6 +45,7 @@
           <i class="el-icon-picture"></i>
           <span>Bird Identification</span>
         </div>
+
       </div>
 
       <!-- 子页面路由出口 -->
@@ -119,6 +128,20 @@ export default {
     switchTab(tab) {
       this.currentTab = tab
       this.$router.push(`/knowledge/${tab}`)
+    },
+
+    selectGameFromNav(gameKey) {
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+
+      this.$router.push(targetPath)
+    },
+
+    selectGame(gameKey) {
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+
+      this.$router.push(targetPath)
     }
   },
 
@@ -152,6 +175,54 @@ export default {
 </script>
 
 <style scoped>
+/* Game 顶部下拉菜单（hover 展开，不依赖点击） */
+.game-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .game-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    z-index: 1001;
+
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    padding: 8px 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .game-dropdown-item {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      &:hover {
+        background: #f2f3ff;
+        color: #22b3c1;
+      }
+    }
+  }
+
+  &:hover {
+    .game-dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
 .knowledge-page {
   padding-top: 70px;
   background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
