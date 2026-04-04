@@ -14,22 +14,22 @@ export default {
 
       newsList: [
         {
-          id: 1,
-          title: '春季鸟类迁徙保护行动',
-          description: '全国多地开展鸟类迁徙通道保护工作，志愿者招募中',
-          image: 'https://picsum.photos/800/400?random=1'
+          "id": 1,
+          "title": "Spring Bird Migration Protection Action",
+          "description": "Bird migration corridor protection work is being carried out nationwide, volunteers are being recruited",
+          "image": "https://picsum.photos/800/400?random=1"
         },
         {
-          id: 2,
-          title: '新增3个鸟类自然保护区',
-          description: '保护面积扩大2000公顷，为候鸟提供更多栖息地',
-          image: 'https://picsum.photos/800/400?random=2'
+          "id": 2,
+          "title": "3 New Bird Nature Reserves Established",
+          "description": "Protected area expanded by 2,000 hectares, providing more habitats for migratory birds",
+          "image": "https://picsum.photos/800/400?random=2"
         },
         {
-          id: 3,
-          title: 'AI鸟类识别系统上线',
-          description: '拍照即可识别500+种鸟类',
-          image: 'https://picsum.photos/800/400?random=3'
+          "id": 3,
+          "title": "AI Bird Recognition System Launched",
+          "description": "Take a photo to identify 500+ bird species",
+          "image": "https://picsum.photos/800/400?random=3"
         }
       ]
     }
@@ -367,7 +367,7 @@ export default {
 
         <!-- 轮播图容器 -->
         <div class="carousel-section fade-in-up">
-          <h3>鸟类保护新闻</h3>
+          <h3>News about Birds</h3>
           <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
             <el-carousel-item v-for="(item, index) in newsList" :key="index">
               <div class="carousel-item" @click="goToNews(item.id)">
@@ -375,7 +375,7 @@ export default {
                 <div class="carousel-overlay">
                   <h4>{{ item.title }}</h4>
                   <p>{{ item.description }}</p>
-                  <span class="read-more">点击查看详情 →</span>
+                  <span class="read-more">Check Detail →</span>
                 </div>
               </div>
             </el-carousel-item>
@@ -384,8 +384,8 @@ export default {
 
         <div class="knowledge-cards-wrapper">
           <div class="section fade-in-up">
-            <h3>Knowledge Part</h3>
-            <p>简介还没写</p>
+            <h3>Knowledge Base</h3>
+            <p>A collection featuring bird identification, migration route maps, and educational resources.</p>
             <div class="section-divider"></div>
           </div>
 
@@ -393,22 +393,111 @@ export default {
             <div class="card fade-in-up">
               <i class="el-icon-camera"></i>
               <h4>Identification</h4>
-              <p>AI智能识别鸟类品种</p>
-              <button class="btn">开始识别</button>
+              <p>AI-powered bird species recognition</p>
+              <button class="btn">Start Identifying</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-location-information"></i>
-              <h4>MigrationMap</h4>
-              <p>鸟类迁徙路线地图</p>
-              <button class="btn">查看地图</button>
+              <h4>Migration Map</h4>
+              <p>Bird migration route map</p>
+              <button class="btn">View Map</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-info"></i>
-              <h4>Tips</h4>
-              <p>鸟类保护小贴士</p>
-              <button class="btn">了解更多</button>
+              <h4>Birding Tips</h4>
+              <p>Bird conservation tips</p>
+              <button class="btn">Learn More</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rescue 板块 -->
+        <div class="knowledge-cards-wrapper">
+          <div class="section fade-in-up">
+            <h3>Bird Rescue</h3>
+            <p>Report injured birds, find rescue centers, and learn first‑aid tips to help birds in need.</p>
+            <div class="section-divider"></div>
+          </div>
+          <div class="cards-container">
+            <div class="card fade-in-up">
+              <i class="el-icon-warning"></i>
+              <h4>Report Injury</h4>
+              <p>Submit rescue reports with location & photos</p>
+              <button class="btn">Report Now</button>
+            </div>
+            <div class="card fade-in-up">
+              <i class="el-icon-location"></i>
+              <h4>Rescue Centers</h4>
+              <p>Find nearest bird rescue & rehabilitation centers</p>
+              <button class="btn">Find Centers</button>
+            </div>
+            <div class="card fade-in-up">
+              <i class="el-icon-first-aid-kit"></i>
+              <h4>First Aid Tips</h4>
+              <p>Basic steps to help a bird before professional care</p>
+              <button class="btn">Learn First Aid</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forum 板块（重新设计版） -->
+        <div class="knowledge-cards-wrapper">
+          <div class="section fade-in-up">
+            <h3>Community Forum</h3>
+            <p>Expert tips, rescue assistance, and daily birdwatching stories – all in one place.</p>
+            <div class="section-divider"></div>
+          </div>
+          <div class="cards-container">
+            <div class="card fade-in-up">
+              <i class="el-icon-star-on"></i>
+              <h4>Featured & Sticky</h4>
+              <p>Expert / admin pinned posts, guidelines, and essential resources</p>
+              <button class="btn">Explore Highlights</button>
+            </div>
+
+            <div class="card fade-in-up">
+              <i class="el-icon-warning-outline"></i>
+              <h4>Rescue Help</h4>
+              <p>Post urgent rescue requests or ask for help with injured birds</p>
+              <button class="btn">Ask for Rescue</button>
+            </div>
+
+            <div class="card fade-in-up">
+              <i class="el-icon-camera-solid"></i>
+              <h4>Birdwatching & Life</h4>
+              <p>Share daily sightings, bird photos, and casual conversations</p>
+              <button class="btn">Join Discussion</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Game 板块 -->
+        <div class="knowledge-cards-wrapper">
+          <div class="section fade-in-up">
+            <h3>Bird Games</h3>
+            <p>Play fun bird‑themed games, challenge your friends, and earn badges.</p>
+            <div class="section-divider"></div>
+          </div>
+          <div class="cards-container">
+            <div class="card fade-in-up">
+              <i class="el-icon-video-game"></i>
+              <h4>Flappy Bird</h4>
+              <p>Classic side‑scroller with bird characters</p>
+              <button class="btn">Play Now</button>
+            </div>
+            <div class="card fade-in-up">
+              <i class="el-icon-puzzle-piece"></i>
+              <h4>2048 Bird</h4>
+              <p>Merge birds to reach the giant bird</p>
+              <button class="btn">Play Now</button>
+            </div>
+            <div class="card fade-in-up">
+              <i class="el-icon-connection"></i>
+              <h4>Merge To Giant Bird</h4>
+              <p>Combine species to create rare birds</p>
+              <button class="btn">Play Now</button>
             </div>
           </div>
         </div>
@@ -572,7 +661,7 @@ export default {
 }
 
 .content-below {
-  background: linear-gradient(135deg, #bbb4ea 0%, #6558d6 100%);
+  background: linear-gradient(135deg, #bfbbe4 0%, #6668d8 100%);
   padding: 60px 20px;
   color: white;
 
@@ -1099,7 +1188,7 @@ export default {
 
   padding: 80px 120px;
   border-radius: 32px;
-  background: linear-gradient(135deg, rgba(101, 88, 214, 0.7), rgba(63, 51, 128, 0.7));
+  background: linear-gradient(135deg, rgba(103, 143, 230, 0.7), rgba(161, 191, 230, 0.7));
   backdrop-filter: blur(5px);
   box-shadow: 0 12px 40px rgba(63, 51, 128, 0.4);
   z-index: 2;

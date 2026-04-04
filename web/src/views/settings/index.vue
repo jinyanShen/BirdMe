@@ -1,5 +1,24 @@
 <template>
   <div class="profile-page">
+    <!-- 顶部导航栏（与 Knowledge 页面一致） -->
+    <div class="top-navbar">
+      <div class="navbar-container">
+        <div class="logo">
+          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
+        </div>
+        <div class="nav-menu">
+          <span class="nav-item" @click="goToHome">Homepage</span>
+          <span class="nav-item" @click="goToKnowledge">Knowledge</span>
+          <span class="nav-item" @click="goToRescue">Rescue</span>
+          <span class="nav-item" @click="goToForum">Forum</span>
+          <span class="nav-item" @click="goToGame">Game</span>
+          <span class="nav-item active" @click="goToPersonalPage">Personal Setting</span>
+          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
+          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
+        </div>
+      </div>
+    </div>
+
     <div class="container">
       <!-- Page Title -->
       <div class="section-title">
@@ -164,7 +183,7 @@
 </template>
 
 <script>
-import { pageUser, getUser, delUser, insertUser, updateUser } from "@/api/user";
+import { updateUser } from "@/api/user";
 import { getReportsBySubmitter } from '@/api/report'
 import ReportDetail from '@/components/ReportDetail/index.vue'
 
@@ -174,6 +193,7 @@ export default {
   },
   data() {
     return {
+      isLoggedIn: false,
       form: {
         id: parseInt(sessionStorage.getItem("id")),
         username: sessionStorage.getItem("username"),
@@ -193,16 +213,96 @@ export default {
   },
 
   mounted() {
+    this.checkLoginStatus();
     this.loadReports();
   },
 
   methods: {
+    // 检查登录状态
+    checkLoginStatus() {
+      this.isLoggedIn = sessionStorage.getItem('id') !== null;
+    },
+
+    // 登出
+    handleLogout() {
+      sessionStorage.removeItem('id');
+      sessionStorage.removeItem('username');
+      sessionStorage.removeItem('password');
+      sessionStorage.removeItem('name');
+      sessionStorage.removeItem('age');
+      sessionStorage.removeItem('phone');
+      sessionStorage.removeItem('avatarUrl');
+      sessionStorage.removeItem('role');
+
+      this.isLoggedIn = false;
+      this.$message.success('Logged out successfully');
+      this.$router.push('/');
+    },
+
+    // 导航方法
+    goToHome() {
+      if (this.$route.path === '/') return;
+      this.$router.push('/');
+    },
+
+    goToKnowledge() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge');
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge');
+        }
+      }
+    },
+
+    goToRescue() {
+      if (this.isLoggedIn) {
+        this.$router.push('/rescue');
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/rescue');
+        }
+      }
+    },
+
+    goToForum() {
+      if (this.isLoggedIn) {
+        this.$router.push('/forum');
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/forum');
+        }
+      }
+    },
+
+    goToGame() {
+      if (this.isLoggedIn) {
+        this.$router.push('/game');
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/game');
+        }
+      }
+    },
+
+    goToPersonalPage() {
+      // 已在当前页面
+      if (this.$route.path === '/settings/index') return;
+      this.$router.push('/settings/index');
+    },
+
+    goToLogin() {
+      if (window.$loginDialog) {
+        window.$loginDialog.show('/');
+      }
+    },
+
     // Profile methods
     togglePassword() {
       this.passwordFieldType = this.passwordFieldType === 'password' ? 'text' : 'password';
     },
     handleUploadSuccess(response, file) {
-      this.form.avatarUrl = "http://localhost:8080/file/download?id=" + response.data.id
+      this.form.avatarUrl = "http://localhost:8080/file/download?id=" + response.data.id;
       this.pictureList.push(response.data);
       this.$message.success('File uploaded successfully');
     },
@@ -229,48 +329,165 @@ export default {
 
     // Report methods
     loadReports() {
-      this.loading = true
+      this.loading = true;
       getReportsBySubmitter("user").then(response => {
         if (response.code === 200) {
-          this.reports = response.data || []
+          this.reports = response.data || [];
         } else {
-          this.$message.error('Failed to load reports')
+          this.$message.error('Failed to load reports');
         }
-        this.loading = false
+        this.loading = false;
       }).catch(error => {
-        console.error('Error loading reports:', error)
-        this.$message.error('Failed to load reports')
-        this.loading = false
-      })
+        console.error('Error loading reports:', error);
+        this.$message.error('Failed to load reports');
+        this.loading = false;
+      });
     },
     viewDetails(report) {
-      this.selectedReport = { ...report }
-      this.dialogVisible = true
+      this.selectedReport = { ...report };
+      this.dialogVisible = true;
     },
     getStatusType(status) {
       switch (status) {
-        case 'PENDING': return 'warning'
-        case 'PROCESSING': return 'info'
-        case 'COMPLETED': return 'success'
-        case 'CANCELLED': return 'danger'
-        default: return 'info'
+        case 'PENDING': return 'warning';
+        case 'PROCESSING': return 'info';
+        case 'COMPLETED': return 'success';
+        case 'CANCELLED': return 'danger';
+        default: return 'info';
       }
     },
     formatDate(dateString) {
-      if (!dateString) return 'N/A'
-      const date = new Date(dateString)
-      return date.toLocaleString()
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleString();
     }
   },
+
+  watch: {
+    '$route'() {
+      this.checkLoginStatus();
+    }
+  }
 };
 </script>
 
 <style scoped>
 /* Profile Page Styles */
 .profile-page {
-  padding: 60px 0;
+  padding-top: 70px;
   background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
   min-height: 100vh;
+}
+
+/* 顶部导航栏样式（与 Knowledge 页面一致） */
+.top-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #22b3c1;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.logo h3:hover {
+  color: #1a9aa8;
+}
+
+.nav-menu {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  transition: color 0.3s;
+  cursor: pointer;
+  padding: 8px 0;
+  position: relative;
+}
+
+.nav-item:hover {
+  color: #22b3c1;
+}
+
+.nav-item.active {
+  color: #22b3c1;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #22b3c1;
+  animation: slideIn 0.3s ease-out;
+}
+
+.login-btn {
+  background: #22b3c1;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+}
+
+.login-btn:hover {
+  background: #1a9aa8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+  color: white !important;
+}
+
+.logout-btn {
+  background: #ff6b6b;
+  color: white !important;
+  padding: 8px 20px;
+  border-radius: 25px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  color: white !important;
+}
+
+@keyframes slideIn {
+  from {
+    width: 0;
+    opacity: 0;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
 }
 
 .container {
@@ -562,10 +779,27 @@ export default {
 
 /* Responsive */
 @media (max-width: 768px) {
-  .profile-page { padding: 40px 0; }
+  .profile-page { padding-top: 60px; }
   .section-title h1 { font-size: 28px; }
   .card-body { padding: 20px; }
   .reports-list { grid-template-columns: 1fr; }
   .page-header h2 { font-size: 26px; }
+
+  .navbar-container {
+    padding: 10px 15px;
+  }
+  .logo h3 {
+    font-size: 20px;
+  }
+  .nav-menu {
+    gap: 15px;
+  }
+  .nav-item {
+    font-size: 14px;
+  }
+  .login-btn,
+  .logout-btn {
+    padding: 6px 15px;
+  }
 }
 </style>
