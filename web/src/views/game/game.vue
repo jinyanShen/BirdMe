@@ -119,8 +119,8 @@ export default {
     },
 
     goToKnowledge() {
-      if (this.isLoggedIn) this.$router.push('/identification')
-      else window.$showLoginDialog && window.$showLoginDialog('/identification')
+      if (this.isLoggedIn) this.$router.push('/knowledge/migration')
+      else window.$showLoginDialog && window.$showLoginDialog('/knowledge/migration')
     },
 
     goToRescue() {
@@ -134,8 +134,8 @@ export default {
     },
 
     goToPersonalPage() {
-      if (this.isLoggedIn) this.$router.push('/center')
-      else window.$showLoginDialog && window.$showLoginDialog('/center')
+      if (this.isLoggedIn) this.$router.push('/settings/index')
+      else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
     },
 
     goToLogin() {
@@ -290,7 +290,7 @@ export default {
 
 /* 复用首页渐变背景（需要给顶部固定导航预留空间） */
 .content-below {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #97a1d3 0%, #856ad5 100%);
   padding: 110px 20px 80px;
   color: white;
 }

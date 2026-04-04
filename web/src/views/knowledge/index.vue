@@ -101,11 +101,13 @@ export default {
     },
 
     goToGame() {
-      console.log('Game page - to be implemented')
+      if (this.isLoggedIn) this.$router.push('/game')
+      else window.$showLoginDialog && window.$showLoginDialog('/game')
     },
 
     goToPersonalPage() {
-      console.log('Personal page - to be implemented')
+      if (this.isLoggedIn) this.$router.push('/settings/index')
+      else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
     },
 
     goToLogin() {

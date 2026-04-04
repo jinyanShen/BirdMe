@@ -106,6 +106,7 @@ export default {
   position: sticky;
   top: 0;
   z-index: 100;
+  display: none !important;
 }
   .main-nav {
     display: flex;
