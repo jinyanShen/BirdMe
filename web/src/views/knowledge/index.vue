@@ -7,10 +7,29 @@
         </div>
         <div class="nav-menu">
           <span class="nav-item" @click="goToHome">Homepage</span>
-          <span class="nav-item active" @click="goToKnowledge">Knowledge</span>
-          <span class="nav-item" @click="goToRescue">Rescue</span>
-          <span class="nav-item" @click="goToForum">Forum</span>
-          <span class="nav-item" @click="goToGame">Game</span>
+          <div class="dropdown">
+            <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" @click="switchTab('migration')">Migration Map</div>
+              <div class="dropdown-item" @click="switchTab('identification')">Identification</div>
+              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <span class="nav-item">Forum ▾</span>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" @click="goToForumPage">Bird Watching</div>
+              <div class="dropdown-item" @click="goToQAPage">Q&A</div>
+            </div>
+          </div>
+          <div class="dropdown">
+            <span class="nav-item">Game ▾</span>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>
+              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>
+              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>
+            </div>
+          </div>
           <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
           <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
           <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
@@ -51,10 +70,36 @@ export default {
   data() {
     return {
       isLoggedIn: false,
-      currentTab: 'migration'
+      currentTab: 'migration',
+      dropdowns: {
+        knowledge: false,
+        forum: false,
+        game: false
+      },
+      isKnowledgeActive: true
     }
   },
   methods: {
+    toggleDropdown(dropdown) {
+      Object.keys(this.dropdowns).forEach(key => {
+        if (key !== dropdown) {
+          this.dropdowns[key] = false
+        }
+      })
+      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
+    },
+    goToFunFacts() {
+      this.$router.push('/knowledge/facts')
+    },
+    goToForumPage() {
+      this.$router.push('/forum/birdwatching')
+    },
+    goToQAPage() {
+      this.$router.push('/forum/qa')
+    },
+    goToGamePage(gameKey) {
+      this.$router.push(`/game/${gameKey}`)
+    },
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
@@ -203,6 +248,72 @@ export default {
   cursor: pointer;
   padding: 8px 0;
   position: relative;
+}
+
+.nav-item:hover {
+  color: #22b3c1;
+}
+
+.nav-item.active {
+  color: #22b3c1;
+}
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #22b3c1;
+  animation: slideIn 0.3s ease-out;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dropdown .dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+  z-index: 1001;
+
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  padding: 8px 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.dropdown .dropdown-menu .dropdown-item {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown .dropdown-menu .dropdown-item:hover {
+  background: #e0f7fa;
+  color: #22b3c1;
+}
+
+.dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
 }
 
 .nav-item:hover {

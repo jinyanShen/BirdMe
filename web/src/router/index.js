@@ -41,6 +41,12 @@ export const constantRoutes = [
         meta: { title: 'Bird Identification', requiresAuth: true }
       },
       {
+        path: 'facts',
+        component: () => import('@/views/knowledge/FunFacts'),
+        name: 'FunFacts',
+        meta: { title: 'Fun Facts', requiresAuth: true }
+      },
+      {
         path: '',
         redirect: 'migration'  // 默认显示迁徙页面
       }
@@ -127,6 +133,33 @@ export const constantRoutes = [
         meta: { title: 'Rescue Station Management', icon: 'location', noCache: true }
       },
     ]
+  },
+  {
+    path: '/forum',
+    component: () => import('@/views/forum/Forum'),
+    name: 'Forum',
+    meta: { title: 'Forum' },
+    children: [
+      {
+        path: 'birdwatching',
+        component: () => import('@/views/forum/Forum'),
+        name: 'ForumBirdWatching',
+        meta: { title: 'Bird Watching' }
+      },
+      {
+        path: 'qa',
+        component: () => import('@/views/forum/Forum'),
+        name: 'ForumQA',
+        meta: { title: 'Q&A' }
+      }
+    ]
+  },
+  {
+    path: '/forum/post/:id',
+    component: () => import('@/views/forum/PostDetail'),
+    name: 'PostDetail',
+    hidden: true,
+    meta: { title: 'Post Detail' }
   },
 ]
 

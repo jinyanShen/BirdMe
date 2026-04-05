@@ -15,7 +15,29 @@
 
               <!-- Navigation Menu -->
               <ul class="nav">
-                <li><a href="#" :class="{ active: $route.path === '/identification' }" @click="$router.push('/identification')">Bird Identification</a></li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle">Knowledge</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" @click.prevent="$router.push('/knowledge/migration')">Migration Map</a></li>
+                    <li><a href="#" @click.prevent="$router.push('/knowledge/identification')">Identification</a></li>
+                    <li><a href="#" @click.prevent="$router.push('/knowledge/facts')">Fun Facts</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle">Forum</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" @click.prevent="$router.push('/forum/birdwatching')">Bird Watching</a></li>
+                    <li><a href="#" @click.prevent="$router.push('/forum/qa')">Q&A</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle">Game</a>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" @click.prevent="$router.push('/game/flappy')">Flappy</a></li>
+                    <li><a href="#" @click.prevent="$router.push('/game/2048')">2048</a></li>
+                    <li><a href="#" @click.prevent="$router.push('/game/merge')">Merge</a></li>
+                  </ul>
+                </li>
                 <li><a href="#" :class="{ active: $route.path === '/center' }" @click="$router.push('/center')">Personal Center</a></li>
                 <li><a href="#" :class="{ active: $route.path === '/report' }" @click="$router.push('/report')">My Reports</a></li>
               </ul>
@@ -141,6 +163,8 @@ export default {
       gap: 40px;
 
       li {
+        position: relative;
+
         a {
           color: #22b3c1;
           text-decoration: none;
@@ -149,6 +173,7 @@ export default {
           transition: all 0.3s ease;
           position: relative;
           padding: 10px 0;
+          display: block;
 
           &:hover {
             color: #0097a7;
@@ -167,6 +192,62 @@ export default {
               height: 3px;
               background: var(--secondary-color);
               border-radius: 2px;
+            }
+          }
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          background: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 15px 30px rgba(34, 179, 193, 0.2);
+          padding: 15px 0;
+          min-width: 200px;
+          z-index: 1000;
+          margin-top: 5px;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s ease, visibility 0.3s ease;
+
+          li {
+            a {
+              padding: 12px 20px;
+              font-size: 14px;
+              font-weight: 500;
+
+              &:hover {
+                background: var(--background-light);
+                color: var(--primary-color);
+                padding-left: 25px;
+              }
+
+              &::after {
+                display: none;
+              }
+            }
+          }
+        }
+
+        &.dropdown {
+          &:hover {
+            .dropdown-menu {
+              opacity: 1;
+              visibility: visible;
+            }
+          }
+
+          .dropdown-toggle {
+            cursor: pointer;
+            position: relative;
+
+            &::after {
+              content: '▼';
+              font-size: 10px;
+              margin-left: 5px;
+              vertical-align: middle;
+              transition: transform 0.3s ease;
             }
           }
         }

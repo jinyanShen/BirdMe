@@ -270,6 +270,12 @@ export default {
       bgGif: bgGif,
       showNavbar: false,
       isLoggedIn: false,
+      dropdowns: {
+        knowledge: false,
+        forum: false,
+        game: false
+      },
+      isKnowledgeActive: false,
 
       newsList: [
         {
@@ -299,6 +305,41 @@ export default {
     this.checkLoginStatus()
   },
   methods: {
+    toggleDropdown(dropdown) {
+      Object.keys(this.dropdowns).forEach(key => {
+        if (key !== dropdown) {
+          this.dropdowns[key] = false
+        }
+      })
+      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
+    },
+    goToKnowledgePage(tab) {
+      if (this.isLoggedIn) {
+        this.$router.push(`/knowledge/${tab}`)
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/knowledge/${tab}`)
+        }
+      }
+    },
+    goToFunFacts() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/facts')
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge/facts')
+        }
+      }
+    },
+    goToForumPage(tab) {
+      if (this.isLoggedIn) {
+        this.$router.push(`/forum/${tab}`)
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/forum/${tab}`)
+        }
+      }
+    },
     // 检查登录状态
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
@@ -577,26 +618,33 @@ export default {
           </div>
           <div class="nav-menu">
             <router-link to="/" class="nav-item">Homepage</router-link>
-<!--            <a href="#knowledge" class="nav-item">Knowledge</a>-->
-<!--            <a href="#rescur" class="nav-item">Rescue</a>-->
-<!--            <a href="#forum" class="nav-item">Forum</a>-->
-<!--            <a href="#game" class="nav-item">Game</a>-->
-
-<!--            把my reports和personal center合到一起-->
-            <span class="nav-item" @click="goToKnowledge">Knowledge</span>
-            <span class="nav-item" @click="goToRescue">Rescue</span>
-            <span class="nav-item" @click="goToForum">Forum</span>
-            <div class="nav-item game-dropdown" @click="goToGame">
-              Game
+            <div class="dropdown">
+              <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
+                <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
+                <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+              </div>
+            </div>
+            <div class="dropdown">
+              <span class="nav-item">Forum ▾</span>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
+                <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
+              </div>
+            </div>
+            <div class="dropdown game-dropdown">
+              <span class="nav-item">Game ▾</span>
               <div class="game-dropdown-menu">
-                <div class="game-dropdown-item" @click.stop="selectGameFromNav('flappy')">Flappy Bird</div>
-                <div class="game-dropdown-item" @click.stop="selectGameFromNav('2048')">2048 Bird</div>
-                <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
+                <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
+                <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
+                <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
               </div>
             </div>
             <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-            <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>          </div>
+            <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
+          </div>
         </div>
       </div>
 
@@ -1198,7 +1246,7 @@ export default {
 
         .game-dropdown-menu {
           position: absolute;
-          /* 让下拉菜单紧贴 Game，避免鼠标从文字移动到菜单时“穿过空隙”导致菜单消失 */
+          /* 让下拉菜单紧贴 Game，避免鼠标从文字移动到菜单时"穿过空隙"导致菜单消失 */
           top: 100%;
           left: 50%;
           transform: translateX(-50%) translateY(0);
@@ -1234,6 +1282,54 @@ export default {
 
         &:hover {
           .game-dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(0);
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+          z-index: 1001;
+
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-radius: 12px;
+          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+          min-width: 180px;
+          padding: 8px 0;
+
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+
+          .dropdown-item {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+            &:hover {
+              background: #f2f3ff;
+              color: #6f5bb8;
+            }
+          }
+        }
+
+        &:hover {
+          .dropdown-menu {
             opacity: 1;
             visibility: visible;
             transform: translateX(-50%) translateY(0);
