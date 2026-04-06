@@ -56,7 +56,7 @@
             <div class="form-group">
               <label>Username</label>
               <div class="input-wrapper">
-                <i class="input-icon">👤</i>
+                <i class="input-icon fas fa-user"></i>
                 <el-input
                   ref="username"
                   v-model="loginForm.username"
@@ -937,12 +937,13 @@ export default {
 
         .input-icon {
           position: absolute;
-          left: 20px;
           top: 50%;
           transform: translateY(-50%);
           font-size: 18px;
           color: var(--text-light);
           z-index: 1;
+          font-style: normal;
+          padding-left: 10px;
         }
 
         ::v-deep .el-input {
