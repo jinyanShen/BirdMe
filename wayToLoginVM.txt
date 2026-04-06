@@ -1,0 +1,4 @@
+open cmd
+enter：ssh CS22207228@ipa-rdp.ucd.ie VJTslcjH7uiiRGjU     ssh CS22207230@ipa-rdp.ucd.ie iZrCtOb3MMSwuwf3
+
+password：Totally_leave_204

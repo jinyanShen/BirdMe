@@ -1,2 +1,0 @@
-打开cmd，输入：ssh CS22207228@ipa-rdp.ucd.ie VJTslcjH7uiiRGjU     ssh CS22207230@ipa-rdp.ucd.ie iZrCtOb3MMSwuwf3
-密码：Totally_leave_204
