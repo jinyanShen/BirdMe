@@ -10,16 +10,29 @@
         <div class="nav-menu">
           <router-link to="/" class="nav-item">Homepage</router-link>
 
-          <span class="nav-item" @click="goToKnowledge">Knowledge</span>
-          <span class="nav-item" @click="goToRescue">Rescue</span>
-          <span class="nav-item" @click="goToForum">Forum</span>
+          <div class="dropdown">
+            <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
+              <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
+              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+            </div>
+          </div>
 
-          <div class="nav-item game-dropdown" @click="goToGame">
-            Game
+          <div class="dropdown">
+            <span class="nav-item">Forum ▾</span>
+            <div class="dropdown-menu">
+              <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
+              <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
+            </div>
+          </div>
+
+          <div class="dropdown game-dropdown">
+            <span class="nav-item">Game ▾</span>
             <div class="game-dropdown-menu">
-              <div class="game-dropdown-item" @click.stop="selectGameFromNav('flappy')">Flappy Bird</div>
-              <div class="game-dropdown-item" @click.stop="selectGameFromNav('2048')">2048 Bird</div>
-                <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
+              <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
+              <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
+              <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
             </div>
           </div>
 
@@ -97,13 +110,36 @@ export default {
       isLoggedIn: false,
       flappyImg,
       img2048,
-      mergeImg
+      mergeImg,
+      dropdowns: {
+        knowledge: false,
+        forum: false,
+        game: false
+      },
+      isKnowledgeActive: false
     }
   },
   mounted() {
     this.checkLoginStatus()
   },
   methods: {
+    toggleDropdown(dropdown) {
+      Object.keys(this.dropdowns).forEach(key => {
+        if (key !== dropdown) {
+          this.dropdowns[key] = false
+        }
+      })
+      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
+    },
+    goToKnowledgePage(tab) {
+      this.$router.push(`/knowledge/${tab}`)
+    },
+    goToFunFacts() {
+      this.$router.push('/knowledge/facts')
+    },
+    goToForumPage(tab) {
+      this.$router.push(`/forum/${tab}`)
+    },
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
@@ -119,8 +155,8 @@ export default {
     },
 
     goToKnowledge() {
-      if (this.isLoggedIn) this.$router.push('/identification')
-      else window.$showLoginDialog && window.$showLoginDialog('/identification')
+      if (this.isLoggedIn) this.$router.push('/knowledge/migration')
+      else window.$showLoginDialog && window.$showLoginDialog('/knowledge/migration')
     },
 
     goToRescue() {
@@ -134,8 +170,8 @@ export default {
     },
 
     goToPersonalPage() {
-      if (this.isLoggedIn) this.$router.push('/center')
-      else window.$showLoginDialog && window.$showLoginDialog('/center')
+      if (this.isLoggedIn) this.$router.push('/settings/index')
+      else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
     },
 
     goToLogin() {
@@ -143,13 +179,26 @@ export default {
     },
 
     handleLogout() {
-      sessionStorage.clear()
+      // 清除所有登录信息
+      sessionStorage.removeItem('id')
+      sessionStorage.removeItem('username')
+      sessionStorage.removeItem('password')
+      sessionStorage.removeItem('name')
+      sessionStorage.removeItem('age')
+      sessionStorage.removeItem('phone')
+      sessionStorage.removeItem('avatarUrl')
+      sessionStorage.removeItem('role')
+
       this.isLoggedIn = false
-      if (this.$message && this.$message.success) {
-        this.$message.success('Logged out successfully')
+      this.$message.success('Logged out successfully')
+
+      // 如果当前在需要登录的页面，跳转到首页
+      const needAuthPages = ['/identification', '/settings']
+      if (needAuthPages.includes(this.$route.path)) {
+        this.$router.push('/')
       }
-      this.$router.push('/login')
     },
+
 
     selectGameFromNav(gameKey) {
       const targetPath = `/game/${gameKey}`
@@ -288,9 +337,58 @@ export default {
   }
 }
 
+/* Dropdown styles for game page */
+.dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(0);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+    z-index: 1001;
+
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    padding: 8px 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    .dropdown-item {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #333;
+      cursor: pointer;
+      transition: background 0.2s ease, color 0.2s ease;
+      &:hover {
+        background: #f2f3ff;
+        color: #6f5bb8;
+      }
+    }
+  }
+
+  &:hover {
+    .dropdown-menu {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
 /* 复用首页渐变背景（需要给顶部固定导航预留空间） */
 .content-below {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #97a1d3 0%, #856ad5 100%);
   padding: 110px 20px 80px;
   color: white;
 }
