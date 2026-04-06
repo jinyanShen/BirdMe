@@ -116,3 +116,60 @@ VALUES ('Owl', 'Bubo virginianus', 39.9642, 116.4674, 'Woodland Park', 'Eye inju
 
 INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
 VALUES ('Duck', 'Anas platyrhynchos', 39.9742, 116.4774, 'Lake Side', 'Leg injury', 'The bird has a broken leg', NULL, 'PROCESSING', datetime('now'), datetime('now'), 'user', 2, 'Found near the lake shore');
+
+-- Create forum_post table
+CREATE TABLE IF NOT EXISTS forum_post (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title VARCHAR(200) NOT NULL,
+    content TEXT NOT NULL,
+    image_url VARCHAR(255),
+    tag VARCHAR(50) NOT NULL,
+    category VARCHAR(50) NOT NULL,
+    author_id INTEGER NOT NULL,
+    author_name VARCHAR(50) NOT NULL,
+    author_avatar VARCHAR(255),
+    is_pinned INTEGER DEFAULT 0,
+    view_count INTEGER DEFAULT 0,
+    reply_count INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (author_id) REFERENCES user(id)
+);
+
+-- Create forum_reply table
+CREATE TABLE IF NOT EXISTS forum_reply (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER NOT NULL,
+    author_name VARCHAR(50) NOT NULL,
+    author_avatar VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (post_id) REFERENCES forum_post(id),
+    FOREIGN KEY (author_id) REFERENCES user(id)
+);
+
+-- Insert sample forum posts (delete existing data first to avoid duplicates)
+DELETE FROM forum_post;
+DELETE FROM forum_reply;
+
+INSERT INTO forum_post (title, content, tag, category, author_id, author_name, author_avatar, is_pinned, view_count, reply_count) VALUES 
+('Best Bird Watching Spots in Spring', 'Hello everyone! Spring is here. I want to share some of my favorite bird watching locations. First is the Wetland Park in the city center, where many migratory birds gather...', 'Bird Watching', 'birdwatching', 1, 'Zhang San', 'http://localhost:8080/file/download?id=cb7cd1ec17624b27bafc3b63a53310a4', 1, 120, 15),
+('How to Distinguish Sparrows from Tits?', 'Newbie here! I saw two types of small birds in the park that look very similar. How can I tell them apart? Any experts can help?', 'Bird Watching', 'birdwatching', 2, 'Li Si', 'http://localhost:8080/file/download?id=bc0a475b0d7d4fbeac5106d2015f631c', 0, 85, 8),
+('Important Notes on Keeping Kestrels', 'Some friends asked if kestrels can be kept as pets. Let me clarify: Kestrels are national second-class protected animals, and private ownership is illegal...', 'Education', 'birdwatching', 3, 'Admin', 'http://localhost:8080/file/download?id=0c58187449134bf8ac4bbeaeda45da1b', 1, 256, 32),
+('Captured Beautiful Egret Photos!', 'Took these photos at the lake today. Sharing with everyone! Equipment: Canon R5 + 100-400mm lens', 'Photography', 'birdwatching', 4, 'Wang Wu', 'http://localhost:8080/file/download?id=0c43b993aca446f195c3821c712f3838', 0, 178, 22),
+('Help: What to Do with Injured Bird?', 'Found an injured bird on my balcony, seems like its wing is hurt. What should I do?', 'Help', 'qa', 5, 'Zhao Liu', 'http://localhost:8080/file/download?id=08912f72952e42d1a977378f68ecb2e9', 0, 45, 6),
+('Bird Migration Routes Explained', 'Every spring and autumn, billions of birds migrate long distances. There are three main bird migration routes in China...', 'Education', 'birdwatching', 3, 'Admin', 'http://localhost:8080/file/download?id=0c58187449134bf8ac4bbeaeda45da1b', 0, 312, 41),
+('What Bird Is This? Need Help!', 'Found this in my neighborhood tree, it sings beautifully. Want to know what species it is', 'Identification', 'qa', 6, 'Admin 2', 'http://localhost:8080/file/download?id=9f4ed887ce9a4093b9259ecf900c4f71', 0, 67, 12),
+('Recommend Some Bird Watching Binoculars', 'Looking to buy bird watching binoculars, budget around 2000 yuan. Any recommendations?', 'Equipment', 'birdwatching', 7, 'Sun Qi', 'http://localhost:8080/file/download?id=9f4ed887ce9a4093b9259ecf900c4f71', 0, 93, 18);
+
+-- Insert sample forum replies
+INSERT INTO forum_reply (post_id, content, author_id, author_name, author_avatar) VALUES
+(1, 'Great recommendations! I also suggest visiting the Nature Reserve in the suburbs.', 2, 'Li Si', 'http://localhost:8080/file/download?id=bc0a475b0d7d4fbeac5106d2015f631c'),
+(1, 'Thanks for sharing! I will visit this weekend.', 3, 'Admin', 'http://localhost:8080/file/download?id=0c58187449134bf8ac4bbeaeda45da1b'),
+(2, 'Sparrows are usually brown with streaks, while tits have more colorful plumage with blue or yellow.', 1, 'Zhang San', 'http://localhost:8080/file/download?id=cb7cd1ec17624b27bafc3b63a53310a4'),
+(3, 'Very informative! Many people dont know this.', 4, 'Wang Wu', 'http://localhost:8080/file/download?id=0c43b993aca446f195c3821c712f3838'),
+(5, 'Please contact local wildlife rescue center immediately! Keep the bird warm and quiet.', 3, 'Admin', 'http://localhost:8080/file/download?id=0c58187449134bf8ac4bbeaeda45da1b'),
+(5, 'I had similar experience. The rescue center was very helpful.', 1, 'Zhang San', 'http://localhost:8080/file/download?id=cb7cd1ec17624b27bafc3b63a53310a4'),
+(7, 'Looks like a Chinese Bulbul! They have distinctive crests.', 2, 'Li Si', 'http://localhost:8080/file/download?id=bc0a475b0d7d4fbeac5106d2015f631c'),
+(8, 'I recommend the Nikon Aculon series, good value for money.', 5, 'Zhao Liu', 'http://localhost:8080/file/download?id=08912f72952e42d1a977378f68ecb2e9');

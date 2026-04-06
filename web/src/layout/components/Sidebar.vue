@@ -38,7 +38,7 @@ export default {
           this.$router.replace("/knowledge");
         }
         else if(key==='2'){
-          this.$router.replace("/center");
+          this.$router.replace("/settings");
         }
     }
   }

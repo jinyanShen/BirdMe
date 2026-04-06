@@ -10,7 +10,9 @@
 	<groupId>com.java.wbis</groupId>
 	<artifactId>BirdME</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 	<name>BirdME</name>
+	<packaging>jar</packaging>
 	<properties>
 		<webVersion>3.0</webVersion>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
