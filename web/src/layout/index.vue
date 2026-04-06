@@ -38,7 +38,7 @@
                     <li><a href="#" @click.prevent="$router.push('/game/merge')">Merge</a></li>
                   </ul>
                 </li>
-                <li><a href="#" :class="{ active: $route.path === '/center' }" @click="$router.push('/center')">Personal Center</a></li>
+                <li><a href="#" :class="{ active: $route.path === '/settings' }" @click="$router.push('/settings')">Personal Center</a></li>
                 <li><a href="#" :class="{ active: $route.path === '/report' }" @click="$router.push('/report')">My Reports</a></li>
               </ul>
 
