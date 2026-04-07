@@ -43,10 +43,10 @@
       <!-- 搜索栏 -->
       <div class="search-bar">
         <div class="search-container">
-          <input 
-            type="text" 
+          <input
+            type="text"
             v-model="searchKeyword"
-            placeholder="Search posts..." 
+            placeholder="Search posts..."
             class="search-input"
             @keyup.enter="handleSearch"
           />
@@ -59,18 +59,18 @@
 
       <!-- 分类标签 -->
       <div class="category-tabs">
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'all' }"
           @click="switchCategory('all')"
         >All</span>
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'birdwatching' }"
           @click="switchCategory('birdwatching')"
         >Bird Watching</span>
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'qa' }"
           @click="switchCategory('qa')"
         >Q&A</span>
@@ -81,9 +81,9 @@
         <div v-if="loading" class="loading">Loading...</div>
         <div v-else-if="posts.length === 0" class="empty-state">No posts found</div>
         <div v-else>
-          <div 
-            v-for="post in posts" 
-            :key="post.id" 
+          <div
+            v-for="post in posts"
+            :key="post.id"
             class="post-item"
             :class="{ 'pinned': post.isPinned === 1 }"
           >
@@ -144,20 +144,20 @@
           </div>
           <div class="form-group">
             <label>Title</label>
-            <input 
-              type="text" 
-              v-model="newPost.title" 
-              class="form-control" 
+            <input
+              type="text"
+              v-model="newPost.title"
+              class="form-control"
               placeholder="Enter post title"
               maxlength="200"
             />
           </div>
           <div class="form-group">
             <label>Tag</label>
-            <input 
-              type="text" 
-              v-model="newPost.tag" 
-              class="form-control" 
+            <input
+              type="text"
+              v-model="newPost.tag"
+              class="form-control"
               placeholder="e.g., Bird Watching, Help, Identification"
               maxlength="50"
             />
@@ -248,7 +248,7 @@ export default {
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
-    
+
     initCategoryFromRoute() {
       const path = this.$route.path
       if (path.includes('/forum/birdwatching')) {
@@ -259,7 +259,7 @@ export default {
         this.currentCategory = 'all'
       }
     },
-    
+
     async loadPosts() {
       this.loading = true
       try {
@@ -276,7 +276,7 @@ export default {
         this.loading = false
       }
     },
-    
+
     switchCategory(category) {
       this.currentCategory = category
       if (category === 'all') {
@@ -285,20 +285,20 @@ export default {
         this.$router.push(`/forum/${category}`).catch(() => {})
       }
     },
-    
+
     handleSearch() {
       console.log('Search:', this.searchKeyword)
       this.loadPosts()
     },
-    
+
     goToPostDetail(postId) {
       this.$router.push(`/forum/post/${postId}`)
     },
-    
+
     goToHome() {
       this.$router.push('/')
     },
-    
+
     goToKnowledgePage(tab) {
       if (this.isLoggedIn) {
         this.$router.push(`/knowledge/${tab}`)
@@ -308,7 +308,7 @@ export default {
         }
       }
     },
-    
+
     goToFunFacts() {
       if (this.isLoggedIn) {
         this.$router.push('/knowledge/facts')
@@ -318,31 +318,31 @@ export default {
         }
       }
     },
-    
+
     goToGamePage(game) {
       this.$router.push(`/game/${game}`)
     },
-    
+
     goToPersonalPage() {
       if (this.isLoggedIn) {
-        this.$router.push('/center')
+        this.$router.push('/settings')
       } else {
         if (window.$showLoginDialog) {
-          window.$showLoginDialog('/center')
+          window.$showLoginDialog('/settings')
         }
       }
     },
-    
+
     goToLogin() {
       this.$router.push('/login')
     },
-    
+
     handleLogout() {
       sessionStorage.clear()
       this.isLoggedIn = false
       this.$router.push('/')
     },
-    
+
     closePostDialog() {
       this.showPostDialog = false
       this.isEditing = false
@@ -354,12 +354,12 @@ export default {
         category: 'birdwatching'
       }
     },
-    
+
     isOwnPost(post) {
       const userId = sessionStorage.getItem('id')
       return userId && post.authorId && post.authorId.toString() === userId.toString()
     },
-    
+
     editPost(post) {
       this.isEditing = true
       this.editingPostId = post.id
@@ -371,19 +371,19 @@ export default {
       }
       this.showPostDialog = true
     },
-    
+
     async submitPost() {
       if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
         alert('Please enter title and content')
         return
       }
-      
+
       this.submitting = true
       try {
         const userId = sessionStorage.getItem('id')
         const username = sessionStorage.getItem('username') || 'User'
         const userAvatar = sessionStorage.getItem('avatarUrl')
-        
+
         const postData = {
           ...this.newPost,
           authorId: parseInt(userId),
@@ -393,7 +393,7 @@ export default {
           viewCount: 0,
           replyCount: 0
         }
-        
+
         let response
         if (this.isEditing && this.editingPostId) {
           // 更新帖子
@@ -411,7 +411,7 @@ export default {
             alert('Post created successfully!')
           }
         }
-        
+
         if (response && response.code === 200) {
           this.closePostDialog()
           this.loadPosts()
@@ -423,28 +423,28 @@ export default {
         this.submitting = false
       }
     },
-    
+
     truncateContent(content, maxLength = 150) {
       if (!content) return ''
       if (content.length <= maxLength) return content
       return content.substring(0, maxLength) + '...'
     },
-    
+
     formatDate(dateStr) {
       if (!dateStr) return ''
       const date = new Date(dateStr)
       const now = new Date()
       const diff = now - date
-      
+
       const minutes = Math.floor(diff / 60000)
       const hours = Math.floor(diff / 3600000)
       const days = Math.floor(diff / 86400000)
-      
+
       if (minutes < 1) return 'Just now'
       if (minutes < 60) return `${minutes}m ago`
       if (hours < 24) return `${hours}h ago`
       if (days < 7) return `${days}d ago`
-      
+
       return date.toLocaleDateString()
     }
   }
