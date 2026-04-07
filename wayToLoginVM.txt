@@ -1,4 +1,10 @@
-open cmd
-enter：ssh CS22207228@ipa-rdp.ucd.ie VJTslcjH7uiiRGjU     ssh CS22207230@ipa-rdp.ucd.ie iZrCtOb3MMSwuwf3
+open shell
+打开 PowerShell 或 Windows Terminal
+ssh CS ucd学号@ipa-rdp.ucd.ie
+输密码：学生密码
+输验证码
+ssh student@csi420-01-vm2
+Totally_leave_204
 
-password：Totally_leave_204
+cd ~/BirdMe/back
+nohup java -jar target/BirdME-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
