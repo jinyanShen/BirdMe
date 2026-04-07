@@ -361,7 +361,6 @@ export default {
       </div>
     </div>
 
-    <!-- 主页面内容，开场动画结束后显示 -->
     <div class="main-content" :class="{ 'visible': !showAnimation }">
       <!-- 顶部导航栏 -->
       <div class="top-navbar" :class="{ 'navbar-visible': showNavbar }">
@@ -371,29 +370,36 @@ export default {
           </div>
           <div class="nav-menu">
             <router-link to="/" class="nav-item">Homepage</router-link>
+
+            <!-- Knowledge 下拉菜单 - 修改：主项可点击跳转 -->
             <div class="dropdown">
-              <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+              <span class="nav-item" :class="{ active: isKnowledgeActive }" @click="goToKnowledge">Knowledge ▾</span>
               <div class="dropdown-menu">
                 <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
                 <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
                 <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
               </div>
             </div>
+
+            <!-- Forum 下拉菜单 - 修改：主项可点击跳转 -->
             <div class="dropdown">
-              <span class="nav-item">Forum ▾</span>
+              <span class="nav-item" @click="goToForum">Forum ▾</span>
               <div class="dropdown-menu">
                 <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
                 <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
               </div>
             </div>
+
+            <!-- Game 下拉菜单 - 修改：主项可点击跳转 -->
             <div class="dropdown game-dropdown">
-              <span class="nav-item">Game ▾</span>
+              <span class="nav-item" @click="goToGame">Game ▾</span>
               <div class="game-dropdown-menu">
                 <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
                 <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
                 <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
               </div>
             </div>
+
             <span class="nav-item" @click="goToPersonalPage">Personal Settings</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
             <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
@@ -401,7 +407,8 @@ export default {
         </div>
       </div>
 
-<!--      <div class="image-container">-->
+
+      <!--      <div class="image-container">-->
 <!--        <img :src="bgGif" alt="background" class="top-image">-->
 <!--        <div class="overlay-text">-->
 <!--          <h2>Welcome to BirdME<br>Here you can identify birds, track migrations, and submit rescue reports</h2>-->
@@ -564,7 +571,7 @@ export default {
 </template>
 
 <style scoped lang="scss">
-/* 根容器 */
+
 .bird-home-container {
   position: relative;
   width: 100%;
@@ -662,7 +669,7 @@ export default {
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
   z-index: 1;
-  overflow-y: auto;  /* 允许滚动 */
+  overflow-y: auto;
   overflow-x: hidden;
 
   &.visible {
@@ -692,15 +699,6 @@ export default {
     color: white;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
     z-index: 2;
-
-    h2 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 20px;
-    }
   }
 }
 
@@ -732,12 +730,12 @@ export default {
     text-align: center;
 
     h3 {
-      font-size: 36px;
-      margin-bottom: 20px;
+      font-size: 48px;  /* 原36px → 调大 */
+      margin-bottom: 25px;
     }
 
     p {
-      font-size: 18px;
+      font-size: 24px;  /* 原18px → 调大 */
       line-height: 1.6;
     }
   }
@@ -754,8 +752,8 @@ export default {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 30px;
-      width: 280px;
+      padding: 35px;
+      width: 300px;  /* 原280px → 稍微调大 */
       text-align: center;
       transition: transform 0.3s, opacity 0.6s ease-out, transform 0.6s ease-out;
 
@@ -765,19 +763,19 @@ export default {
       }
 
       i {
-        font-size: 48px;
-        margin-bottom: 20px;
+        font-size: 64px;  /* 原48px → 调大 */
+        margin-bottom: 25px;
         display: block;
       }
 
       h4 {
-        font-size: 24px;
-        margin-bottom: 15px;
+        font-size: 28px;  /* 原24px → 调大 */
+        margin-bottom: 18px;
       }
 
       p {
-        font-size: 14px;
-        margin-bottom: 20px;
+        font-size: 18px;  /* 原14px → 调大 */
+        margin-bottom: 25px;
         opacity: 0.9;
       }
 
@@ -785,8 +783,9 @@ export default {
         background: rgba(255, 255, 255, 0.3);
         border: 1px solid white;
         color: white;
-        padding: 8px 20px;
+        padding: 10px 24px;  /* 原8px 20px → 调大 */
         border-radius: 25px;
+        font-size: 16px;  /* 新增 */
         cursor: pointer;
         transition: all 0.3s;
 
@@ -802,7 +801,7 @@ export default {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25);
     border-radius: 24px;
-    padding: 40px 30px;
+    padding: 50px 40px;  /* 原40px 30px → 调大 */
     margin: 0 auto 60px;
     max-width: 1200px;
     backdrop-filter: blur(10px);
@@ -835,17 +834,17 @@ export default {
 
     .section {
       max-width: 1200px;
-      margin: 0 auto 40px;
+      margin: 0 auto 50px;  /* 原40px → 调大 */
       text-align: center;
 
       h3 {
-        font-size: 36px;
-        margin-bottom: 20px;
+        font-size: 48px;  /* 原36px → 调大 */
+        margin-bottom: 25px;
         color: white;
       }
 
       p {
-        font-size: 18px;
+        font-size: 24px;  /* 原18px → 调大 */
         line-height: 1.6;
         color: rgba(255, 255, 255, 0.9);
       }
@@ -857,8 +856,6 @@ export default {
         margin: 0 auto;
         border-radius: 2px;
       }
-
-
     }
 
     .cards-container {
@@ -873,8 +870,8 @@ export default {
         background: rgba(255, 255, 255, 0.15);
         backdrop-filter: blur(10px);
         border-radius: 16px;
-        padding: 30px;
-        width: 280px;
+        padding: 35px;  /* 原30px → 调大 */
+        width: 300px;  /* 原280px → 调大 */
         text-align: center;
         transition: transform 0.3s;
 
@@ -884,21 +881,21 @@ export default {
         }
 
         i {
-          font-size: 48px;
-          margin-bottom: 20px;
+          font-size: 64px;  /* 原48px → 调大 */
+          margin-bottom: 25px;
           display: block;
           color: white;
         }
 
         h4 {
-          font-size: 24px;
-          margin-bottom: 15px;
+          font-size: 28px;  /* 原24px → 调大 */
+          margin-bottom: 18px;
           color: white;
         }
 
         p {
-          font-size: 14px;
-          margin-bottom: 20px;
+          font-size: 18px;  /* 原14px → 调大 */
+          margin-bottom: 25px;
           opacity: 0.9;
           color: rgba(255, 255, 255, 0.9);
         }
@@ -907,8 +904,9 @@ export default {
           background: rgba(255, 255, 255, 0.3);
           border: 1px solid white;
           color: white;
-          padding: 8px 20px;
+          padding: 10px 24px;  /* 原8px 20px → 调大 */
           border-radius: 25px;
+          font-size: 16px;  /* 新增 */
           cursor: pointer;
           transition: all 0.3s;
 
@@ -927,9 +925,9 @@ export default {
     margin: 0 auto 80px;
 
     h3 {
-      font-size: 36px;
+      font-size: 48px;  /* 原36px → 调大 */
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 50px;
     }
 
     .news-carousel {
@@ -955,25 +953,25 @@ export default {
           left: 0;
           right: 0;
           background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-          padding: 40px 30px 30px;
+          padding: 50px 40px 40px;  /* 原40px 30px 30px → 调大 */
           color: white;
           text-align: left;
 
           h4 {
-            font-size: 28px;
-            margin-bottom: 12px;
+            font-size: 36px;  /* 原28px → 调大 */
+            margin-bottom: 15px;
             font-weight: bold;
           }
 
           p {
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 20px;  /* 原16px → 调大 */
+            margin-bottom: 20px;
             opacity: 0.9;
           }
 
           .read-more {
             display: inline-block;
-            font-size: 14px;
+            font-size: 18px;  /* 原14px → 调大 */
             color: #ffd966;
             transition: transform 0.3s;
 
@@ -987,7 +985,7 @@ export default {
   }
 }
 
-/* 轮播图指示器样式 */
+/* 轮播图指示器样式 - 保持不变 */
 ::v-deep .el-carousel__indicators {
   bottom: 20px;
 
@@ -1014,7 +1012,7 @@ export default {
   }
 }
 
-/* 左边云朵向左移动动画 */
+/* 左边云朵向左移动动画 - 保持不变 */
 @keyframes cloudMoveLeft {
   0% {
     transform: translateX(0) scale(1);
@@ -1026,7 +1024,7 @@ export default {
   }
 }
 
-/* 右边云朵向右移动动画 */
+/* 右边云朵向右移动动画 - 保持不变 */
 @keyframes cloudMoveRight {
   0% {
     transform: translateX(0) scale(1);
@@ -1038,7 +1036,7 @@ export default {
   }
 }
 
-/* 顶部导航栏 */
+/* 顶部导航栏 - 完全保持不变 */
 .top-navbar {
   position: fixed;
   top: 0;
@@ -1089,7 +1087,7 @@ export default {
         }
       }
 
-      /* Game 顶部下拉菜单（hover 展开，不依赖点击） */
+      /* Game 顶部下拉菜单 */
       .game-dropdown {
         position: relative;
         display: inline-flex;
@@ -1097,7 +1095,6 @@ export default {
 
         .game-dropdown-menu {
           position: absolute;
-          /* 让下拉菜单紧贴 Game，避免鼠标从文字移动到菜单时"穿过空隙"导致菜单消失 */
           top: 100%;
           left: 50%;
           transform: translateX(-50%) translateY(0);
@@ -1203,7 +1200,7 @@ export default {
   }
 }
 
-/* 文字显现动画 */
+/* 文字显现动画 - 保持不变 */
 @keyframes textReveal {
   from {
     opacity: 0;
@@ -1215,7 +1212,7 @@ export default {
   }
 }
 
-/* 响应式调整 */
+/* 响应式调整 - 保持不变 */
 @media (max-width: 768px) {
   .top-navbar {
     .navbar-container {
@@ -1258,6 +1255,68 @@ export default {
       transform: translateX(250px) scale(0.8);
     }
   }
+
+  /* 移动端内容字号适配 - 新增 */
+  .content-below {
+    .section {
+      h3 {
+        font-size: 36px;
+      }
+      p {
+        font-size: 18px;
+      }
+    }
+    .cards-container .card {
+      width: 260px;
+      padding: 25px;
+      h4 {
+        font-size: 22px;
+      }
+      p {
+        font-size: 14px;
+      }
+    }
+    .knowledge-cards-wrapper {
+      padding: 30px 20px;
+      .section {
+        h3 {
+          font-size: 36px;
+        }
+        p {
+          font-size: 18px;
+        }
+      }
+      .cards-container .card {
+        width: 260px;
+        padding: 25px;
+        h4 {
+          font-size: 22px;
+        }
+        p {
+          font-size: 14px;
+        }
+        i {
+          font-size: 48px;
+        }
+      }
+    }
+    .carousel-section {
+      h3 {
+        font-size: 36px;
+      }
+      .news-carousel .carousel-item .carousel-overlay {
+        h4 {
+          font-size: 24px;
+        }
+        p {
+          font-size: 14px;
+        }
+        .read-more {
+          font-size: 14px;
+        }
+      }
+    }
+  }
 }
 
 .nav-item {
@@ -1267,6 +1326,7 @@ export default {
 .logo h3 {
   cursor: pointer;
 }
+
 .logout-btn {
   background: #ff6b6b;
   color: white !important;
@@ -1298,7 +1358,7 @@ export default {
 }
 
 .overlay-text h2 {
-  font-size: 144px; /* 原72px → 放大一倍 */
+  font-size: 90px;
   font-weight: 800;
   color: #ffffff;
   margin: 0 0 20px 0;
@@ -1311,7 +1371,7 @@ export default {
 }
 
 .overlay-text .desc {
-  font-size: 60px; /* 原30px → 放大一倍 */
+  font-size: 30px;
   font-weight: 400;
   color: rgba(255,255,255,0.95);
   margin: 0 0 28px 0;
@@ -1319,7 +1379,7 @@ export default {
 }
 
 .overlay-text .author {
-  font-size: 44px; /* 原22px → 放大一倍 */
+  font-size: 28px;
   font-weight: 300;
   color: rgba(255,255,255,0.75);
   margin: 0;

@@ -1,5 +1,42 @@
 <template>
   <div class="knowledge-page">
+<!--    <div class="top-navbar">-->
+<!--      <div class="navbar-container">-->
+<!--        <div class="logo">-->
+<!--          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>-->
+<!--        </div>-->
+<!--        <div class="nav-menu">-->
+<!--          <span class="nav-item" @click="goToHome">Homepage</span>-->
+<!--          <div class="dropdown">-->
+<!--            <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>-->
+<!--            <div class="dropdown-menu">-->
+<!--              <div class="dropdown-item" @click="switchTab('migration')">Migration Map</div>-->
+<!--              <div class="dropdown-item" @click="switchTab('identification')">Identification</div>-->
+<!--              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="dropdown">-->
+<!--            <span class="nav-item">Forum ▾</span>-->
+<!--            <div class="dropdown-menu">-->
+<!--              <div class="dropdown-item" @click="goToForumPage">Bird Watching</div>-->
+<!--              <div class="dropdown-item" @click="goToQAPage">Q&A</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="dropdown">-->
+<!--            <span class="nav-item">Game ▾</span>-->
+<!--            <div class="dropdown-menu">-->
+<!--              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>-->
+<!--              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>-->
+<!--              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>-->
+<!--          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>-->
+<!--          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+    <!-- 顶部导航栏 -->
     <div class="top-navbar">
       <div class="navbar-container">
         <div class="logo">
@@ -7,29 +44,36 @@
         </div>
         <div class="nav-menu">
           <span class="nav-item" @click="goToHome">Homepage</span>
+
+          <!-- Knowledge 下拉菜单 - 主项可点击 -->
           <div class="dropdown">
-            <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+            <span class="nav-item" :class="{ active: isKnowledgeActive }" @click="goToKnowledge">Knowledge ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="switchTab('migration')">Migration Map</div>
               <div class="dropdown-item" @click="switchTab('identification')">Identification</div>
               <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
             </div>
           </div>
+
+          <!-- Forum 下拉菜单 - 主项可点击 -->
           <div class="dropdown">
-            <span class="nav-item">Forum ▾</span>
+            <span class="nav-item" @click="goToForum">Forum ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="goToForumPage">Bird Watching</div>
               <div class="dropdown-item" @click="goToQAPage">Q&A</div>
             </div>
           </div>
+
+          <!-- Game 下拉菜单 - 主项可点击 -->
           <div class="dropdown">
-            <span class="nav-item">Game ▾</span>
+            <span class="nav-item" @click="goToGame">Game ▾</span>
             <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>
-              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>
-              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>
+              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy Bird</div>
+              <div class="dropdown-item" @click="goToGamePage('2048')">2048 Bird</div>
+              <div class="dropdown-item" @click="goToGamePage('merge')">Merge To Giant Bird</div>
             </div>
           </div>
+
           <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
           <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
           <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
@@ -91,15 +135,15 @@ export default {
     goToFunFacts() {
       this.$router.push('/knowledge/facts')
     },
-    goToForumPage() {
-      this.$router.push('/forum/birdwatching')
-    },
-    goToQAPage() {
-      this.$router.push('/forum/qa')
-    },
-    goToGamePage(gameKey) {
-      this.$router.push(`/game/${gameKey}`)
-    },
+    // goToForumPage() {
+    //   this.$router.push('/forum/birdwatching')
+    // },
+    // goToQAPage() {
+    //   this.$router.push('/forum/qa')
+    // },
+    // goToGamePage(gameKey) {
+    //   this.$router.push(`/game/${gameKey}`)
+    // },
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
@@ -132,32 +176,119 @@ export default {
       this.$router.push('/')
     },
 
-    goToKnowledge() {
-      // 已经在knowledge页面，刷新当前标签页
-      this.$router.go(0)
-    },
-
-    goToRescue() {
-      console.log('Rescue page - to be implemented')
-    },
-
-    goToForum() {
-      console.log('Forum page - to be implemented')
-    },
-
-    goToGame() {
-      if (this.isLoggedIn) this.$router.push('/game')
-      else window.$showLoginDialog && window.$showLoginDialog('/game')
-    },
-
-    goToPersonalPage() {
-      if (this.isLoggedIn) this.$router.push('/settings/index')
-      else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
-    },
+    // goToKnowledge() {
+    //   // 已经在knowledge页面，刷新当前标签页
+    //   this.$router.go(0)
+    // },
+    //
+    // goToRescue() {
+    //   console.log('Rescue page - to be implemented')
+    // },
+    //
+    // goToForum() {
+    //   console.log('Forum page - to be implemented')
+    // },
+    //
+    // goToGame() {
+    //   if (this.isLoggedIn) this.$router.push('/game')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/game')
+    // },
+    //
+    // goToPersonalPage() {
+    //   if (this.isLoggedIn) this.$router.push('/settings/index')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
+    // },
 
     goToLogin() {
       if (window.$loginDialog) {
         window.$loginDialog.show('/')
+      }
+    },
+
+    goToKnowledge() {
+      // 如果已经在 knowledge 页面，刷新当前标签页
+      if (this.$route.path.startsWith('/knowledge')) {
+        this.$router.go(0)
+      } else {
+        this.$router.push('/knowledge/migration')
+      }
+    },
+
+    // 修改 goToForum - 跳转到 forum 页面
+    goToForum() {
+      if (this.isLoggedIn) {
+        if (!this.$route.path.startsWith('/forum')) {
+          this.$router.push('/forum/birdwatching')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/forum/birdwatching')
+        }
+      }
+    },
+
+    // 修改 goToGame - 跳转到 game 首页
+    goToGame() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/game') {
+          this.$router.push('/game')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/game')
+        }
+      }
+    },
+
+    // 修改 goToGamePage - 添加登录检查
+    goToGamePage(gameKey) {
+      if (!this.isLoggedIn) {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/game/${gameKey}`)
+        }
+        return
+      }
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+      this.$router.push(targetPath)
+    },
+
+    // 修改 goToForumPage
+    goToForumPage() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/forum/birdwatching') {
+          this.$router.push('/forum/birdwatching')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/forum/birdwatching')
+        }
+      }
+    },
+
+    // 修改 goToQAPage
+    goToQAPage() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/forum/qa') {
+          this.$router.push('/forum/qa')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/forum/qa')
+        }
+      }
+    },
+
+    // 修改 goToPersonalPage
+    goToPersonalPage() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/settings/index') {
+          this.$router.push('/settings/index')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/settings/index')
+        }
       }
     },
 
@@ -287,7 +418,7 @@ export default {
 
 .logo h3 {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   color: #22b3c1;
   font-weight: bold;
   cursor: pointer;
@@ -307,7 +438,7 @@ export default {
 .nav-item {
   text-decoration: none;
   color: #333;
-  font-size: 16px;
+  font-size: 20px;
   transition: color 0.3s;
   cursor: pointer;
   padding: 8px 0;
