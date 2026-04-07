@@ -544,19 +544,19 @@ export default {
           </div>
           <div class="cards-container">
             <div class="card fade-in-up">
-              <i class="el-icon-video-game"></i>
+              <i class="fas fa-dove"></i>  <!-- 改为鸽子图标 -->
               <h4>Flappy Bird</h4>
               <p>Classic side‑scroller with bird characters</p>
               <button class="btn">Play Now</button>
             </div>
             <div class="card fade-in-up">
-              <i class="el-icon-puzzle-piece"></i>
+              <i class="fas fa-th-large"></i>  <!-- 改为网格图标 -->
               <h4>2048 Bird</h4>
               <p>Merge birds to reach the giant bird</p>
               <button class="btn">Play Now</button>
             </div>
             <div class="card fade-in-up">
-              <i class="el-icon-connection"></i>
+              <i class="fas fa-code-branch"></i>  <!-- 改为分支图标 -->
               <h4>Merge To Giant Bird</h4>
               <p>Combine species to create rare birds</p>
               <button class="btn">Play Now</button>
