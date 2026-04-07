@@ -472,7 +472,7 @@ export default {
 
 .logo h3 {
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
   color: #22b3c1;
   font-weight: bold;
   cursor: pointer;
@@ -492,7 +492,7 @@ export default {
 .nav-item {
   text-decoration: none;
   color: #333;
-  font-size: 16px;
+  font-size: 20px;
   transition: color 0.3s;
   cursor: pointer;
   padding: 8px 0;

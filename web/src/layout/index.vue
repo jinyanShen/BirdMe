@@ -382,7 +382,7 @@ export default {
     .main-nav {
       .logo {
         .logo-text {
-          font-size: 24px;
+          font-size: 28px;
         }
       }
 

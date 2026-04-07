@@ -10,8 +10,9 @@
         <div class="nav-menu">
           <router-link to="/" class="nav-item">Homepage</router-link>
 
+          <!-- Knowledge 下拉菜单 - 主项可点击 -->
           <div class="dropdown">
-            <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+            <span class="nav-item" :class="{ active: isKnowledgeActive }" @click="goToKnowledge">Knowledge ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
               <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
@@ -19,16 +20,18 @@
             </div>
           </div>
 
+          <!-- Forum 下拉菜单 - 主项可点击 -->
           <div class="dropdown">
-            <span class="nav-item">Forum ▾</span>
+            <span class="nav-item" @click="goToForum">Forum ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
               <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
             </div>
           </div>
 
+          <!-- Game 下拉菜单 - 主项可点击 -->
           <div class="dropdown game-dropdown">
-            <span class="nav-item">Game ▾</span>
+            <span class="nav-item" @click="goToGame">Game ▾</span>
             <div class="game-dropdown-menu">
               <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
               <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
@@ -131,20 +134,110 @@ export default {
       })
       this.dropdowns[dropdown] = !this.dropdowns[dropdown]
     },
-    goToKnowledgePage(tab) {
-      this.$router.push(`/knowledge/${tab}`)
-    },
-    goToFunFacts() {
-      this.$router.push('/knowledge/facts')
-    },
-    goToForumPage(tab) {
-      this.$router.push(`/forum/${tab}`)
-    },
+    // goToKnowledgePage(tab) {
+    //   this.$router.push(`/knowledge/${tab}`)
+    // },
+    // goToFunFacts() {
+    //   this.$router.push('/knowledge/facts')
+    // },
+    // goToForumPage(tab) {
+    //   this.$router.push(`/forum/${tab}`)
+    // },
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
 
-    // 顶部导航：如果已经在 /game 就别重复 push，避免干扰滚动
+    // // 顶部导航：如果已经在 /game 就别重复 push，避免干扰滚动
+    // goToGame() {
+    //   if (this.$route.path === '/game') return
+    //   if (this.isLoggedIn) {
+    //     this.$router.push('/game')
+    //   } else if (window.$showLoginDialog) {
+    //     window.$showLoginDialog('/game')
+    //   }
+    // },
+    //
+    // goToKnowledge() {
+    //   if (this.isLoggedIn) this.$router.push('/knowledge/migration')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/knowledge/migration')
+    // },
+    //
+    // goToRescue() {
+    //   if (this.isLoggedIn) this.$router.push('/rescue')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/rescue')
+    // },
+    //
+    // goToForum() {
+    //   if (this.isLoggedIn) this.$router.push('/forum')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/forum')
+    // },
+    //
+    // goToPersonalPage() {
+    //   if (this.isLoggedIn) this.$router.push('/settings/index')
+    //   else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
+    // },
+    //
+    // goToLogin() {
+    //   this.$router.push('/login')
+    // },
+    goToKnowledge() {
+      if (this.isLoggedIn) {
+        if (!this.$route.path.startsWith('/knowledge')) {
+          this.$router.push('/knowledge/migration')
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/knowledge/migration')
+      }
+    },
+
+    // 修改 goToKnowledgePage - 添加登录检查
+    goToKnowledgePage(tab) {
+      if (this.isLoggedIn) {
+        const targetPath = `/knowledge/${tab}`
+        if (this.$route.path !== targetPath) {
+          this.$router.push(targetPath)
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog(`/knowledge/${tab}`)
+      }
+    },
+
+    // 修改 goToFunFacts - 添加登录检查
+    goToFunFacts() {
+      if (this.isLoggedIn) {
+        const targetPath = '/knowledge/facts'
+        if (this.$route.path !== targetPath) {
+          this.$router.push(targetPath)
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/knowledge/facts')
+      }
+    },
+
+    // 修改 goToForum - 跳转到 forum 页面
+    goToForum() {
+      if (this.isLoggedIn) {
+        if (!this.$route.path.startsWith('/forum')) {
+          this.$router.push('/forum/birdwatching')
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/forum/birdwatching')
+      }
+    },
+
+    // 修改 goToForumPage - 添加登录检查
+    goToForumPage(tab) {
+      if (this.isLoggedIn) {
+        const targetPath = `/forum/${tab}`
+        if (this.$route.path !== targetPath) {
+          this.$router.push(targetPath)
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog(`/forum/${tab}`)
+      }
+    },
+
+    // 修改 goToGame - 跳转到 game 首页
     goToGame() {
       if (this.$route.path === '/game') return
       if (this.isLoggedIn) {
@@ -154,29 +247,43 @@ export default {
       }
     },
 
-    goToKnowledge() {
-      if (this.isLoggedIn) this.$router.push('/knowledge/migration')
-      else window.$showLoginDialog && window.$showLoginDialog('/knowledge/migration')
+    // 修改 selectGameFromNav - 添加登录检查
+    selectGameFromNav(gameKey) {
+      if (!this.isLoggedIn) {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/game/${gameKey}`)
+        }
+        return
+      }
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+      this.$router.push(targetPath)
     },
 
-    goToRescue() {
-      if (this.isLoggedIn) this.$router.push('/rescue')
-      else window.$showLoginDialog && window.$showLoginDialog('/rescue')
+    // 修改 selectGame - 添加登录检查
+    selectGame(gameKey) {
+      if (!this.isLoggedIn) {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/game/${gameKey}`)
+        }
+        return
+      }
+      const targetPath = `/game/${gameKey}`
+      if (this.$route.path === targetPath) return
+      this.$router.push(targetPath)
     },
 
-    goToForum() {
-      if (this.isLoggedIn) this.$router.push('/forum')
-      else window.$showLoginDialog && window.$showLoginDialog('/forum')
-    },
-
+    // 修改 goToPersonalPage
     goToPersonalPage() {
-      if (this.isLoggedIn) this.$router.push('/settings/index')
-      else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/settings/index') {
+          this.$router.push('/settings/index')
+        }
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/settings/index')
+      }
     },
 
-    goToLogin() {
-      this.$router.push('/login')
-    },
 
     handleLogout() {
       // 清除所有登录信息
@@ -200,19 +307,19 @@ export default {
     },
 
 
-    selectGameFromNav(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
-    },
-
-    selectGame(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
-    }
+    // selectGameFromNav(gameKey) {
+    //   const targetPath = `/game/${gameKey}`
+    //   if (this.$route.path === targetPath) return
+    //
+    //   this.$router.push(targetPath)
+    // },
+    //
+    // selectGame(gameKey) {
+    //   const targetPath = `/game/${gameKey}`
+    //   if (this.$route.path === targetPath) return
+    //
+    //   this.$router.push(targetPath)
+    // }
   }
 }
 </script>
@@ -256,7 +363,7 @@ export default {
 .nav-item {
   text-decoration: none;
   color: #333;
-  font-size: 16px;
+  font-size: 20px;
   cursor: pointer;
   transition: color 0.3s;
   &:hover {

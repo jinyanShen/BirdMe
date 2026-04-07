@@ -1,6 +1,7 @@
 <template>
   <div class="forum-container">
     <!-- 顶部导航栏 -->
+    <!-- 顶部导航栏 -->
     <div class="top-navbar">
       <div class="navbar-container">
         <div class="logo">
@@ -9,7 +10,7 @@
         <div class="nav-menu">
           <span class="nav-item" @click="goToHome">Homepage</span>
           <div class="dropdown">
-            <span class="nav-item">Knowledge ▾</span>
+            <span class="nav-item" @click="goToKnowledge">Knowledge ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
               <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
@@ -17,18 +18,18 @@
             </div>
           </div>
           <div class="dropdown">
-            <span class="nav-item" :class="{ active: true }">Forum ▾</span>
+            <span class="nav-item" :class="{ active: isForumActive }" @click="goToForum">Forum ▾</span>
             <div class="dropdown-menu">
               <div class="dropdown-item" @click="switchCategory('birdwatching')">Bird Watching</div>
               <div class="dropdown-item" @click="switchCategory('qa')">Q&A</div>
             </div>
           </div>
           <div class="dropdown">
-            <span class="nav-item">Game ▾</span>
+            <span class="nav-item" @click="goToGame">Game ▾</span>
             <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>
-              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>
-              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>
+              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy Bird</div>
+              <div class="dropdown-item" @click="goToGamePage('2048')">2048 Bird</div>
+              <div class="dropdown-item" @click="goToGamePage('merge')">Merge To Giant Bird</div>
             </div>
           </div>
           <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
@@ -244,6 +245,11 @@ export default {
       this.loadPosts()
     }
   },
+  computed: {
+    isForumActive() {
+      return this.$route.path.startsWith('/forum')
+    }
+  },
   methods: {
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
@@ -319,9 +325,9 @@ export default {
       }
     },
 
-    goToGamePage(game) {
-      this.$router.push(`/game/${game}`)
-    },
+    // goToGamePage(game) {
+    //   this.$router.push(`/game/${game}`)
+    // },
 
     goToPersonalPage() {
       if (this.isLoggedIn) {
@@ -335,6 +341,58 @@ export default {
 
     goToLogin() {
       this.$router.push('/login')
+    },
+
+    // Knowledge 主项点击
+    goToKnowledge() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/knowledge') {
+          this.$router.push('/knowledge')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge')
+        }
+      }
+    },
+
+// Forum 主项点击
+    goToForum() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/forum') {
+          this.$router.push('/forum')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/forum')
+        }
+      }
+    },
+
+// Game 主项点击
+    goToGame() {
+      if (this.isLoggedIn) {
+        if (this.$route.path !== '/game') {
+          this.$router.push('/game')
+        }
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/game')
+        }
+      }
+    },
+
+// 修改现有的 goToGamePage，添加登录检查
+    goToGamePage(game) {
+      if (!this.isLoggedIn) {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/game/${game}`)
+        }
+        return
+      }
+      const targetPath = `/game/${game}`
+      if (this.$route.path === targetPath) return
+      this.$router.push(targetPath)
     },
 
     handleLogout() {
@@ -478,7 +536,7 @@ export default {
 .logo h3 {
   margin: 0;
   color: #22b3c1;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
 }
 
@@ -491,7 +549,7 @@ export default {
 .nav-item {
   color: #333;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 20px;
   cursor: pointer;
   transition: color 0.3s;
   position: relative;
