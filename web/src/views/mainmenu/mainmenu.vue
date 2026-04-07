@@ -1066,7 +1066,7 @@ export default {
     .logo {
       h3 {
         margin: 0;
-        font-size: 24px;
+        font-size: 28px;
         color: #8fa0ca;
         font-weight: bold;
       }
@@ -1074,13 +1074,13 @@ export default {
 
     .nav-menu {
       display: flex;
-      gap: 30px;
+      gap: 40px;
       align-items: center;
 
       .nav-item {
         text-decoration: none;
         color: #333;
-        font-size: 16px;
+        font-size: 20px;
         transition: color 0.3s;
         cursor: pointer;
 
