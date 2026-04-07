@@ -525,12 +525,6 @@ export default {
               <button class="btn">Join Discussion</button>
             </div>
 
-            <div class="card fade-in-up">
-              <i class="el-icon-camera-solid"></i>
-              <h4>Birdwatching & Life</h4>
-              <p>Share daily sightings, bird photos, and casual conversations</p>
-              <button class="btn">Join Discussion</button>
-            </div>
           </div>
         </div>
 
