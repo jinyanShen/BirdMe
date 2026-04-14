@@ -18,8 +18,8 @@
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle">Knowledge</a>
                   <ul class="dropdown-menu">
-                    <li><a href="#" @click.prevent="$router.push('/knowledge/migration')">Migration Map</a></li>
-                    <li><a href="#" @click.prevent="$router.push('/knowledge/identification')">Identification</a></li>
+                    <li><a href="#" @click.prevent="$router.push({ path: '/knowledge/index', query: { tab: 'migration' } })">Migration Map</a></li>
+                    <li><a href="#" @click.prevent="$router.push({ path: '/knowledge/index', query: { tab: 'identification' } })">Identification</a></li>
                     <li><a href="#" @click.prevent="$router.push('/knowledge/facts')">Fun Facts</a></li>
                   </ul>
                 </li>
@@ -48,6 +48,7 @@
                   <img :src="userAvatar" alt="User" />
                 </div>
                 <div v-if="showUserMenu" class="user-menu">
+                  <router-link v-if="role==='1'" to="/admin/users" class="menu-item">Admin Panel</router-link>
                   <a href="#" @click="handleLogout">Logout</a>
                 </div>
               </div>
@@ -83,7 +84,8 @@ export default {
   data() {
     return {
       showUserMenu: false,
-      userAvatar: ''
+      userAvatar: '',
+      role: sessionStorage.getItem('role')
     }
   },
   mounted() {
@@ -129,7 +131,6 @@ export default {
   position: sticky;
   top: 0;
   z-index: 100;
-  display: none !important;
 }
   .main-nav {
     display: flex;

@@ -1,52 +1,14 @@
 <template>
   <div class="forum-container">
-    <!-- 顶部导航栏 -->
-    <div class="top-navbar">
-      <div class="navbar-container">
-        <div class="logo">
-          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
-        </div>
-        <div class="nav-menu">
-          <span class="nav-item" @click="goToHome">Homepage</span>
-          <div class="dropdown">
-            <span class="nav-item">Knowledge ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
-              <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
-            </div>
-          </div>
-          <div class="dropdown">
-            <span class="nav-item" :class="{ active: true }">Forum ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="switchCategory('birdwatching')">Bird Watching</div>
-              <div class="dropdown-item" @click="switchCategory('qa')">Q&A</div>
-            </div>
-          </div>
-          <div class="dropdown">
-            <span class="nav-item">Game ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>
-              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>
-              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>
-            </div>
-          </div>
-          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
-          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
-        </div>
-      </div>
-    </div>
-
     <!-- 主要内容区 -->
     <div class="forum-content">
       <!-- 搜索栏 -->
       <div class="search-bar">
         <div class="search-container">
-          <input 
-            type="text" 
+          <input
+            type="text"
             v-model="searchKeyword"
-            placeholder="Search posts..." 
+            placeholder="Search posts..."
             class="search-input"
             @keyup.enter="handleSearch"
           />
@@ -59,18 +21,18 @@
 
       <!-- 分类标签 -->
       <div class="category-tabs">
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'all' }"
           @click="switchCategory('all')"
         >All</span>
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'birdwatching' }"
           @click="switchCategory('birdwatching')"
         >Bird Watching</span>
-        <span 
-          class="tab-item" 
+        <span
+          class="tab-item"
           :class="{ active: currentCategory === 'qa' }"
           @click="switchCategory('qa')"
         >Q&A</span>
@@ -81,9 +43,9 @@
         <div v-if="loading" class="loading">Loading...</div>
         <div v-else-if="posts.length === 0" class="empty-state">No posts found</div>
         <div v-else>
-          <div 
-            v-for="post in posts" 
-            :key="post.id" 
+          <div
+            v-for="post in posts"
+            :key="post.id"
             class="post-item"
             :class="{ 'pinned': post.isPinned === 1 }"
           >
@@ -116,8 +78,13 @@
                   <i class="el-icon-chat-dot-round"></i> {{ post.replyCount }}
                 </span>
               </span>
-              <div class="post-actions" v-if="isOwnPost(post)" @click.stop>
-                <button class="edit-btn" @click="editPost(post)">
+              <div class="post-actions" v-if="isOwnPostOrAdmin(post)" @click.stop>
+                <button class="pin-btn" :class="{ pinned: post.isPinned === 1 }" v-if="isOwnPost(post)"
+                        @click="togglePin(post)">
+                  <i :class="post.isPinned === 1 ? 'el-icon-star-on' : 'el-icon-star-off'"></i>
+                  {{ post.isPinned === 1 ? 'Unpin' : 'Pin' }}
+                </button>
+                <button class="edit-btn" @click="editPost(post)" v-if="isOwnPost(post)">
                   <i class="el-icon-edit"></i> Edit
                 </button>
               </div>
@@ -131,7 +98,7 @@
     <div v-if="showPostDialog" class="dialog-overlay" @click="closePostDialog">
       <div class="post-dialog" @click.stop>
         <div class="dialog-header">
-          <h3>Create New Post</h3>
+          <h3>{{ isEditing ? 'Edit Post' : 'Create New Post' }}</h3>
           <button class="close-btn" @click="closePostDialog">×</button>
         </div>
         <div class="dialog-body">
@@ -142,22 +109,28 @@
               <option value="qa">Q&A</option>
             </select>
           </div>
+          <div class="form-group" v-if="isAdmin">
+            <label>
+              <input type="checkbox" v-model="newPost.isPinned" :true-value="1" :false-value="0" />
+              Pin this post
+            </label>
+          </div>
           <div class="form-group">
             <label>Title</label>
-            <input 
-              type="text" 
-              v-model="newPost.title" 
-              class="form-control" 
+            <input
+              type="text"
+              v-model="newPost.title"
+              class="form-control"
               placeholder="Enter post title"
               maxlength="200"
             />
           </div>
           <div class="form-group">
             <label>Tag</label>
-            <input 
-              type="text" 
-              v-model="newPost.tag" 
-              class="form-control" 
+            <input
+              type="text"
+              v-model="newPost.tag"
+              class="form-control"
               placeholder="e.g., Bird Watching, Help, Identification"
               maxlength="50"
             />
@@ -199,6 +172,7 @@ export default {
   data() {
     return {
       isLoggedIn: false,
+      isAdmin: false,
       currentCategory: 'all',
       searchKeyword: '',
       posts: [],
@@ -209,7 +183,8 @@ export default {
         title: '',
         content: '',
         tag: '',
-        category: 'birdwatching'
+        category: 'birdwatching',
+        isPinned: 0
       },
       editorOptions: {
         theme: 'snow',
@@ -247,8 +222,10 @@ export default {
   methods: {
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
+      const role = sessionStorage.getItem('role')
+      this.isAdmin = role === '1'
     },
-    
+
     initCategoryFromRoute() {
       const path = this.$route.path
       if (path.includes('/forum/birdwatching')) {
@@ -259,7 +236,7 @@ export default {
         this.currentCategory = 'all'
       }
     },
-    
+
     async loadPosts() {
       this.loading = true
       try {
@@ -276,7 +253,7 @@ export default {
         this.loading = false
       }
     },
-    
+
     switchCategory(category) {
       this.currentCategory = category
       if (category === 'all') {
@@ -285,64 +262,16 @@ export default {
         this.$router.push(`/forum/${category}`).catch(() => {})
       }
     },
-    
+
     handleSearch() {
       console.log('Search:', this.searchKeyword)
       this.loadPosts()
     },
-    
+
     goToPostDetail(postId) {
       this.$router.push(`/forum/post/${postId}`)
     },
-    
-    goToHome() {
-      this.$router.push('/')
-    },
-    
-    goToKnowledgePage(tab) {
-      if (this.isLoggedIn) {
-        this.$router.push(`/knowledge/${tab}`)
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/knowledge/${tab}`)
-        }
-      }
-    },
-    
-    goToFunFacts() {
-      if (this.isLoggedIn) {
-        this.$router.push('/knowledge/facts')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge/facts')
-        }
-      }
-    },
-    
-    goToGamePage(game) {
-      this.$router.push(`/game/${game}`)
-    },
-    
-    goToPersonalPage() {
-      if (this.isLoggedIn) {
-        this.$router.push('/center')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/center')
-        }
-      }
-    },
-    
-    goToLogin() {
-      this.$router.push('/login')
-    },
-    
-    handleLogout() {
-      sessionStorage.clear()
-      this.isLoggedIn = false
-      this.$router.push('/')
-    },
-    
+
     closePostDialog() {
       this.showPostDialog = false
       this.isEditing = false
@@ -351,15 +280,39 @@ export default {
         title: '',
         content: '',
         tag: '',
-        category: 'birdwatching'
+        category: 'birdwatching',
+        isPinned: 0
       }
     },
-    
+
     isOwnPost(post) {
       const userId = sessionStorage.getItem('id')
       return userId && post.authorId && post.authorId.toString() === userId.toString()
     },
-    
+
+    isOwnPostOrAdmin(post) {
+      if (!this.isLoggedIn) return false
+      if (this.isAdmin) return true
+      return this.isOwnPost(post)
+    },
+
+    async togglePin(post) {
+      if (!this.isOwnPostOrAdmin(post)) return
+
+      try {
+        const newPinned = post.isPinned === 1 ? 0 : 1
+        const response = await updatePost(post.id, { isPinned: newPinned })
+        if (response && response.code === 200) {
+          post.isPinned = newPinned
+          this.$message.success(newPinned === 1 ? 'Post pinned' : 'Post unpinned')
+        }
+        this.loadPosts()
+      } catch (error) {
+        console.error('Failed to toggle pin:', error)
+        this.$message.error('Failed to update pin status')
+      }
+    },
+
     editPost(post) {
       this.isEditing = true
       this.editingPostId = post.id
@@ -367,23 +320,24 @@ export default {
         title: post.title,
         content: post.content,
         tag: post.tag,
-        category: post.category
+        category: post.category,
+        isPinned: post.isPinned
       }
       this.showPostDialog = true
     },
-    
+
     async submitPost() {
       if (!this.newPost.title.trim() || !this.newPost.content.trim()) {
         alert('Please enter title and content')
         return
       }
-      
+
       this.submitting = true
       try {
         const userId = sessionStorage.getItem('id')
         const username = sessionStorage.getItem('username') || 'User'
         const userAvatar = sessionStorage.getItem('avatarUrl')
-        
+
         const postData = {
           ...this.newPost,
           authorId: parseInt(userId),
@@ -393,10 +347,9 @@ export default {
           viewCount: 0,
           replyCount: 0
         }
-        
+
         let response
         if (this.isEditing && this.editingPostId) {
-          // 更新帖子
           const updateData = {
             ...postData,
             id: this.editingPostId
@@ -411,7 +364,7 @@ export default {
             alert('Post created successfully!')
           }
         }
-        
+
         if (response && response.code === 200) {
           this.closePostDialog()
           this.loadPosts()
@@ -423,28 +376,28 @@ export default {
         this.submitting = false
       }
     },
-    
+
     truncateContent(content, maxLength = 150) {
       if (!content) return ''
       if (content.length <= maxLength) return content
       return content.substring(0, maxLength) + '...'
     },
-    
+
     formatDate(dateStr) {
       if (!dateStr) return ''
       const date = new Date(dateStr)
       const now = new Date()
       const diff = now - date
-      
+
       const minutes = Math.floor(diff / 60000)
       const hours = Math.floor(diff / 3600000)
       const days = Math.floor(diff / 86400000)
-      
+
       if (minutes < 1) return 'Just now'
       if (minutes < 60) return `${minutes}m ago`
       if (hours < 24) return `${hours}h ago`
       if (days < 7) return `${days}d ago`
-      
+
       return date.toLocaleDateString()
     }
   }
@@ -457,136 +410,12 @@ export default {
   background: #f5f7fa;
 }
 
-/* 顶部导航栏 */
-.top-navbar {
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo h3 {
-  margin: 0;
-  color: #22b3c1;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.nav-item {
-  color: #333;
-  text-decoration: none;
-  font-size: 15px;
-  cursor: pointer;
-  transition: color 0.3s;
-  position: relative;
-}
-
-.nav-item:hover {
-  color: #22b3c1;
-}
-
-.nav-item.active {
-  color: #22b3c1;
-}
-
-/* Dropdown styles */
-.dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.dropdown .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-  z-index: 1001;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  min-width: 180px;
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.dropdown .dropdown-menu .dropdown-item {
-  padding: 10px 20px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.dropdown .dropdown-menu .dropdown-item:hover {
-  background: #e0f7fa;
-  color: #22b3c1;
-}
-
-.dropdown:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-.login-btn {
-  background: #22b3c1;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-}
-
-.login-btn:hover {
-  background: #1a9aa8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
-}
-
-.logout-btn {
-  background: #ff6b6b;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-}
-
-.logout-btn:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-/* 主要内容区 */
 .forum-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 30px 20px;
 }
 
-/* 搜索栏 */
 .search-bar {
   background: white;
   border-radius: 16px;
@@ -598,21 +427,21 @@ export default {
 .search-container {
   display: flex;
   gap: 15px;
-  align-items: center;
 }
 
 .search-input {
   flex: 1;
   padding: 12px 20px;
-  border: 2px solid #e8e8e8;
+  border: 2px solid #e0f7fa;
   border-radius: 25px;
   font-size: 15px;
-  outline: none;
-  transition: border-color 0.3s;
+  transition: all 0.3s;
 }
 
 .search-input:focus {
+  outline: none;
   border-color: #22b3c1;
+  box-shadow: 0 0 0 3px rgba(34, 179, 193, 0.1);
 }
 
 .search-btn {
@@ -621,9 +450,9 @@ export default {
   color: white;
   border: none;
   border-radius: 25px;
-  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 15px;
 }
 
 .search-btn:hover {
@@ -634,77 +463,83 @@ export default {
 
 .post-btn {
   padding: 12px 30px;
-  background: #6f5bb8;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
   border-radius: 25px;
-  font-size: 15px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 15px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .post-btn:hover {
-  background: #5d4aa8;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(111, 91, 184, 0.3);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
-/* 分类标签 */
 .category-tabs {
   display: flex;
-  gap: 15px;
+  gap: 20px;
   margin-bottom: 25px;
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .tab-item {
   padding: 10px 25px;
-  background: white;
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
+  color: #666;
   font-size: 15px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .tab-item:hover {
-  background: #e0f7fa;
   color: #22b3c1;
-  transform: translateY(-2px);
+  background: #e0f7fa;
 }
 
 .tab-item.active {
-  background: #22b3c1;
+  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
   color: white;
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
 }
 
-/* 帖子列表 */
 .post-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.post-item {
   background: white;
   border-radius: 16px;
   padding: 25px;
-  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.loading, .empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+.post-item {
+  padding: 20px;
+  border-bottom: 1px solid #f0f0f0;
   transition: all 0.3s;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.post-item:last-child {
+  border-bottom: none;
 }
 
 .post-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  background: #fafafa;
 }
 
 .post-item.pinned {
-  border-left: 4px solid #ffd700;
-  background: linear-gradient(to right, #fffef0, white);
+  background: #fffbf0;
+  border-left: 4px solid #ffc107;
 }
 
 .post-header {
@@ -732,31 +567,29 @@ export default {
 }
 
 .post-title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
   color: #333;
   margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  line-height: 1.4;
 }
 
 .pinned-badge {
-  background: #ffd700;
+  background: #ffc107;
   color: #333;
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
   font-size: 12px;
-  font-weight: 600;
+  margin-right: 8px;
 }
 
 .qa-badge {
-  background: #ff6b6b;
+  background: #22b3c1;
   color: white;
-  padding: 3px 10px;
-  border-radius: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
   font-size: 12px;
-  font-weight: 600;
+  margin-right: 8px;
 }
 
 .post-meta {
@@ -766,48 +599,32 @@ export default {
   color: #999;
 }
 
-.author-name {
-  color: #666;
-  font-weight: 500;
-}
-
-.post-tag {
-  background: #e0f7fa;
-  color: #22b3c1;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-}
-
 .post-content {
   color: #666;
   font-size: 15px;
   line-height: 1.6;
   margin-bottom: 15px;
+  padding-left: 65px;
 }
 
 .post-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #999;
-  font-size: 14px;
+  padding-left: 65px;
 }
 
 .post-stats {
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
-.post-stats .stat-item {
+.stat-item {
   display: flex;
   align-items: center;
   gap: 5px;
-}
-
-.post-stats i {
-  font-size: 16px;
-  color: #22b3c1;
+  color: #999;
+  font-size: 14px;
 }
 
 .post-actions {
@@ -817,35 +634,51 @@ export default {
 
 .edit-btn {
   padding: 6px 15px;
-  background: #22b3c1;
-  color: white;
+  background: #f5f5f5;
+  color: #666;
   border: none;
-  border-radius: 6px;
-  font-size: 13px;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  font-size: 13px;
 }
 
 .edit-btn:hover {
-  background: #1a9aa8;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(34, 179, 193, 0.3);
+  background: #22b3c1;
+  color: white;
 }
 
-.edit-btn i {
-  font-size: 14px;
+.pin-btn {
+  padding: 6px 15px;
+  background: #f5f5f5;
+  color: #666;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 13px;
 }
 
-/* 对话框 */
+.pin-btn:hover {
+  background: #ffc107;
+  color: #333;
+}
+
+.pin-btn.pinned {
+  background: #ffc107;
+  color: #333;
+}
+
+.pin-btn.pinned:hover {
+  background: #e6ac00;
+}
+
 .dialog-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
@@ -855,39 +688,36 @@ export default {
 
 .post-dialog {
   background: white;
-  border-radius: 16px;
+  border-radius: 20px;
   width: 90%;
-  max-width: 600px;
+  max-width: 700px;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .dialog-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 25px;
-  border-bottom: 1px solid #e8e8e8;
+  padding: 25px 30px;
+  border-bottom: 1px solid #eee;
 }
 
 .dialog-header h3 {
   margin: 0;
-  color: #333;
   font-size: 20px;
+  color: #333;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 28px;
+  font-size: 30px;
   color: #999;
   cursor: pointer;
-  padding: 0;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: color 0.3s;
+  line-height: 1;
 }
 
 .close-btn:hover {
@@ -895,7 +725,7 @@ export default {
 }
 
 .dialog-body {
-  padding: 25px;
+  padding: 30px;
 }
 
 .form-group {
@@ -905,109 +735,79 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #333;
   font-weight: 500;
-  font-size: 14px;
+  color: #333;
 }
 
 .form-control {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e8e8e8;
-  border-radius: 8px;
+  border: 2px solid #e0f7fa;
+  border-radius: 10px;
   font-size: 15px;
-  outline: none;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+.form-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+  vertical-align: middle;
+  cursor: pointer;
 }
 
 .form-control:focus {
+  outline: none;
   border-color: #22b3c1;
+  box-shadow: 0 0 0 3px rgba(34, 179, 193, 0.1);
 }
 
-.form-control textarea {
-  resize: vertical;
-  min-height: 120px;
+.quill-editor {
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .dialog-footer {
   display: flex;
   justify-content: flex-end;
   gap: 15px;
-  padding: 20px 25px;
-  border-top: 1px solid #e8e8e8;
+  padding: 20px 30px;
+  border-top: 1px solid #eee;
 }
 
 .btn-cancel {
-  padding: 10px 25px;
+  padding: 12px 30px;
   background: #f5f5f5;
   color: #666;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 15px;
 }
 
 .btn-cancel:hover {
-  background: #e8e8e8;
+  background: #e0e0e0;
 }
 
 .btn-submit {
-  padding: 10px 30px;
-  background: #22b3c1;
+  padding: 12px 30px;
+  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 15px;
+  border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
+  font-size: 15px;
 }
 
-.btn-submit:hover {
-  background: #1a9aa8;
+.btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.4);
 }
 
 .btn-submit:disabled {
-  background: #ccc;
+  opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* 富文本编辑器样式 */
-.quill-editor {
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.quill-editor >>> .ql-toolbar {
-  border: none;
-  border-bottom: 1px solid #e8e8e8;
-  background-color: #f9f9f9;
-}
-
-.quill-editor >>> .ql-container {
-  border: none;
-  min-height: 200px;
-  font-size: 15px;
-}
-
-.quill-editor >>> .ql-editor {
-  padding: 15px;
-  min-height: 200px;
-}
-
-/* 加载和空状态 */
-
-/* 加载和空状态 */
-.loading, .empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  font-size: 16px;
 }
 </style>

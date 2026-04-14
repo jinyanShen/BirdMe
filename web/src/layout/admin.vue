@@ -53,7 +53,7 @@
               <img :src="userAvatar" alt="User" />
             </div>
             <div v-if="showUserMenu" class="user-menu">
-              <router-link to="/identification" class="menu-item">Bird Identification</router-link>
+              <router-link to="/" class="menu-item">Homepage</router-link>
               <a href="#" @click="handleLogout" class="menu-item">Logout</a>
             </div>
           </div>

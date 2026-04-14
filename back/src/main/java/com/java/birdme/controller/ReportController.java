@@ -21,7 +21,7 @@ import java.util.Map;
  * Handles API requests related to bird rescue reports
  */
 @RestController
-@RequestMapping("/api/report")
+@RequestMapping("/report")
 @CrossOrigin
 public class ReportController {
     

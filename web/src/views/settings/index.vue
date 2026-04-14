@@ -1,33 +1,5 @@
 <template>
   <div class="profile-page">
-    <!-- 顶部导航栏（与 Knowledge 页面一致） -->
-    <div class="top-navbar">
-      <div class="navbar-container">
-        <div class="logo">
-          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
-        </div>
-        <div class="nav-menu">
-          <span class="nav-item" @click="goToHome">Homepage</span>
-          <span class="nav-item" @click="goToKnowledge">Knowledge</span>
-          <span class="nav-item" @click="goToRescue">Rescue</span>
-          <span class="nav-item" @click="goToForum">Forum</span>
-          <div class="nav-item game-dropdown" @click="goToGame">
-            Game
-            <div class="game-dropdown-menu">
-              <div class="game-dropdown-item" @click.stop="selectGameFromNav('flappy')">Flappy Bird</div>
-              <div class="game-dropdown-item" @click.stop="selectGameFromNav('2048')">2048 Bird</div>
-              <div class="game-dropdown-item" @click.stop="selectGameFromNav('merge')">Merge To Giant Bird</div>
-            </div>
-          </div>
-
-
-          <span class="nav-item active" @click="goToPersonalPage">Personal Setting</span>
-          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
-        </div>
-      </div>
-    </div>
-
     <div class="container">
       <!-- Page Title -->
       <div class="section-title">
@@ -227,12 +199,10 @@ export default {
   },
 
   methods: {
-    // 检查登录状态
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null;
     },
 
-    // 登出
     handleLogout() {
       sessionStorage.removeItem('id');
       sessionStorage.removeItem('username');
@@ -246,64 +216,6 @@ export default {
       this.isLoggedIn = false;
       this.$message.success('Logged out successfully');
       this.$router.push('/');
-    },
-
-    // 导航方法
-    goToHome() {
-      if (this.$route.path === '/') return;
-      this.$router.push('/');
-    },
-
-    goToKnowledge() {
-      if (this.isLoggedIn) {
-        this.$router.push('/knowledge');
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge');
-        }
-      }
-    },
-
-    goToRescue() {
-      if (this.isLoggedIn) {
-        this.$router.push('/rescue');
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/rescue');
-        }
-      }
-    },
-
-    goToForum() {
-      if (this.isLoggedIn) {
-        this.$router.push('/forum');
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/forum');
-        }
-      }
-    },
-
-    goToGame() {
-      if (this.isLoggedIn) {
-        this.$router.push('/game');
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/game');
-        }
-      }
-    },
-
-    goToPersonalPage() {
-      // 已在当前页面
-      if (this.$route.path === '/settings/index') return;
-      this.$router.push('/settings/index');
-    },
-
-    goToLogin() {
-      if (window.$loginDialog) {
-        window.$loginDialog.show('/');
-      }
     },
 
     // Profile methods
@@ -369,19 +281,6 @@ export default {
       if (!dateString) return 'N/A';
       const date = new Date(dateString);
       return date.toLocaleString();
-    },
-    selectGameFromNav(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
-    },
-
-    selectGame(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
     }
   },
 
@@ -394,170 +293,11 @@ export default {
 </script>
 
 <style scoped>
-/* Game 顶部下拉菜单（hover 展开，不依赖点击） */
-.game-dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  .game-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-    z-index: 1001;
-
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    padding: 8px 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .game-dropdown-item {
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-      &:hover {
-        background: #f2f3ff;
-        color: #22b3c1;
-      }
-    }
-  }
-
-  &:hover {
-    .game-dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
 /* Profile Page Styles */
 .profile-page {
   padding-top: 70px;
   background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
   min-height: 100vh;
-}
-
-/* 顶部导航栏样式（与 Knowledge 页面一致） */
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo h3 {
-  margin: 0;
-  font-size: 24px;
-  color: #22b3c1;
-  font-weight: bold;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.logo h3:hover {
-  color: #1a9aa8;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: #333;
-  font-size: 16px;
-  transition: color 0.3s;
-  cursor: pointer;
-  padding: 8px 0;
-  position: relative;
-}
-
-.nav-item:hover {
-  color: #22b3c1;
-}
-
-.nav-item.active {
-  color: #22b3c1;
-}
-
-.nav-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #22b3c1;
-  animation: slideIn 0.3s ease-out;
-}
-
-.login-btn {
-  background: #22b3c1;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-}
-
-.login-btn:hover {
-  background: #1a9aa8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
-  color: white !important;
-}
-
-.logout-btn {
-  background: #ff6b6b;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  color: white !important;
-}
-
-@keyframes slideIn {
-  from {
-    width: 0;
-    opacity: 0;
-  }
-  to {
-    width: 100%;
-    opacity: 1;
-  }
 }
 
 .container {

@@ -24,31 +24,22 @@ export const constantRoutes = [
   },
   {
     path: '/knowledge',
-    component: () => import('@/views/knowledge/index'),
-    name: 'knowledge',
-    meta: { title: 'Bird knowledge', requiresAuth: true },
+    component: Layout,
+    redirect: '/knowledge/index',
+    hidden: true,
+    meta: { title: 'Knowledge', requiresAuth: true },
     children: [
       {
-        path: 'migration',
-        component: () => import('@/views/knowledge/BirdMigration'),
-        name: 'BirdMigration',
-        meta: { title: 'Bird Migration', requiresAuth: true }
-      },
-      {
-        path: 'identification',
-        component: () => import('@/views/knowledge/BirdIdentification'),
-        name: 'BirdIdentification',
-        meta: { title: 'Bird Identification', requiresAuth: true }
+        path: 'index',
+        component: () => import('@/views/knowledge/index'),
+        name: 'KnowledgeMain',
+        meta: { title: 'Knowledge' }
       },
       {
         path: 'facts',
         component: () => import('@/views/knowledge/FunFacts'),
         name: 'FunFacts',
         meta: { title: 'Fun Facts', requiresAuth: true }
-      },
-      {
-        path: '',
-        redirect: 'migration'  // 默认显示迁徙页面
       }
     ]
   },
@@ -69,16 +60,25 @@ export const constantRoutes = [
   },
   {
     path: '/game',
-    component: () => import('@/views/game/game'),
-    name: 'Game',
-    meta: { title: 'Game' }
-  },
-  {
-    path: '/game/:gameKey',
-    component: () => import('@/views/game/gameSubpage'),
-    name: 'GameSubpage',
+    component: Layout,
+    redirect: '/game/index',
     hidden: true,
-    meta: { title: 'Game' }
+    meta: { title: 'Game' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/game/game'),
+        name: 'Game',
+        meta: { title: 'Game' }
+      },
+      {
+        path: ':gameKey',
+        component: () => import('@/views/game/gameSubpage'),
+        name: 'GameSubpage',
+        hidden: true,
+        meta: { title: 'Game' }
+      }
+    ]
   },
   {
     path: '/admin',
@@ -121,8 +121,9 @@ export const constantRoutes = [
   },
   {
     path: '/forum',
-    component: () => import('@/views/forum/Forum'),
-    name: 'Forum',
+    component: Layout,
+    redirect: '/forum/birdwatching',
+    hidden: true,
     meta: { title: 'Forum' },
     children: [
       {
@@ -136,15 +137,15 @@ export const constantRoutes = [
         component: () => import('@/views/forum/Forum'),
         name: 'ForumQA',
         meta: { title: 'Q&A' }
+      },
+      {
+        path: 'post/:id',
+        component: () => import('@/views/forum/PostDetail'),
+        name: 'PostDetail',
+        hidden: true,
+        meta: { title: 'Post Detail' }
       }
     ]
-  },
-  {
-    path: '/forum/post/:id',
-    component: () => import('@/views/forum/PostDetail'),
-    name: 'PostDetail',
-    hidden: true,
-    meta: { title: 'Post Detail' }
   },
 ]
 

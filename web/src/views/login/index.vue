@@ -457,13 +457,19 @@ export default {
                 sessionStorage.setItem('role', res.data.role)
                 this.$message.success("Login successful")
 
-                // 获取重定向地址
-                const redirect = this.$route.query.redirect
-                if (redirect) {
-                  this.$router.push(decodeURIComponent(redirect))
+                if (res.data.role === 1) {
+                  // Admin user - redirect to admin panel
+                  this.$router.push({ path: '/admin/users' })
                 } else {
-                  // 默认跳转到首页
-                  this.$router.push('/')
+                  // Regular user - redirect to identification page
+                  // 获取重定向地址
+                  const redirect = this.$route.query.redirect
+                  if (redirect) {
+                    this.$router.push(decodeURIComponent(redirect))
+                  } else {
+                    // 默认跳转到首页
+                    this.$router.push('/')
+                  }
                 }
               } else {
                 this.loading = false
