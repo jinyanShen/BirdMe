@@ -9,6 +9,14 @@ export function pageReport(query) {
   })
 }
 
+export function pageMyReport(query) {
+  return request({
+    url: '/report/pageMy',
+    method: 'post',
+    data: query
+  })
+}
+
 // Query all list
 export function allReport() {
   return request({

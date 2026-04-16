@@ -21,10 +21,10 @@ import java.util.Map;
  */
 @Service
 public class ReportServiceImpl implements ReportService {
-    
+
     @Autowired
     private ReportMapper reportMapper;
-    
+
     @Override
     public ReturnResp insert(Report report) {
         if (report == null) {
@@ -56,17 +56,38 @@ public class ReportServiceImpl implements ReportService {
         Page<Report> page = new Page<>(pageReq.getOffset(), pageReq.getPageSize());
 
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
-        if (pageReq.getData() != null) {
-            String keyword = pageReq.getData().getBirdName();
-            String status = pageReq.getData().getStatus();
-            
-            if (keyword != null && !keyword.isEmpty()) {
-                wrapper.and(w -> w.like(Report::getBirdName, keyword).or().like(Report::getLocation, keyword));
-            }
-            if (status != null && !status.isEmpty()) {
-                wrapper.eq(Report::getStatus, status);
-            }
+        String keyword = pageReq.getData().getBirdName();
+        String status = pageReq.getData().getStatus();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(Report::getBirdName, keyword).or().like(Report::getLocation, keyword));
         }
+        if (status != null && !status.isEmpty()) {
+            wrapper.eq(Report::getStatus, status);
+        }
+
+        Page<Report> reportPage = reportMapper.selectPage(page, wrapper);
+        List<Report> records = reportPage.getRecords();
+
+        return PageResp.page(pageReq.getOffset(), pageReq.getPageSize(), (int) reportPage.getTotal(), records);
+    }
+
+    @Override
+    public PageResp pageMy(PageReq<Report> pageReq) {
+        Page<Report> page = new Page<>(pageReq.getOffset(), pageReq.getPageSize());
+
+        LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Report::getRescueStationId, pageReq.getData().getRescueStationId());
+        String keyword = pageReq.getData().getBirdName();
+        String status = pageReq.getData().getStatus();
+
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(Report::getBirdName, keyword).or().like(Report::getLocation, keyword));
+        }
+        if (status != null && !status.isEmpty()) {
+            wrapper.eq(Report::getStatus, status);
+        }
+
         Page<Report> reportPage = reportMapper.selectPage(page, wrapper);
         List<Report> records = reportPage.getRecords();
 
@@ -83,28 +104,28 @@ public class ReportServiceImpl implements ReportService {
         Integer ret = reportMapper.deleteBatchIds(ids);
         return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }
-    
+
     @Override
     public List<Report> getReportsBySubmitterId(String submitterId) {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Report::getSubmitterId, submitterId);
         return reportMapper.selectList(wrapper);
     }
-    
+
     @Override
     public List<Report> getReportsByRescueStationId(Integer rescueStationId) {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Report::getRescueStationId, rescueStationId);
         return reportMapper.selectList(wrapper);
     }
-    
+
     @Override
     public List<Report> getReportsByStatus(String status) {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Report::getStatus, status);
         return reportMapper.selectList(wrapper);
     }
-    
+
     @Override
     public ReturnResp updateReportStatus(Integer reportId, String status, String notes) {
         Report report = reportMapper.selectById(reportId);
@@ -117,25 +138,25 @@ public class ReportServiceImpl implements ReportService {
         }
         return ReturnResp.fail("Report not found");
     }
-    
+
     @Override
     public Map<String, Object> getReportStatistics() {
         LambdaQueryWrapper<Report> wrapper = new LambdaQueryWrapper<>();
         List<Report> allReports = reportMapper.selectList(wrapper);
-        
+
         Map<String, Object> statistics = new java.util.HashMap<>();
         statistics.put("totalReports", allReports.size());
-        
+
         long pendingCount = allReports.stream().filter(r -> "PENDING".equals(r.getStatus())).count();
         long processingCount = allReports.stream().filter(r -> "PROCESSING".equals(r.getStatus())).count();
         long completedCount = allReports.stream().filter(r -> "COMPLETED".equals(r.getStatus())).count();
         long cancelledCount = allReports.stream().filter(r -> "CANCELLED".equals(r.getStatus())).count();
-        
+
         statistics.put("pendingReports", (int) pendingCount);
         statistics.put("processingReports", (int) processingCount);
         statistics.put("completedReports", (int) completedCount);
         statistics.put("cancelledReports", (int) cancelledCount);
-        
+
         return statistics;
     }
 }

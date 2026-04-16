@@ -24,10 +24,10 @@ import java.util.Map;
 @RequestMapping("/report")
 @CrossOrigin
 public class ReportController {
-    
+
     @Autowired
     private ReportService reportService;
-    
+
     /**
      * Add new report
      **/
@@ -75,7 +75,15 @@ public class ReportController {
     public ReturnResp all() {
         return reportService.all();
     }
-    
+
+    /**
+     * Get reports for rescue station (by rescue station ID)
+     */
+    @RequestMapping("/pageMy")
+    public PageResp pageMy(@RequestBody PageReq<Report> pageReq) {
+        return reportService.pageMy(pageReq);
+    }
+
     /**
      * Get reports by submitter ID
      */
@@ -89,7 +97,7 @@ public class ReportController {
             return ReturnResp.fail("Failed to get reports");
         }
     }
-    
+
     /**
      * Get reports by status
      */
@@ -103,7 +111,7 @@ public class ReportController {
             return ReturnResp.fail("Failed to get reports");
         }
     }
-    
+
     /**
      * Submit new report
      */
@@ -111,7 +119,7 @@ public class ReportController {
     public ReturnResp submitReport(@RequestBody Report report) {
         return reportService.insert(report);
     }
-    
+
     /**
      * Update report status (rescue station only)
      */
@@ -122,7 +130,7 @@ public class ReportController {
             @RequestParam(required = false) String notes) {
         return reportService.updateReportStatus(reportId, status, notes);
     }
-    
+
     /**
      * Get report statistics (admin only)
      */

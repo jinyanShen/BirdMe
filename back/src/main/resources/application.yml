@@ -32,12 +32,10 @@ spring:
     password:
 
 mybatis-plus:
-  mapper-locations: classpath:/mapper/*Mapper.xml
   typeAliasesPackage: com.java.birdme.bean
   global-config:
     id-type: 2
     db-column-underline: true
-    refresh-mapper: true
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false

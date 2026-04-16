@@ -449,6 +449,9 @@ export default {
                 sessionStorage.setItem('phone', res.data.phone)
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
+                if (res.data.rescueStationId) {
+                  sessionStorage.setItem('rescueStationId', res.data.rescueStationId)
+                }
 
                 this.$message.success("Login successful")
                 this.dialogVisible = false

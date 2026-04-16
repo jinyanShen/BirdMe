@@ -49,6 +49,7 @@
                 </div>
                 <div v-if="showUserMenu" class="user-menu">
                   <router-link v-if="role==='1'" to="/admin/users" class="menu-item">Admin Panel</router-link>
+                  <router-link v-if="role==='2'" to="/admin/reports" class="menu-item">Rescue Station</router-link>
                   <a href="#" @click="handleLogout">Logout</a>
                 </div>
               </div>

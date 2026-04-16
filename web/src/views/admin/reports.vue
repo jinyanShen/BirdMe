@@ -159,7 +159,7 @@
 </template>
 
 <script>
-import { pageReport, insertReport, updateReport, delReport } from '@/api/report'
+import { pageReport, pageMyReport, insertReport, updateReport, delReport } from '@/api/report'
 import ReportDetail from '@/components/ReportDetail/index.vue'
 
 export default {
@@ -179,6 +179,8 @@ export default {
       isEdit: false,
       dialogTitle: 'Add Report',
       selectedReport: null,
+      isRescueStation: false,
+      rescueStationId: null,
       form: {
         id: null,
         birdName: '',
@@ -214,21 +216,40 @@ export default {
     }
   },
   mounted() {
+    const role = sessionStorage.getItem('role')
+    this.isRescueStation = role === '2'
+    if (this.isRescueStation) {
+      this.rescueStationId = parseInt(sessionStorage.getItem('rescueStationId')) || null
+    }
     this.fetchReportList()
   },
   methods: {
     async fetchReportList() {
       this.loading = true
       try {
-        const response = await pageReport({
-          offset: this.pageInfo.offset,
-          pageSize: this.pageInfo.pageSize,
-          data: {
-            birdName: this.searchKeyword,
-            location: this.searchKeyword,
-            status: this.searchStatus
-          }
-        })
+        let response
+        if (this.isRescueStation) {
+          response = await pageMyReport({
+            offset: this.pageInfo.offset,
+            pageSize: this.pageInfo.pageSize,
+            data: {
+              birdName: this.searchKeyword,
+              location: this.searchKeyword,
+              status: this.searchStatus,
+              rescueStationId: this.rescueStationId
+            }
+          })
+        } else {
+          response = await pageReport({
+            offset: this.pageInfo.offset,
+            pageSize: this.pageInfo.pageSize,
+            data: {
+              birdName: this.searchKeyword,
+              location: this.searchKeyword,
+              status: this.searchStatus
+            }
+          })
+        }
         if (response.data && response.data.length > 0) {
           this.reportList = response.data
           this.pageInfo.total = response.totalCount

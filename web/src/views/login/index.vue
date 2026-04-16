@@ -455,11 +455,17 @@ export default {
                 sessionStorage.setItem('phone', res.data.phone)
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
+                if (res.data.rescueStationId) {
+                  sessionStorage.setItem('rescueStationId', res.data.rescueStationId)
+                }
                 this.$message.success("Login successful")
 
                 if (res.data.role === 1) {
                   // Admin user - redirect to admin panel
                   this.$router.push({ path: '/admin/users' })
+                }else if (res.data.role === 2) {
+                  // Rescue user - redirect to reports
+                  this.$router.push({ path: '/admin/reports' })
                 } else {
                   // Regular user - redirect to identification page
                   // 获取重定向地址
