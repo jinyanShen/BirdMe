@@ -37,7 +37,7 @@ export default {
         return [10, 20, 30, 50]
       }
     },
-    // 移动端页码按钮的数量端默认值5
+    // Mobile page button count default value 5
     pagerCount: {
       type: Number,
       default: document.body.clientWidth < 992 ? 5 : 7

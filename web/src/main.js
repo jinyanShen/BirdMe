@@ -49,18 +49,18 @@
 //   router,
 //   render: h => h(App)
 // })
-// / 创建登录弹窗实例
+// / Create login dialog instance
 // const LoginDialogConstructor = Vue.extend(LoginDialog)
 // const loginDialogInstance = new LoginDialogConstructor()
 // loginDialogInstance.$mount()
 // document.body.appendChild(loginDialogInstance.$el)
 //
-// // 将登录弹窗方法挂载到全局
+// // Mount login dialog method to global
 // window.$showLoginDialog = (redirectPath) => {
 //   loginDialogInstance.show(redirectPath)
 // }
 //
-// // 添加全局路由守卫的备用方法
+// // Add global route guard backup method
 // window.$loginDialog = loginDialogInstance
 //
 // new Vue({
@@ -83,7 +83,7 @@ import Pagination from "@/components/Pagination";
 import VueMeta from 'vue-meta'
 import echarts from 'echarts'
 
-// 导入 LoginDialog - 使用正确的路径
+// Import LoginDialog - using correct path
 import LoginDialog from '@/views/loginDialog/index.vue'
 
 Vue.prototype.$echarts = echarts
@@ -97,13 +97,13 @@ Vue.use(Element, {
 
 Vue.config.productionTip = false
 
-// 创建登录弹窗实例
+// Create login dialog instance
 const LoginDialogConstructor = Vue.extend(LoginDialog)
 const loginDialogInstance = new LoginDialogConstructor()
 loginDialogInstance.$mount()
 document.body.appendChild(loginDialogInstance.$el)
 
-// 将登录弹窗方法挂载到全局
+// Mount login dialog method to global
 window.$showLoginDialog = (redirectPath) => {
   console.log('Showing login dialog, redirectPath:', redirectPath)
   if (loginDialogInstance && loginDialogInstance.show) {
@@ -115,7 +115,7 @@ window.$showLoginDialog = (redirectPath) => {
 
 window.$loginDialog = loginDialogInstance
 
-// 创建 Vue 实例
+// Create Vue instance
 new Vue({
   el: '#app',
   router,

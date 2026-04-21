@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
-* mybatis-plus配置
+* MyBatis-Plus configuration
 */
 @Configuration
 public class MyBatisPlusConfig {

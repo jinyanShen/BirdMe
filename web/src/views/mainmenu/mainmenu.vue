@@ -46,7 +46,7 @@ export default {
   //   this.checkLoginStatus()
   // },
   mounted() {
-    // 修改了云朵动画，使其在会话内只播放一次动画--->每次打开网页都会播放，但是在网页间跳转则不会播放
+    // Modified cloud animation to play only once per session --> plays every time page loads, but not when navigating between pages
     if (sessionStorage.getItem('animationPlayed')) {
       this.showAnimation = false
     } else {
@@ -93,14 +93,14 @@ export default {
         }
       }
     },
-    // 检查登录状态
+    // Check login status
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
 
-    // 登出
+    // Logout
     handleLogout() {
-      // 清除所有登录信息
+      // Clear all login information
       sessionStorage.removeItem('id')
       sessionStorage.removeItem('username')
       sessionStorage.removeItem('password')
@@ -113,7 +113,7 @@ export default {
       this.isLoggedIn = false
       this.$message.success('Logged out successfully')
 
-      // 如果当前在需要登录的页面，跳转到首页
+      // If currently on a page that requires login, redirect to home page
       const needAuthPages = ['/identification', '/settings']
       if (needAuthPages.includes(this.$route.path)) {
         this.$router.push('/')
@@ -121,7 +121,7 @@ export default {
     },
 
     goToNews(id) {
-      console.log('点击新闻', id)
+      console.log('Click news', id)
     },
 
     goToHome() {
@@ -131,19 +131,19 @@ export default {
       this.$router.push('/')
     },
 
-    // 跳转到 Knowledge 页面
+    // Navigate to Knowledge page
     goToKnowledge() {
       if (this.isLoggedIn) {
         this.$router.push('/knowledge')
       } else {
-        // 未登录，弹出登录弹窗
+        // Not logged in, show login dialog
         if (window.$showLoginDialog) {
           window.$showLoginDialog('/knowledge')
         }
       }
     },
 
-    // 跳转到 Rescue 页面
+    // Navigate to Rescue page
     goToRescue() {
       if (this.isLoggedIn) {
         this.$router.push('/rescue')
@@ -154,7 +154,7 @@ export default {
       }
     },
 
-    // 跳转到 Forum 页面
+    // Navigate to Forum page
     goToForum() {
       if (this.isLoggedIn) {
         this.$router.push('/forum')
@@ -165,7 +165,7 @@ export default {
       }
     },
 
-    // 跳转到 Game 页面
+    // Navigate to Game page
     goToGame() {
       if (this.isLoggedIn) {
         this.$router.push('/game')
@@ -176,7 +176,7 @@ export default {
       }
     },
 
-    // 顶部 Game 下拉子项点击（当前先做占位提示）
+    // Game dropdown item click (currently placeholder)
     selectGameFromNav(gameKey) {
       const targetPath = `/game/${gameKey}`
       if (this.$route.path === targetPath) return
@@ -184,7 +184,7 @@ export default {
       this.$router.push(targetPath)
     },
 
-    // 跳转到 Personal Profile 页面
+    // Navigate to Personal Profile page
     goToPersonalPage() {
       if (this.isLoggedIn) {
         this.$router.push('/settings')
@@ -195,7 +195,7 @@ export default {
       }
     },
 
-    // 跳转到登录页
+    // Navigate to login page
     goToLogin() {
       this.$router.push('/login')
     },
@@ -309,17 +309,17 @@ export default {
 
 <template>
   <div class="bird-home-container">
-    <!-- 开场动画遮罩层 -->
+    <!-- Opening animation mask layer -->
     <div v-if="showAnimation" class="opening-animation">
       <div class="sky-bg"></div>
 
-      <!-- 文字内容 -->
+      <!-- Text content -->
       <div class="welcome-text">
         <h1>BirdME</h1>
         <p>Group2_TOT</p>
       </div>
 
-      <!-- 左边云朵层 -->
+      <!-- Left cloud layer -->
       <div class="clouds-layer">
         <div
           v-for="cloud in leftClouds"
@@ -340,7 +340,7 @@ export default {
         </div>
       </div>
 
-      <!-- 右边云朵层 -->
+      <!-- Right cloud layer -->
       <div class="clouds-layer">
         <div
           v-for="cloud in rightClouds"
@@ -361,9 +361,9 @@ export default {
       </div>
     </div>
 
-    <!-- 主页面内容，开场动画结束后显示 -->
+    <!-- Main page content, displayed after opening animation ends -->
     <div class="main-content" :class="{ 'visible': !showAnimation }">
-      <!-- 顶部导航栏 -->
+      <!-- Top navigation bar -->
       <div class="top-navbar" :class="{ 'navbar-visible': showNavbar }">
         <div class="navbar-container">
           <div class="logo">
@@ -419,7 +419,7 @@ export default {
 
       <div class="content-below">
 
-        <!-- 轮播图容器 -->
+        <!-- Carousel container -->
         <div class="carousel-section fade-in-up">
           <h3>News about Birds</h3>
           <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
@@ -467,7 +467,7 @@ export default {
           </div>
         </div>
 
-        <!-- Rescue 板块 -->
+        <!-- Rescue section -->
         <div class="knowledge-cards-wrapper">
           <div class="section fade-in-up">
             <h3>Bird Rescue</h3>
@@ -496,7 +496,7 @@ export default {
           </div>
         </div>
 
-        <!-- Forum 板块（重新设计版） -->
+        <!-- Forum section (redesigned) -->
         <div class="knowledge-cards-wrapper">
           <div class="section fade-in-up">
             <h3>Community Forum</h3>
@@ -534,7 +534,7 @@ export default {
           </div>
         </div>
 
-        <!-- Game 板块 -->
+        <!-- Game section -->
         <div class="knowledge-cards-wrapper">
           <div class="section fade-in-up">
             <h3>Bird Games</h3>
@@ -570,14 +570,14 @@ export default {
 </template>
 
 <style scoped lang="scss">
-/* 根容器 */
+/* Root container */
 .bird-home-container {
   position: relative;
   width: 100%;
   min-height: 100vh;
 }
 
-/* 开场动画容器 */
+/* Opening animation container */
 .opening-animation {
   position: fixed;
   top: 0;
@@ -587,7 +587,7 @@ export default {
   z-index: 9999;
   overflow: hidden;
 
-  /* 蓝天背景 */
+  /* Sky background */
   .sky-bg {
     position: absolute;
     top: 0;
@@ -597,7 +597,7 @@ export default {
     background: linear-gradient(135deg, #bfd2f8 0%, #d2d9f4 50%, #dadff6 100%);
   }
 
-  /* 欢迎文字 */
+  /* Welcome text */
   .welcome-text {
     position: absolute;
     top: 50%;
@@ -630,7 +630,7 @@ export default {
     }
   }
 
-  /* 云朵层 */
+  /* Cloud layer */
   .clouds-layer {
     position: absolute;
     top: 0;
@@ -640,25 +640,25 @@ export default {
     z-index: 20;
   }
 
-  /* 云朵基础样式 */
+  /* Cloud basic style */
   .cloud {
     position: absolute;
     pointer-events: none;
     filter: drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.2));
   }
 
-  /* 左边云朵动画 - 向左散开 */
+  /* Left cloud animation - moving left */
   .cloud-left {
     animation: cloudMoveLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 
-  /* 右边云朵动画 - 向右散开 */
+  /* Right cloud animation - moving right */
   .cloud-right {
     animation: cloudMoveRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
 }
 
-/* 主页面内容 */
+/* Main page content */
 .main-content {
   position: fixed;
   top: 0;
@@ -668,7 +668,7 @@ export default {
   opacity: 0;
   transition: opacity 0.8s ease-in-out;
   z-index: 1;
-  overflow-y: auto;  /* 允许滚动 */
+  overflow-y: auto;  /* Allow scrolling */
   overflow-x: hidden;
 
   &.visible {
@@ -676,7 +676,7 @@ export default {
   }
 }
 
-/* 顶部图片容器 */
+/* Top image container */
 .image-container {
   position: relative;
   width: 100%;
@@ -803,7 +803,7 @@ export default {
       }
     }
   }
-  /*每部分的框*/
+  /* Section frame */
   .knowledge-cards-wrapper {
     background: rgba(255, 255, 255, 0.08);
     border: 1px solid rgba(255, 255, 255, 0.25);
@@ -927,7 +927,7 @@ export default {
     }
   }
 
-  /*轮播图容器*/
+  /*Carousel container*/
   .carousel-section {
     max-width: 1200px;
     margin: 0 auto 80px;
@@ -993,7 +993,7 @@ export default {
   }
 }
 
-/* 轮播图指示器样式 */
+/* Carousel indicator style */
 ::v-deep .el-carousel__indicators {
   bottom: 20px;
 
@@ -1020,7 +1020,7 @@ export default {
   }
 }
 
-/* 左边云朵向左移动动画 */
+/* Left cloud move left animation */
 @keyframes cloudMoveLeft {
   0% {
     transform: translateX(0) scale(1);
@@ -1032,7 +1032,7 @@ export default {
   }
 }
 
-/* 右边云朵向右移动动画 */
+/* Right cloud move right animation */
 @keyframes cloudMoveRight {
   0% {
     transform: translateX(0) scale(1);
@@ -1044,7 +1044,7 @@ export default {
   }
 }
 
-/* 顶部导航栏 */
+/* Top navigation bar */
 .top-navbar {
   position: fixed;
   top: 0;
@@ -1095,7 +1095,7 @@ export default {
         }
       }
 
-      /* Game 顶部下拉菜单（hover 展开，不依赖点击） */
+      /* Game top dropdown menu (expand on hover, not click dependent) */
       .game-dropdown {
         position: relative;
         display: inline-flex;
@@ -1103,7 +1103,7 @@ export default {
 
         .game-dropdown-menu {
           position: absolute;
-          /* 让下拉菜单紧贴 Game，避免鼠标从文字移动到菜单时"穿过空隙"导致菜单消失 */
+          /* Keep dropdown menu close to Game to avoid "gap" when mouse moves from text to menu causing menu to disappear */
           top: 100%;
           left: 50%;
           transform: translateX(-50%) translateY(0);
@@ -1209,7 +1209,7 @@ export default {
   }
 }
 
-/* 文字显现动画 */
+/* Text reveal animation */
 @keyframes textReveal {
   from {
     opacity: 0;
@@ -1221,7 +1221,7 @@ export default {
   }
 }
 
-/* 响应式调整 */
+/* Responsive adjustment */
 @media (max-width: 768px) {
   .top-navbar {
     .navbar-container {
@@ -1304,7 +1304,7 @@ export default {
 }
 
 .overlay-text h2 {
-  font-size: 144px; /* 原72px → 放大一倍 */
+  font-size: 144px; /* Original 72px -> doubled */
   font-weight: 800;
   color: #ffffff;
   margin: 0 0 20px 0;
@@ -1317,7 +1317,7 @@ export default {
 }
 
 .overlay-text .desc {
-  font-size: 60px; /* 原30px → 放大一倍 */
+  font-size: 60px; /* Original 30px -> doubled */
   font-weight: 400;
   color: rgba(255,255,255,0.95);
   margin: 0 0 28px 0;
@@ -1325,7 +1325,7 @@ export default {
 }
 
 .overlay-text .author {
-  font-size: 44px; /* 原22px → 放大一倍 */
+  font-size: 44px; /* Original 22px -> doubled */
   font-weight: 300;
   color: rgba(255,255,255,0.75);
   margin: 0;

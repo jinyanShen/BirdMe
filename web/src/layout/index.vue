@@ -23,6 +23,7 @@
                     <li><a href="#" @click.prevent="$router.push('/knowledge/facts')">Fun Facts</a></li>
                   </ul>
                 </li>
+                <li><a href="#" :class="{ active: $route.path === '/help' }" @click="$router.push('/help')">Help</a></li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle">Forum</a>
                   <ul class="dropdown-menu">

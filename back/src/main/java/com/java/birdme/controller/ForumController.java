@@ -23,10 +23,10 @@ public class ForumController {
         try {
             List<ForumPost> posts;
             if (keyword != null && !keyword.trim().isEmpty()) {
-                // 如果有搜索关键词，使用搜索功能
+                // If search keyword exists, use search function
                 posts = forumService.searchPosts(keyword, category);
             } else {
-                // 否则按分类获取
+                // Otherwise get by category
                 posts = forumService.getPostsByCategory(category);
             }
             return ReturnResp.success(posts);

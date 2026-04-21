@@ -115,7 +115,7 @@ export default {
     async fetchUserInfo() {
       this.loading = true
       try {
-        // 获取当前用户信息
+        // Get current user information
         const userId = sessionStorage.getItem('id')
         const response = await getCurrentUser(userId)
         if (response.code === 200) {
@@ -137,7 +137,7 @@ export default {
         if (valid) {
           this.submitLoading = true
           try {
-            // 移除密码字段如果为空
+            // Remove password field if empty
             const updateData = { ...this.userInfo }
             if (!updateData.password) {
               delete updateData.password
@@ -147,7 +147,7 @@ export default {
             if (response.code === 200) {
               this.$message.success('Profile updated successfully')
               this.originalUserInfo = { ...this.userInfo }
-              // 更新sessionStorage中的头像
+              // Update avatar in sessionStorage
               if (this.userInfo.avatarUrl) {
                 sessionStorage.setItem('avatarUrl', this.userInfo.avatarUrl)
               }

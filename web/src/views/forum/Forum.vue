@@ -1,8 +1,8 @@
 <template>
   <div class="forum-container">
-    <!-- 主要内容区 -->
+    <!-- Main content area -->
     <div class="forum-content">
-      <!-- 搜索栏 -->
+      <!-- Search bar -->
       <div class="search-bar">
         <div class="search-container">
           <input
@@ -19,7 +19,7 @@
         </div>
       </div>
 
-      <!-- 分类标签 -->
+      <!-- Category tabs -->
       <div class="category-tabs">
         <span
           class="tab-item"
@@ -38,7 +38,7 @@
         >Q&A</span>
       </div>
 
-      <!-- 帖子列表 -->
+      <!-- Post list -->
       <div class="post-list">
         <div v-if="loading" class="loading">Loading...</div>
         <div v-else-if="posts.length === 0" class="empty-state">No posts found</div>
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <!-- 发帖对话框 -->
+    <!-- Post dialog -->
     <div v-if="showPostDialog" class="dialog-overlay" @click="closePostDialog">
       <div class="post-dialog" @click.stop>
         <div class="dialog-header">

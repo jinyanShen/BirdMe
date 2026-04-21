@@ -1,11 +1,11 @@
 <template>
   <div class="post-detail-container">
-    <!-- 主要内容区 -->
+    <!-- Main content area -->
     <div class="post-detail-content">
       <div v-if="loading" class="loading">Loading...</div>
       <div v-else-if="!post" class="empty-state">Post not found</div>
       <div v-else>
-        <!-- 帖子详情 -->
+        <!-- Post detail -->
         <div class="post-detail">
           <div class="post-header">
             <h1 class="post-title">
@@ -37,7 +37,7 @@
           </div>
         </div>
 
-        <!-- 回复列表 -->
+        <!-- Reply list -->
         <div class="replies-section">
           <h3 class="replies-title">Replies ({{ replies.length }})</h3>
 
@@ -59,7 +59,7 @@
           </div>
         </div>
 
-        <!-- 回复表单 -->
+        <!-- Reply form -->
         <div class="reply-form-section" v-if="isLoggedIn">
           <h3>Leave a Reply</h3>
           <textarea
@@ -76,7 +76,7 @@
           Please <a href="#" @click.prevent="goToLogin">login</a> to leave a reply.
         </div>
 
-        <!-- 返回按钮 -->
+        <!-- Back button -->
         <button class="back-btn" @click="goBack">← Back to Forum</button>
       </div>
     </div>

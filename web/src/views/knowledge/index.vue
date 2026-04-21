@@ -1,7 +1,7 @@
 <template>
   <div class="knowledge-page">
     <div class="container">
-      <!-- 子页面标签页 -->
+      <!-- Subpage tabs -->
       <div class="knowledge-tabs">
         <div
           class="tab-item"
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <!-- 子页面内容 -->
+      <!-- Subpage content -->
       <component :is="currentComponent" />
     </div>
   </div>

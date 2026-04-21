@@ -4,8 +4,8 @@
 //
 // NProgress.configure({ showSpinner: false })
 //
-// // 添加 '/' 到白名单
-// const whiteList = ['/', '/login', '/auth-redirect']  // 这里改了
+// // Add '/' to whitelist
+// const whiteList = ['/', '/login', '/auth-redirect']  // changed here
 //
 // router.beforeEach(async(to, from, next) => {
 //   NProgress.start()
@@ -18,7 +18,7 @@
 //       next()
 //     }
 //   } else {
-//     /* 没有token */
+//     /* no token */
 //     if (whiteList.indexOf(to.path) !== -1) {
 //       next()
 //     } else {
@@ -37,10 +37,10 @@ import 'nprogress/nprogress.css'
 
 NProgress.configure({ showSpinner: false })
 
-// 白名单页面（不需要登录）
+// White list pages (no login required)
 const whiteList = ['/', '/login']
 
-// 路由守卫
+// Route guard
 router.beforeEach((to, from, next) => {
   NProgress.start()
 
@@ -50,7 +50,7 @@ router.beforeEach((to, from, next) => {
   console.log('Is logged in:', isLoggedIn)
   console.log('From path:', from.path)
 
-  // 白名单页面直接放行
+  // White list pages - allow access directly
   if (whiteList.includes(to.path)) {
     console.log('White list page, allow access')
     next()
@@ -58,11 +58,11 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // 检查路由是否需要登录
+  // Check if route requires login
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth) || to.meta.requiresAuth
   console.log('Requires auth:', requiresAuth)
 
-  // 如果需要登录且已登录，放行
+  // If login required and user is logged in - allow access
   if (requiresAuth && isLoggedIn) {
     console.log('Authenticated, allow access')
     next()
@@ -70,22 +70,22 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // 如果需要登录但未登录，显示登录弹窗
+  // If login required but not logged in - show login dialog
   if (requiresAuth && !isLoggedIn) {
     console.log('Need login, showing dialog for:', to.fullPath)
     NProgress.done()
 
-    // 阻止导航
+    // Block navigation
     next(false)
 
-    // 显示登录弹窗
+    // Show login dialog
     if (window.$showLoginDialog) {
       window.$showLoginDialog(to.fullPath)
     }
     return
   }
 
-  // 其他情况直接放行（包括首页）
+  // Other pages - allow access (including home page)
   console.log('Other page, allow access')
   next()
   NProgress.done()
