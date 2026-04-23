@@ -2,10 +2,8 @@ package com.java.birdme.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.java.birdme.bean.PageReq;
-import com.java.birdme.bean.PageResp;
-import com.java.birdme.bean.ReturnResp;
-import com.java.birdme.bean.User;
+import com.java.birdme.bean.*;
+import com.java.birdme.dao.RescueStationMapper;
 import com.java.birdme.dao.UserMapper;
 import com.java.birdme.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserMapper mapper;
+    @Autowired
+    private RescueStationMapper rescueStationMapper;
 
     @Override
     public ReturnResp insert(User user) {
@@ -32,6 +32,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ReturnResp update(User user) {
+        if (user.getRole() == 2){
+            LambdaQueryWrapper<RescueStation> rescueStationWrapper = new LambdaQueryWrapper<>();
+            rescueStationWrapper.eq(RescueStation::getName, user.getName());
+            RescueStation rescueStation = rescueStationMapper.selectOne(rescueStationWrapper);
+            rescueStation.setPhone(user.getPhone());
+
+            rescueStationMapper.updateById(rescueStation);
+        }
+
+
         int ret = mapper.updateById(user);
         return ret > 0 ? ReturnResp.success() : ReturnResp.fail();
     }

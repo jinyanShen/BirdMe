@@ -447,6 +447,8 @@ export default {
           login(this.loginForm.username, this.loginForm.password)
             .then(res => {
               if (res.code === 200) {
+                window.isLoginModalShown = false;
+
                 sessionStorage.setItem('id', res.data.id)
                 sessionStorage.setItem('username', res.data.username)
                 sessionStorage.setItem('password', res.data.password)

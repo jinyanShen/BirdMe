@@ -1,36 +1,3 @@
-// import router from './router'
-// import NProgress from 'nprogress'
-// import 'nprogress/nprogress.css'
-//
-// NProgress.configure({ showSpinner: false })
-//
-// // Add '/' to whitelist
-// const whiteList = ['/', '/login', '/auth-redirect']  // changed here
-//
-// router.beforeEach(async(to, from, next) => {
-//   NProgress.start()
-//   let id = sessionStorage.getItem('id')
-//   if (id) {
-//     if (to.path === '/login') {
-//       next({ path: '/' })
-//       NProgress.done()
-//     } else {
-//       next()
-//     }
-//   } else {
-//     /* no token */
-//     if (whiteList.indexOf(to.path) !== -1) {
-//       next()
-//     } else {
-//       next('/login')
-//       NProgress.done()
-//     }
-//   }
-// })
-//
-// router.afterEach(() => {
-//   NProgress.done()
-// })
 import router from './router'
 import NProgress from 'nprogress'
 import 'nprogress/nprogress.css'

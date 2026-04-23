@@ -4,54 +4,138 @@
       <h1>Help Center</h1>
       <p>Get assistance with bird rescue and reporting</p>
     </div>
-    <div class="amap-container">
-      <div id="amap"></div>
-    </div>
-    <div class="rescue-stations-list">
-      <h2>Rescue Stations</h2>
-      <div v-if="loadingStations" class="loading">Loading rescue stations...</div>
-      <div v-else-if="rescueStations.length === 0" class="no-stations">No rescue stations found</div>
-      <div v-else class="stations-grid">
-        <div v-for="station in rescueStations" :key="station.id" class="station-card">
-          <h3>{{ station.name }}</h3>
-          <p><strong>Address:</strong> {{ station.address }}</p>
-          <p><strong>Phone:</strong> {{ station.phone }}</p>
-          <p><strong>Hours:</strong> {{ station.openingHours }}</p>
-          <button class="view-on-map" @click="centerOnStation(station)">View on Map</button>
+    <div class="map-section">
+      <div class="map-controls">
+        <div class="search-box">
+          <el-input
+            v-model="searchQuery"
+            placeholder="Search for location"
+            prefix-icon="el-icon-search"
+            clearable
+            @keyup.enter.native="handleSearch"
+          >
+            <el-button slot="append" @click="handleSearch">Search</el-button>
+          </el-input>
+          <div v-if="searchResults.length > 0" class="search-results">
+          <div v-for="(result, index) in searchResults" :key="index"
+               class="search-result-item"
+               @click="selectSearchResult(result)">
+            <div class="result-title">{{ result.name || result.address }}</div>
+            <div class="result-address">{{ result.address }}</div>
+          </div>
         </div>
+        </div>
+        <el-button type="primary" @click="getCurrentLocation">
+          <i class="el-icon-position"></i> My Location
+        </el-button>
+      </div>
+      <div class="amap-container">
+        <div id="amap"></div>
+      </div>
+      <div v-if="selectedLocation" class="location-info">
+        <h3>Selected Location</h3>
+        <p>{{ selectedLocation.name || selectedLocation.address }}</p>
+        <el-button type="success" @click="startRescue">Initiate Rescue</el-button>
       </div>
     </div>
+
+    <el-dialog :visible.sync="rescueDialogVisible" title="Submit Rescue Request" width="600px" @close="resetRescueForm">
+      <el-form :model="rescueForm" label-width="140px" :rules="rescueFormRules" ref="rescueFormRef">
+        <el-form-item label="Name" prop="name">
+          <el-input v-model="rescueForm.name" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Location" prop="location">
+          <el-input v-model="rescueForm.location" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Latitude" prop="latitude">
+          <el-input v-model="rescueForm.latitude" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Longitude" prop="longitude">
+          <el-input v-model="rescueForm.longitude" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="Bird Name" prop="birdName">
+          <el-input v-model="rescueForm.birdName" placeholder="Enter bird name"></el-input>
+        </el-form-item>
+        <el-form-item label="Species" prop="species">
+          <el-input v-model="rescueForm.species" placeholder="Enter species (optional)"></el-input>
+        </el-form-item>
+        <el-form-item label="Injury Type" prop="injuryType">
+          <el-select v-model="rescueForm.injuryType" placeholder="Select injury type" style="width: 100%;">
+            <el-option label="Unable to Fly" value="Unable to Fly"></el-option>
+            <el-option label="Wing Injury" value="Wing Injury"></el-option>
+            <el-option label="Leg Injury" value="Leg Injury"></el-option>
+            <el-option label="Eye Injury" value="Eye Injury"></el-option>
+            <el-option label="Poisoning" value="Poisoning"></el-option>
+            <el-option label="Exhaustion" value="Exhaustion"></el-option>
+            <el-option label="Other" value="Other"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Description" prop="injuryDescription">
+          <el-input type="textarea" v-model="rescueForm.injuryDescription" rows="4" placeholder="Describe the bird's condition"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="rescueDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitRescueForm" :loading="submitLoading">Submit</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { allRescueStation } from '@/api/rescueStation'
+import { getNearbyStations } from '@/api/rescueStation'
+import { insertReport } from '@/api/report'
+import { geocode } from '@/api/help'
 
 export default {
   name: 'Help',
   data() {
     return {
-      rescueStations: [],
-      loadingStations: false,
-      map: null
+      map: null,
+      searchQuery: '',
+      searchResults: [],
+      selectedLocation: null,
+      userLocation: {
+        latitude: null,
+        longitude: null
+      },
+      nearbyStations: [],
+      rescueDialogVisible: false,
+      submitLoading: false,
+      rescueForm: {
+        name: '',
+        location: '',
+        latitude: '',
+        longitude: '',
+        birdName: '',
+        species: '',
+        injuryType: '',
+        injuryDescription: ''
+      },
+      rescueFormRules: {
+        birdName: [{ required: true, message: 'Please enter bird name', trigger: 'blur' }],
+        injuryType: [{ required: true, message: 'Please select injury type', trigger: 'change' }],
+        injuryDescription: [{ required: true, message: 'Please enter description', trigger: 'blur' }]
+      },
+      rescueFormRef: null
     }
   },
   mounted() {
     this.$nextTick(() => {
       this.loadAMap()
-      this.fetchRescueStations()
     })
   },
   methods: {
     loadAMap() {
-      // 先尝试加载国际版
       if (typeof window.AMap === 'undefined') {
         const script = document.createElement('script')
-        script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=e5d66bf0765f5f7cb43d9390902bdab2&lang=en'
+        // Use the correct Web端 key from the user's account
+        script.src = 'https://webapi.amap.com/maps?v=1.4.15&key=e0edd598435b472eda3656fad1055d37&lang=en'
         script.async = true
         script.onload = () => this.initAMap()
         script.onerror = (error) => {
-          console.warn('International version failed, trying standard version...', error)
+          console.warn('Failed to load AMap script', error)
+          this.$message.error('Failed to load map. Please check your network connection.')
         }
         document.head.appendChild(script)
       } else {
@@ -67,26 +151,23 @@ export default {
           return
         }
 
-        // 尝试创建地图
         this.map = new window.AMap.Map('amap', {
           center: [116.4074, 39.9042],
           zoom: 10,
-          lang: 'en',  // 设置语言
+          lang: 'en',
           viewMode: '2D',
           resizeEnable: true,
           zoomEnable: true,
         })
 
-        // 多次尝试设置语言
         if (this.map.setLang) {
           this.map.setLang('en')
         }
 
-        // 监听地图加载完成
         this.map.on('complete', () => {
-          console.log('Map loaded, current lang:', this.map.getLang ? this.map.getLang() : 'unknown')
-          // 地图加载完成后添加标记
-          this.addStationMarkers()
+          console.log('Map loaded successfully')
+          // Ask for user location
+          this.getCurrentLocation()
         })
 
       } catch (error) {
@@ -94,30 +175,202 @@ export default {
       }
     },
 
-    fetchRescueStations() {
-      this.loadingStations = true
-      allRescueStation()
+    getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.userLocation.latitude = position.coords.latitude
+            this.userLocation.longitude = position.coords.longitude
+
+            if (this.map) {
+              this.map.setCenter([this.userLocation.longitude, this.userLocation.latitude])
+              this.map.setZoom(15)
+
+              // Add marker for user location
+              const marker = new window.AMap.Marker({
+                position: [this.userLocation.longitude, this.userLocation.latitude],
+                title: 'Your Location',
+                icon: new window.AMap.Icon({
+                  size: new window.AMap.Size(30, 30),
+                  image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-red.png',
+                  imageSize: new window.AMap.Size(30, 30)
+                })
+              })
+              marker.setMap(this.map)
+            }
+          },
+          (error) => {
+            console.error('Error getting location:', error)
+            this.$message.error('Failed to get your location. Please search for a location manually.')
+          }
+        )
+      } else {
+        this.$message.error('Geolocation is not supported by your browser.')
+      }
+    },
+
+    handleSearch() {
+      if (!this.searchQuery) {
+        this.$message.warning('Please enter a location to search (English only)')
+        return
+      }
+
+      const loadingInstance = this.$loading({
+        lock: true,
+        text: 'Searching location...',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+
+      if (this.map) {
+        this.performSearch(loadingInstance)
+      } else {
+        loadingInstance.close()
+        this.$message.error('Map not initialized')
+      }
+    },
+
+    performSearch(loadingInstance) {
+      try {
+        console.log('Performing search for:', this.searchQuery)
+
+        geocode(this.searchQuery)
+          .then(response => {
+            loadingInstance.close()
+            console.log('Geocoder response:', response)
+
+            if (response.code === 200 && response.data) {
+              this.searchResults = response.data
+              if (response.data.length === 1) {
+                // Auto select if only one result
+                this.selectSearchResult(response.data[0])
+              } else {
+                this.$message.success(`Found ${response.data.length} locations`)
+              }
+            } else {
+              this.$message.error('Location not found. Please try a different address.')
+              console.error('Geocoder error:', response)
+            }
+          })
+          .catch(error => {
+            loadingInstance.close()
+            console.error('Error in performSearch:', error)
+            this.$message.error('Error searching location. Please try again.')
+          })
+      } catch (error) {
+        loadingInstance.close()
+        console.error('Error in performSearch:', error)
+        this.$message.error('Error searching location. Please try again.')
+      }
+    },
+
+    selectSearchResult(result) {
+      this.$message.success('Location selected')
+      const position = [result.longitude, result.latitude]
+
+      console.log('Selecting location:', result)
+      console.log('Map instance:', this.map)
+      console.log('Marker position:', position)
+
+      if (!this.map) {
+        console.error('Map is not initialized')
+        this.$message.error('Map is not initialized')
+        return
+      }
+
+      this.map.setCenter(position)
+      this.map.setZoom(15)
+
+      try {
+        // Add marker for selected location
+        const marker = new window.AMap.Marker({
+          position: position,
+          title: result.name || result.address,
+          icon: new window.AMap.Icon({
+            size: new window.AMap.Size(30, 30),
+            image: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png',
+            imageSize: new window.AMap.Size(30, 30)
+          })
+        })
+
+        console.log('Marker created:', marker)
+        marker.setMap(this.map)
+        console.log('Marker added to map')
+
+        // Add English text label on the map
+        const text = new window.AMap.Text({
+          text: result.name || result.address,
+          textAlign: 'center',
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          borderColor: '#ccc',
+          borderWidth: 1,
+          padding: '5px 10px',
+          position: position,
+          style: {
+            'font-size': '14px',
+            'color': '#333'
+          }
+        })
+        text.setMap(this.map)
+
+        // Add info window to marker
+        const infoWindow = new window.AMap.InfoWindow({
+          content: `
+            <div style="padding: 10px;">
+              <h3>${result.name}</h3>
+              <p>${result.address}</p>
+              ${result.phone ? `<p>Phone: ${result.phone}</p>` : ''}
+              <p>Longitude: ${result.longitude}</p>
+              <p>Latitude: ${result.latitude}</p>
+              <button onclick="document.querySelector('.location-info .el-button--success').click()"
+                      style="margin-top: 10px; padding: 5px 10px; background: #67c23a; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                Initiate Rescue
+              </button>
+            </div>
+          `,
+          offset: new window.AMap.Pixel(0, -30)
+        })
+
+        marker.on('click', () => {
+          infoWindow.open(this.map, marker.getPosition())
+        })
+
+        this.selectedLocation = {
+          name: result.name,
+          address: result.address,
+          longitude: result.longitude,
+          latitude: result.latitude
+        }
+
+        // Clear search results
+        this.searchResults = []
+
+        // Search for nearby rescue stations
+        this.searchNearbyStations(result.latitude, result.longitude)
+      } catch (error) {
+        console.error('Error adding marker:', error)
+        this.$message.error('Error adding marker to map')
+      }
+    },
+
+    searchNearbyStations(latitude, longitude) {
+      getNearbyStations(latitude, longitude, 50)
         .then(response => {
           if (response.code === 200) {
-            this.rescueStations = response.data
-            // 数据加载完成后添加标记
+            this.nearbyStations = response.data
+            // Add markers for nearby stations
             this.addStationMarkers()
-          } else {
-            console.error('Failed to fetch rescue stations:', response.msg)
           }
         })
         .catch(error => {
-          console.error('Error fetching rescue stations:', error)
-        })
-        .finally(() => {
-          this.loadingStations = false
+          console.error('Error searching nearby stations:', error)
         })
     },
 
     addStationMarkers() {
-      if (!this.map || this.rescueStations.length === 0) return
+      if (!this.map || this.nearbyStations.length === 0) return
 
-      this.rescueStations.forEach(station => {
+      this.nearbyStations.forEach(station => {
         if (station.longitude && station.latitude) {
           const marker = new window.AMap.Marker({
             position: [station.longitude, station.latitude],
@@ -129,7 +382,6 @@ export default {
             })
           })
 
-          // 添加信息窗口
           const infoWindow = new window.AMap.InfoWindow({
             content: `
               <div style="padding: 10px;">
@@ -151,11 +403,87 @@ export default {
       })
     },
 
-    centerOnStation(station) {
-      if (!this.map || !station.longitude || !station.latitude) return
+    startRescue() {
+      if (!this.selectedLocation) {
+        this.$message.error('Please select a location first')
+        return
+      }
 
-      this.map.setCenter([station.longitude, station.latitude])
-      this.map.setZoom(15)
+      this.rescueForm.name = this.selectedLocation.name
+      this.rescueForm.location = this.selectedLocation.address
+      this.rescueForm.latitude = this.selectedLocation.latitude
+      this.rescueForm.longitude = this.selectedLocation.longitude
+      this.rescueForm.birdName = ''
+      this.rescueForm.species = ''
+      this.rescueForm.injuryType = ''
+      this.rescueForm.injuryDescription = ''
+      this.rescueDialogVisible = true
+    },
+
+    resetRescueForm() {
+      this.rescueForm = {
+        name: '',
+        location: '',
+        latitude: '',
+        longitude: '',
+        birdName: '',
+        species: '',
+        injuryType: '',
+        injuryDescription: ''
+      }
+      if (this.$refs.rescueFormRef) {
+        this.$refs.rescueFormRef.resetFields()
+      }
+    },
+
+    async submitRescueForm() {
+      if (!this.rescueForm.birdName || !this.rescueForm.injuryType || !this.rescueForm.injuryDescription) {
+        this.$message.error('Please fill all required fields')
+        return
+      }
+
+      this.submitLoading = true
+      try {
+        let userId = parseInt(sessionStorage.getItem('id'))
+        let rescueStationId = null
+
+        if (this.nearbyStations && this.nearbyStations.length > 0) {
+          for (const station of this.nearbyStations) {
+            if (station.latitude === this.rescueForm.latitude &&
+                station.longitude === this.rescueForm.longitude) {
+              rescueStationId = station.id
+              break
+            }
+          }
+        }
+
+        const reportData = {
+          birdName: this.rescueForm.birdName,
+          species: this.rescueForm.species || 'Unknown',
+          name: this.rescueForm.name,
+          location: this.rescueForm.location,
+          latitude: this.rescueForm.latitude,
+          longitude: this.rescueForm.longitude,
+          injuryType: this.rescueForm.injuryType,
+          injuryDescription: this.rescueForm.injuryDescription,
+          submitterId: userId ? userId.toString() : null,
+          rescueStationId: rescueStationId
+        }
+
+        const response = await insertReport(reportData)
+        if (response.code === 200) {
+          this.$message.success('Rescue report submitted successfully')
+          this.rescueDialogVisible = false
+          this.resetRescueForm()
+        } else {
+          this.$message.error(response.msg || 'Failed to submit rescue report')
+        }
+      } catch (error) {
+        console.error('Error submitting rescue report:', error)
+        this.$message.error('Failed to submit rescue report')
+      } finally {
+        this.submitLoading = false
+      }
     }
   }
 }
@@ -163,35 +491,87 @@ export default {
 
 <style scoped lang="scss">
 .help-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .help-header {
   text-align: center;
-  margin-bottom: 30px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 
   h1 {
-    font-size: 32px;
+    font-size: 28px;
     color: #333;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   p {
-    font-size: 16px;
+    font-size: 14px;
     color: #666;
+    margin: 0;
+  }
+}
+
+.map-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.map-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+
+  .search-box {
+    flex: 1;
+    min-width: 300px;
+    position: relative;
+
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #dcdfe6;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+
+      .search-result-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+          background-color: #f5f7fa;
+        }
+
+        &:active {
+          background-color: #ecf5ff;
+        }
+      }
+    }
   }
 }
 
 .amap-container {
-  width: 100%;
-  height: 600px;
+  flex: 1;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
-  margin-bottom: 30px;
-  background-color: #f5f5f5;
+  min-height: 600px;
 
   #amap {
     width: 100%;
@@ -199,63 +579,37 @@ export default {
   }
 }
 
-.rescue-stations-list {
-  margin-top: 40px;
-  
-  h2 {
-    font-size: 24px;
+.location-info {
+  margin-top: 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    font-size: 18px;
     color: #333;
-    margin-bottom: 20px;
-    text-align: center;
+    margin-bottom: 10px;
   }
-  
-  .loading,
-  .no-stations {
-    text-align: center;
-    padding: 40px;
+
+  p {
     color: #666;
+    margin-bottom: 15px;
   }
-  
-  .stations-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .map-controls {
+    flex-direction: column;
+
+    .search-box {
+      width: 100%;
+      min-width: unset;
+    }
   }
-  
-  .station-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    h3 {
-      font-size: 18px;
-      color: #333;
-      margin-bottom: 10px;
-    }
-    
-    p {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
-    }
-    
-    .view-on-map {
-      margin-top: 15px;
-      padding: 8px 16px;
-      background-color: #1890ff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      
-      &:hover {
-        background-color: #40a9ff;
-      }
-    }
+
+  .amap-container {
+    min-height: 500px;
   }
 }
 </style>

@@ -1,41 +1,17 @@
-#spring:
-#  datasource:
-#    url: jdbc:mysql://localhost:3306/birdme?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-#    username: root
-#    password: 1wjxycts
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#
-##mybatis
-#mybatis-plus:
-#  mapper-locations: classpath:/mapper/*Mapper.xml
-#  #Entity scan, multiple packages separated by commas or semicolons
-#  typeAliasesPackage: com.java.bean
-#  global-config:
-#    #Primary key type  0:"Database ID auto-increment", 1:"User input ID",2:"Global unique ID (numeric type unique ID)", 3:"Global unique ID UUID";
-#    id-type: 2
-#    #Camel case to underscore conversion
-#    db-column-underline: true
-#        #Refresh mapper debugging tool
-#    refresh-mapper: true
-#  configuration:
-#    map-underscore-to-camel-case: true
-#    cache-enabled: false
-#
-#uploadPath: d:/uploads/birdme
-
-
 spring:
   datasource:
     url: jdbc:sqlite:back/birdme.db
     driver-class-name: org.sqlite.JDBC
     username:
     password:
+  servlet:
+    multipart:
+      max-file-size: 10MB      # 单个文件最大大小
+      max-request-size: 10MB  # 单次请求最大总大小
+      enabled: true            # 启用文件上传
 
 mybatis-plus:
   typeAliasesPackage: com.java.birdme.bean
-  global-config:
-    id-type: 2
-    db-column-underline: true
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false

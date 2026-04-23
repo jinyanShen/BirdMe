@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
-import { logout } from '@/api/login'
+import router from '@/router'
+import { logoutSys } from '@/api/login'
 
 // Create axios instance
 const service = axios.create({
@@ -28,26 +29,34 @@ service.interceptors.response.use(
     if (config && config.responseType === 'blob') {
       return response
     }
-    if (res.code === 401) {
+
+    return res
+  },
+  error => {
+    console.log('Request error: ' + error)
+
+    if (error.response.status === 401) {
       MessageBox.confirm('Login status expired, please login again', 'System', {
         confirmButtonText: 'Login',
         cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        logout()
+        logoutSys().then(res => {
+          sessionStorage.clear();
+          router.replace({
+            path: '/login',
+          })
+        })
       })
-    } else {
-      return res
+    }else {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 2000
+      })
+      return Promise.reject(error)
     }
-  },
-  error => {
-    console.log('Request error: ' + error)
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 2000
-    })
-    return Promise.reject(error)
+
   }
 )
 

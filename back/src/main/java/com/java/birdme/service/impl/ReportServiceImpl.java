@@ -2,11 +2,10 @@ package com.java.birdme.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.java.birdme.bean.Report;
-import com.java.birdme.bean.PageReq;
-import com.java.birdme.bean.PageResp;
-import com.java.birdme.bean.ReturnResp;
+import com.java.birdme.bean.*;
 import com.java.birdme.dao.ReportMapper;
+import com.java.birdme.dao.RescueStationMapper;
+import com.java.birdme.dao.UserMapper;
 import com.java.birdme.service.ReportService;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +24,12 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ReportMapper reportMapper;
 
+    @Autowired
+    private RescueStationMapper rescueStationMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public ReturnResp insert(Report report) {
         if (report == null) {
@@ -34,6 +39,34 @@ public class ReportServiceImpl implements ReportService {
         report.setCreatedAt(new Date());
         report.setUpdatedAt(new Date());
         report.setStatus("PENDING");
+
+        if (report.getRescueStationId() == null && report.getLatitude() != null && report.getLongitude() != null) {
+            //Add rescue station
+            RescueStation newStation = new RescueStation();
+            newStation.setName(report.getName());
+            newStation.setAddress(report.getLocation());
+            newStation.setLatitude(report.getLatitude());
+            newStation.setLongitude(report.getLongitude());
+            newStation.setPhone(report.getSubmitterId());
+            newStation.setDescription("Auto-registered rescue station from report #" + System.currentTimeMillis());
+            rescueStationMapper.insert(newStation);
+            report.setRescueStationId(newStation.getId());
+
+            //Add user
+            User user = new User();
+            if (report.getName().contains("(")) {
+                user.setUsername(report.getName().substring(0, report.getName().indexOf("(")).trim());
+            } else {
+                user.setUsername(report.getName());
+            }
+            user.setName(report.getName());
+            user.setPassword("123456");
+            user.setRescueStationId(newStation.getId());
+            user.setRole(2);
+            user.setCreatedAt(new Date());
+            userMapper.insert(user);
+        }
+
         reportMapper.insert(report);
         return ReturnResp.success();
     }
