@@ -13,15 +13,32 @@
             prefix-icon="el-icon-search"
             clearable
             @keyup.enter.native="handleSearch"
+            @focus="showLists = true"
+            @blur="handleSearchBlur"
           >
-            <el-button slot="append" @click="handleSearch">Search</el-button>
+            <el-button slot="append" @click="toggleLists">Lists</el-button>
           </el-input>
-          <div v-if="searchResults.length > 0" class="search-results">
+          <div v-if="searchResults.length > 0 && showLists" class="search-results">
           <div v-for="(result, index) in searchResults" :key="index"
                class="search-result-item"
                @click="selectSearchResult(result)">
             <div class="result-title">{{ result.name || result.address }}</div>
             <div class="result-address">{{ result.address }}</div>
+          </div>
+        </div>
+        <div v-if="displayStations.length > 0 && showLists" class="station-list">
+          <div class="station-list-header">
+            <span>Nearby Rescue Stations ({{ displayStations.length }})</span>
+          </div>
+          <div v-for="(station, index) in displayStations" :key="index"
+               class="station-item"
+               @click="selectStation(station)">
+            <div class="station-info">
+              <div class="station-name">{{ station.name }}</div>
+              <div class="station-address">{{ station.address }}</div>
+              <div class="station-phone" v-if="station.phone">{{ station.phone }}</div>
+            </div>
+            <el-button type="success" size="small" @click.stop="startRescueForStation(station)">Rescue</el-button>
           </div>
         </div>
         </div>
@@ -83,9 +100,9 @@
 </template>
 
 <script>
-import { getNearbyStations } from '@/api/rescueStation'
+import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
 import { insertReport } from '@/api/report'
-import { geocode } from '@/api/help'
+import { geocode, searchNearbyPetHospitals } from '@/api/help'
 
 export default {
   name: 'Help',
@@ -94,12 +111,14 @@ export default {
       map: null,
       searchQuery: '',
       searchResults: [],
+      showLists: false,
       selectedLocation: null,
       userLocation: {
         latitude: null,
         longitude: null
       },
       nearbyStations: [],
+      displayStations: [],
       rescueDialogVisible: false,
       submitLoading: false,
       rescueForm: {
@@ -166,7 +185,7 @@ export default {
 
         this.map.on('complete', () => {
           console.log('Map loaded successfully')
-          // Ask for user location
+          this.loadAllStations()
           this.getCurrentLocation()
         })
 
@@ -197,6 +216,9 @@ export default {
                 })
               })
               marker.setMap(this.map)
+
+              // Check nearby pet hospitals
+              this.checkAndAddNearbyPetHospitals()
             }
           },
           (error) => {
@@ -227,6 +249,19 @@ export default {
       } else {
         loadingInstance.close()
         this.$message.error('Map not initialized')
+      }
+    },
+
+    handleSearchBlur() {
+      setTimeout(() => {
+        this.showLists = false
+      }, 200)
+    },
+
+    toggleLists() {
+      this.showLists = !this.showLists
+      if (this.showLists) {
+        this.handleSearch()
       }
     },
 
@@ -370,11 +405,14 @@ export default {
     addStationMarkers() {
       if (!this.map || this.nearbyStations.length === 0) return
 
+      const self = this
+
       this.nearbyStations.forEach(station => {
         if (station.longitude && station.latitude) {
           const marker = new window.AMap.Marker({
             position: [station.longitude, station.latitude],
             title: station.name,
+            extData: station,
             icon: new window.AMap.Icon({
               size: new window.AMap.Size(30, 30),
               image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/poi-marker-default.png',
@@ -384,23 +422,155 @@ export default {
 
           const infoWindow = new window.AMap.InfoWindow({
             content: `
-              <div style="padding: 10px;">
+              <div style="padding: 10px; min-width: 200px;">
                 <h3>${station.name}</h3>
-                <p>Address: ${station.address}</p>
-                <p>Phone: ${station.phone}</p>
-                <p>Hours: ${station.openingHours}</p>
+                <p>Address: ${station.address || 'N/A'}</p>
+                <p>Phone: ${station.phone || 'N/A'}</p>
+                <p>Hours: ${station.openingHours || 'N/A'}</p>
+                <button class="rescue-btn" data-action="rescue" style="margin-top: 10px; padding: 5px 15px; background: #67c23a; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                  Initiate Rescue
+                </button>
               </div>
             `,
             offset: new window.AMap.Pixel(0, -30)
           })
 
-          marker.on('click', () => {
-            infoWindow.open(this.map, marker.getPosition())
+          marker.on('click', (e) => {
+            infoWindow.open(self.map, marker.getPosition())
+
+            setTimeout(() => {
+              const btn = document.querySelector('.rescue-btn')
+              if (btn) {
+                btn.addEventListener('click', () => {
+                  self.startRescueForStation(station)
+                })
+              }
+            }, 100)
           })
 
-          marker.setMap(this.map)
+          marker.setMap(self.map)
         }
       })
+    },
+
+    loadAllStations() {
+      allRescueStation()
+        .then(response => {
+          if (response.code === 200 && response.data) {
+            this.nearbyStations = response.data
+            this.loadDisplayStations()
+            this.addStationMarkers()
+            console.log('Loaded all stations:', response.data.length)
+          }
+        })
+        .catch(error => {
+          console.error('Error loading all stations:', error)
+        })
+    },
+
+    loadDisplayStations() {
+      if (!this.userLocation.latitude || !this.userLocation.longitude) {
+        this.displayStations = this.nearbyStations.slice(0, 20)
+        return
+      }
+
+      const radius = 30000
+      const stationsWithDistance = this.nearbyStations.map(station => {
+        station.distance = this.calculateDistance(
+          this.userLocation.latitude,
+          this.userLocation.longitude,
+          station.latitude,
+          station.longitude
+        )
+        return station
+      }).filter(station => station.distance <= radius)
+        .sort((a, b) => a.distance - b.distance)
+
+      if (stationsWithDistance.length < 10) {
+        this.displayStations = stationsWithDistance.slice(0, 20)
+      } else {
+        this.displayStations = stationsWithDistance.slice(0, 20)
+      }
+    },
+
+    selectStation(station) {
+      if (!this.map) return
+
+      this.selectedLocation = {
+        name: station.name,
+        address: station.address,
+        latitude: station.latitude,
+        longitude: station.longitude,
+        id: station.id
+      }
+
+      this.map.setCenter([station.longitude, station.latitude])
+      this.map.setZoom(15)
+    },
+
+    startRescueForStation(station) {
+      this.selectedLocation = {
+        name: station.name,
+        address: station.address,
+        latitude: station.latitude,
+        longitude: station.longitude,
+        id: station.id
+      }
+      this.startRescue()
+    },
+
+    checkAndAddNearbyPetHospitals() {
+      const radius = 30000
+      if (this.userLocation.latitude && this.userLocation.longitude) {
+        const nearbyCount = this.nearbyStations.filter(station => {
+          const distance = this.calculateDistance(
+            this.userLocation.latitude,
+            this.userLocation.longitude,
+            station.latitude,
+            station.longitude
+          )
+          return distance <= radius
+        }).length
+
+        if (nearbyCount < 10) {
+          this.$message.info(`Found only ${nearbyCount} rescue stations nearby. Searching for pet hospitals...`)
+          this.searchAndAddPetHospitals()
+        }
+      }
+    },
+
+    calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000
+      const dLat = this.deg2rad(lat2 - lat1)
+      const dLon = this.deg2rad(lon2 - lon1)
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      return R * c
+    },
+
+    deg2rad(deg) {
+      return deg * (Math.PI / 180)
+    },
+
+    searchAndAddPetHospitals() {
+      searchNearbyPetHospitals(this.userLocation.latitude, this.userLocation.longitude, 30000)
+        .then(response => {
+          if (response.code === 200 && response.data) {
+            const count = response.data.length
+            this.$message.success(`Found ${count} pet hospitals nearby`)
+            this.nearbyStations = [...this.nearbyStations, ...response.data]
+            this.addStationMarkers()
+            this.loadDisplayStations()
+          } else {
+            console.log('No pet hospitals found or error:', response)
+          }
+        })
+        .catch(error => {
+          console.error('Error searching pet hospitals:', error)
+        })
     },
 
     startRescue() {
@@ -560,6 +730,69 @@ export default {
 
         &:active {
           background-color: #ecf5ff;
+        }
+      }
+    }
+
+    .station-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #dcdfe6;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      z-index: 99;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 5px;
+
+      .station-list-header {
+        padding: 10px 15px;
+        background: #f5f7fa;
+        border-bottom: 1px solid #ebeef5;
+        font-weight: bold;
+        color: #606266;
+      }
+
+      .station-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #f0f0f0;
+
+        &:hover {
+          background-color: #f5f7fa;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .station-info {
+          flex: 1;
+
+          .station-name {
+            font-weight: bold;
+            color: #303133;
+            margin-bottom: 4px;
+          }
+
+          .station-address {
+            font-size: 12px;
+            color: #909399;
+            margin-bottom: 2px;
+          }
+
+          .station-phone {
+            font-size: 12px;
+            color: #67c23a;
+          }
         }
       }
     }

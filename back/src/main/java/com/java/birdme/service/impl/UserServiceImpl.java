@@ -57,8 +57,11 @@ public class UserServiceImpl implements UserService {
         Page<User> page = new Page<>(pageReq.getOffset(), pageReq.getPageSize());
 
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        if (pageReq.getData().getName() != null) {
+        if (pageReq.getData().getName() != null && !pageReq.getData().getName().isEmpty()) {
             wrapper.like(User::getName, pageReq.getData().getName());
+        }
+        if (pageReq.getData().getRole() != null) {
+            wrapper.eq(User::getRole, pageReq.getData().getRole());
         }
         Page<User> userPage = mapper.selectPage(page, wrapper);
         List<User> records = userPage.getRecords();
