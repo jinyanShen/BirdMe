@@ -1,325 +1,179 @@
 <script>
-import bgGif from '@/assets/images/bg.gif'
+  import bgGif from '@/assets/images/bg.gif'
 
-export default {
-  name: 'MainMenu',
-  data() {
-    return {
-      showAnimation: true,
-      leftClouds: [],
-      rightClouds: [],
-      bgGif: bgGif,
-      showNavbar: false,
-      isLoggedIn: false,
-      dropdowns: {
-        knowledge: false,
-        forum: false,
-        game: false
+  export default {
+    name: 'MainMenu',
+    data() {
+      return {
+        showAnimation: true,
+        leftClouds: [],
+        rightClouds: [],
+        bgGif: bgGif,
+        showNavbar: false,
+
+        newsList: [
+          {
+            id: 1,
+            title: '春季鸟类迁徙保护行动',
+            description: '全国多地开展鸟类迁徙通道保护工作，志愿者招募中',
+            image: 'https://picsum.photos/800/400?random=1'
+          },
+          {
+            id: 2,
+            title: '新增3个鸟类自然保护区',
+            description: '保护面积扩大2000公顷，为候鸟提供更多栖息地',
+            image: 'https://picsum.photos/800/400?random=2'
+          },
+          {
+            id: 3,
+            title: 'AI鸟类识别系统上线',
+            description: '拍照即可识别500+种鸟类，准确率达95%',
+            image: 'https://picsum.photos/800/400?random=3'
+          }
+        ]
+      }
+    },
+    mounted() {
+      this.generateClouds()
+      this.initScrollAnimation()
+      // setTimeout(() => {
+      //   const elements = document.querySelectorAll('.fade-in-up')
+      //   elements.forEach(el => {
+      //     el.classList.add('visible')
+      //   })
+      // }, 2000)
+    },
+    methods: {
+      goToNews(id) {
+        console.log('点击新闻', id)
+        // 跳转到新闻详情页
+        // this.$router.push(`/news/${id}`)
+        // 或者打开新窗口
+        // window.open(`https://example.com/news/${id}`, '_blank')
       },
-      isKnowledgeActive: false,
 
-      newsList: [
-        {
-          "id": 1,
-          "title": "Spring Bird Migration Protection Action",
-          "description": "Bird migration corridor protection work is being carried out nationwide, volunteers are being recruited",
-          "image": "https://picsum.photos/800/400?random=1"
-        },
-        {
-          "id": 2,
-          "title": "3 New Bird Nature Reserves Established",
-          "description": "Protected area expanded by 2,000 hectares, providing more habitats for migratory birds",
-          "image": "https://picsum.photos/800/400?random=2"
-        },
-        {
-          "id": 3,
-          "title": "AI Bird Recognition System Launched",
-          "description": "Take a photo to identify 500+ bird species",
-          "image": "https://picsum.photos/800/400?random=3"
+      generateClouds() {
+        const leftClouds = []
+        const rightClouds = []
+
+        // 左边云朵配置
+        const leftPositions = [-10,-20,-30,-10,-20,-30,-10,-20,-30,0]
+        // 右边云朵配置
+        const rightPositions = [40,50,50,30,50,20,40,50,60,30]
+        // 垂直位置
+        const leftTopPositions = [-40, -20, 0, 20, 40, -30, -10, 10, 30, 50]
+        const rightTopPositions = [-35, -15, 5, 25, 45, -25, -5, 15, 35, 55]
+
+        for (let i = 0; i < 10; i++) {
+          leftClouds.push({
+            id: `left-${i}`,
+            left: leftPositions[i],
+            top: leftTopPositions[i],
+            delay: i * 0.3,
+            duration: 5,
+            width:1200,
+            height: 750,
+            opacity: 0.95,
+            direction: 'left',
+            image: require('@/assets/images/cloud1.png')
+          })
         }
-      ]
-    }
-  },
-  // mounted() {
-  //   this.generateClouds()
-  //   this.initScrollAnimation()
-  //   this.checkLoginStatus()
-  // },
-  mounted() {
-    // Modified cloud animation to play only once per session --> plays every time page loads, but not when navigating between pages
-    if (sessionStorage.getItem('animationPlayed')) {
-      this.showAnimation = false
-    } else {
-      sessionStorage.setItem('animationPlayed', 'true')
-    }
 
-    this.generateClouds()
-    this.initScrollAnimation()
-    this.checkLoginStatus()
-  },
-  methods: {
-    toggleDropdown(dropdown) {
-      Object.keys(this.dropdowns).forEach(key => {
-        if (key !== dropdown) {
-          this.dropdowns[key] = false
+        for (let i = 0; i < 10; i++) {
+          rightClouds.push({
+            id: `right-${i}`,
+            left: rightPositions[i],
+            top: rightTopPositions[i],
+            delay: i * 0.3,
+            duration: 5,
+            width: 1200,
+            height: 750,
+            opacity: 0.95,
+            direction: 'right',
+            image: require('@/assets/images/cloud1.png')
+          })
         }
-      })
-      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
-    },
-    goToKnowledgePage(tab) {
-      if (this.isLoggedIn) {
-        this.$router.push(`/knowledge/${tab}`)
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/knowledge/${tab}`)
+
+        this.leftClouds = leftClouds
+        this.rightClouds = rightClouds
+      },
+      onCloudAnimationEnd() {
+        setTimeout(() => {
+          this.showAnimation = false
+          this.$nextTick(() => {
+            this.handleScroll()
+          })
+        }, 1000)
+      },
+
+      initScrollAnimation() {
+        // 获取滚动容器
+        const scrollContainer = document.querySelector('.main-content')
+        if (scrollContainer) {
+          scrollContainer.addEventListener('scroll', this.handleScroll)
         }
-      }
-    },
-    goToFunFacts() {
-      if (this.isLoggedIn) {
-        this.$router.push('/knowledge/facts')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge/facts')
+        this.handleScroll()
+      },
+
+      handleScroll() {
+        const scrollContainer = document.querySelector('.main-content')
+        const scrollTop = scrollContainer ? scrollContainer.scrollTop : 0
+
+        // 控制顶栏显示
+        this.showNavbar = scrollTop > 100
+
+        // 控制 content-below 内部内容的逐渐显示
+        const contentBelowChildren = document.querySelectorAll('.content-below > *')
+        if (contentBelowChildren.length > 0) {
+          const maxScroll = 1200
+          let opacity = scrollTop / maxScroll
+
+          opacity = Math.min(opacity, 1)
+
+          // 为每个子元素设置不同的偏移距离
+          contentBelowChildren.forEach((child, index) => {
+            child.style.opacity = opacity
+            let translateY = 50 - (scrollTop / maxScroll) * 50
+            translateY = Math.max(translateY, 0)
+            child.style.transform = `translateY(${translateY * (1 - index * 0.2)}px)`
+          })
         }
-      }
-    },
-    goToForumPage(tab) {
-      if (this.isLoggedIn) {
-        this.$router.push(`/forum/${tab}`)
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/forum/${tab}`)
-        }
-      }
-    },
-    // Check login status
-    checkLoginStatus() {
-      this.isLoggedIn = sessionStorage.getItem('id') !== null
-    },
 
-    // Logout
-    handleLogout() {
-      // Clear all login information
-      sessionStorage.removeItem('id')
-      sessionStorage.removeItem('username')
-      sessionStorage.removeItem('password')
-      sessionStorage.removeItem('name')
-      sessionStorage.removeItem('age')
-      sessionStorage.removeItem('phone')
-      sessionStorage.removeItem('avatarUrl')
-      sessionStorage.removeItem('role')
+        // 下面的 fade-in-up 逻辑保持不变
+        const elements = document.querySelectorAll('.fade-in-up')
+        const windowHeight = window.innerHeight
 
-      this.isLoggedIn = false
-      this.$message.success('Logged out successfully')
-
-      // If currently on a page that requires login, redirect to home page
-      const needAuthPages = ['/identification', '/settings']
-      if (needAuthPages.includes(this.$route.path)) {
-        this.$router.push('/')
-      }
-    },
-
-    goToNews(id) {
-      console.log('Click news', id)
-    },
-
-    goToHome() {
-      if (this.$route.path === '/') {
-        return
-      }
-      this.$router.push('/')
-    },
-
-    // Navigate to Knowledge page
-    goToKnowledge() {
-      if (this.isLoggedIn) {
-        this.$router.push('/knowledge')
-      } else {
-        // Not logged in, show login dialog
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge')
-        }
-      }
-    },
-
-    // Navigate to Rescue page
-    goToRescue() {
-      if (this.isLoggedIn) {
-        this.$router.push('/rescue')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/rescue')
-        }
-      }
-    },
-
-    // Navigate to Forum page
-    goToForum() {
-      if (this.isLoggedIn) {
-        this.$router.push('/forum')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/forum')
-        }
-      }
-    },
-
-    // Navigate to Game page
-    goToGame() {
-      if (this.isLoggedIn) {
-        this.$router.push('/game')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/game')
-        }
-      }
-    },
-
-    // Game dropdown item click (currently placeholder)
-    selectGameFromNav(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
-    },
-
-    // Navigate to Personal Profile page
-    goToPersonalPage() {
-      if (this.isLoggedIn) {
-        this.$router.push('/settings')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/settings')
-        }
-      }
-    },
-
-    // Navigate to login page
-    goToLogin() {
-      this.$router.push('/login')
-    },
-
-    generateClouds() {
-      const leftClouds = []
-      const rightClouds = []
-
-      const leftPositions = [-10, -20, -30, -10, -20, -30, -10, -20, -30, 0]
-      const rightPositions = [40, 50, 50, 30, 50, 20, 40, 50, 60, 30]
-      const leftTopPositions = [-40, -20, 0, 20, 40, -30, -10, 10, 30, 50]
-      const rightTopPositions = [-35, -15, 5, 25, 45, -25, -5, 15, 35, 55]
-
-      for (let i = 0; i < 10; i++) {
-        leftClouds.push({
-          id: `left-${i}`,
-          left: leftPositions[i],
-          top: leftTopPositions[i],
-          delay: i * 0.3,
-          duration: 5,
-          width: 1200,
-          height: 750,
-          opacity: 0.95,
-          direction: 'left',
-          image: require('@/assets/images/cloud1.png')
+        elements.forEach(el => {
+          const rect = el.getBoundingClientRect()
+          if (rect.top < windowHeight + 100) {
+            el.classList.add('visible')
+          }
         })
       }
-
-      for (let i = 0; i < 10; i++) {
-        rightClouds.push({
-          id: `right-${i}`,
-          left: rightPositions[i],
-          top: rightTopPositions[i],
-          delay: i * 0.3,
-          duration: 5,
-          width: 1200,
-          height: 750,
-          opacity: 0.95,
-          direction: 'right',
-          image: require('@/assets/images/cloud1.png')
-        })
-      }
-
-      this.leftClouds = leftClouds
-      this.rightClouds = rightClouds
     },
 
-    onCloudAnimationEnd() {
-      setTimeout(() => {
-        this.showAnimation = false
-        this.$nextTick(() => {
-          this.handleScroll()
-        })
-      }, 1000)
-    },
-
-    initScrollAnimation() {
+    beforeDestroy() {
       const scrollContainer = document.querySelector('.main-content')
       if (scrollContainer) {
-        scrollContainer.addEventListener('scroll', this.handleScroll)
+        scrollContainer.removeEventListener('scroll', this.handleScroll)
       }
-      this.handleScroll()
-    },
-
-    handleScroll() {
-      const scrollContainer = document.querySelector('.main-content')
-      const scrollTop = scrollContainer ? scrollContainer.scrollTop : 0
-
-      this.showNavbar = scrollTop > 100
-
-      const contentBelowChildren = document.querySelectorAll('.content-below > *')
-      if (contentBelowChildren.length > 0) {
-        const maxScroll = 1200
-        let opacity = scrollTop / maxScroll
-        opacity = Math.min(opacity, 1)
-
-        contentBelowChildren.forEach((child, index) => {
-          child.style.opacity = opacity
-          let translateY = 50 - (scrollTop / maxScroll) * 50
-          translateY = Math.max(translateY, 0)
-          child.style.transform = `translateY(${translateY * (1 - index * 0.2)}px)`
-        })
-      }
-
-      const elements = document.querySelectorAll('.fade-in-up')
-      const windowHeight = window.innerHeight
-
-      elements.forEach(el => {
-        const rect = el.getBoundingClientRect()
-        if (rect.top < windowHeight + 100) {
-          el.classList.add('visible')
-        }
-      })
-    }
-  },
-
-  watch: {
-    '$route'() {
-      this.checkLoginStatus()
-    }
-  },
-
-  beforeDestroy() {
-    const scrollContainer = document.querySelector('.main-content')
-    if (scrollContainer) {
-      scrollContainer.removeEventListener('scroll', this.handleScroll)
     }
   }
-}
 </script>
 
 <template>
   <div class="bird-home-container">
-    <!-- Opening animation mask layer -->
+    <!-- 开场动画遮罩层 -->
     <div v-if="showAnimation" class="opening-animation">
       <div class="sky-bg"></div>
 
-      <!-- Text content -->
+      <!-- 文字内容 -->
       <div class="welcome-text">
         <h1>BirdME</h1>
         <p>Group2_TOT</p>
       </div>
 
-      <!-- Left cloud layer -->
+      <!-- 左边云朵层 -->
       <div class="clouds-layer">
         <div
           v-for="cloud in leftClouds"
@@ -340,7 +194,7 @@ export default {
         </div>
       </div>
 
-      <!-- Right cloud layer -->
+      <!-- 右边云朵层 -->
       <div class="clouds-layer">
         <div
           v-for="cloud in rightClouds"
@@ -361,9 +215,9 @@ export default {
       </div>
     </div>
 
-    <!-- Main page content, displayed after opening animation ends -->
+    <!-- 主页面内容，开场动画结束后显示 -->
     <div class="main-content" :class="{ 'visible': !showAnimation }">
-      <!-- Top navigation bar -->
+      <!-- 顶部导航栏 -->
       <div class="top-navbar" :class="{ 'navbar-visible': showNavbar }">
         <div class="navbar-container">
           <div class="logo">
@@ -372,56 +226,49 @@ export default {
           <div class="nav-menu">
             <router-link to="/" class="nav-item">Homepage</router-link>
             <div class="dropdown">
-              <span class="nav-item" :class="{ active: isKnowledgeActive }">Knowledge ▾</span>
+              <span class="nav-item dropdown-toggle">Knowledge</span>
               <div class="dropdown-menu">
-                <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
-                <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-                <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+                <div class="dropdown-item" @click="$router.push({ path: '/knowledge/index', query: { tab: 'migration' } })">Migration Map</div>
+                <div class="dropdown-item" @click="$router.push({ path: '/knowledge/index', query: { tab: 'identification' } })">Identification</div>
+                <div class="dropdown-item" @click="$router.push('/knowledge/facts')">Fun Facts</div>
+              </div>
+            </div>
+            <span class="nav-item" @click="$router.push('/help')">Help</span>
+            <div class="dropdown">
+              <span class="nav-item dropdown-toggle">Forum</span>
+              <div class="dropdown-menu">
+                <div class="dropdown-item" @click="$router.push('/forum/birdwatching')">Bird Watching</div>
+                <div class="dropdown-item" @click="$router.push('/forum/qa')">Q&A</div>
               </div>
             </div>
             <div class="dropdown">
-              <span class="nav-item">Forum ▾</span>
+              <span class="nav-item dropdown-toggle">Game</span>
               <div class="dropdown-menu">
-                <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
-                <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
+                <div class="dropdown-item" @click="$router.push('/game/flappy')">Flappy</div>
+                <div class="dropdown-item" @click="$router.push('/game/2048')">2048</div>
+                <div class="dropdown-item" @click="$router.push('/game/merge')">Merge</div>
               </div>
             </div>
-            <div class="dropdown game-dropdown">
-              <span class="nav-item">Game ▾</span>
-              <div class="game-dropdown-menu">
-                <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
-                <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-                <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
-              </div>
-            </div>
-            <span class="nav-item" @click="goToPersonalPage">Personal Settings</span>
-            <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-            <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
+            <span class="nav-item" @click="$router.push('/settings')">Personal Center</span>
+            <span class="nav-item" @click="$router.push('/report')">My Reports</span>
+            <router-link to="/login" class="nav-item login-btn">Login</router-link>
           </div>
         </div>
       </div>
 
-<!--      <div class="image-container">-->
-<!--        <img :src="bgGif" alt="background" class="top-image">-->
-<!--        <div class="overlay-text">-->
-<!--          <h2>Welcome to BirdME<br>Here you can identify birds, track migrations, and submit rescue reports</h2>-->
-<!--          <p>Group2_TOT | AI Bird Identification & Rescue System</p>-->
-<!--        </div>-->
-<!--      </div>-->
       <div class="image-container">
         <img :src="bgGif" alt="background" class="top-image">
         <div class="overlay-text">
-          <h2>Welcome to <span>BirdME</span></h2>
-          <p class="desc">Here you can identify birds, track migrations, and submit rescue reports</p>
-          <p class="author">Group2_TOT | AI Bird Identification & Rescue System</p>
+          <h2>没想好写什么</h2>
+          <p>没想好写什么你们快想想呀><</p>
         </div>
       </div>
 
       <div class="content-below">
 
-        <!-- Carousel container -->
+        <!-- 轮播图容器 -->
         <div class="carousel-section fade-in-up">
-          <h3>News about Birds</h3>
+          <h3>鸟类保护新闻</h3>
           <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
             <el-carousel-item v-for="(item, index) in newsList" :key="index">
               <div class="carousel-item" @click="goToNews(item.id)">
@@ -429,7 +276,7 @@ export default {
                 <div class="carousel-overlay">
                   <h4>{{ item.title }}</h4>
                   <p>{{ item.description }}</p>
-                  <span class="read-more">Check Detail →</span>
+                  <span class="read-more">点击查看详情 →</span>
                 </div>
               </div>
             </el-carousel-item>
@@ -438,8 +285,8 @@ export default {
 
         <div class="knowledge-cards-wrapper">
           <div class="section fade-in-up">
-            <h3>Knowledge Base</h3>
-            <p>A collection featuring bird identification, migration route maps, and educational resources.</p>
+            <h3>Knowledge Part</h3>
+            <p>简介还没写</p>
             <div class="section-divider"></div>
           </div>
 
@@ -447,118 +294,22 @@ export default {
             <div class="card fade-in-up">
               <i class="el-icon-camera"></i>
               <h4>Identification</h4>
-              <p>AI-powered bird species recognition</p>
-              <button class="btn">Start Identifying</button>
+              <p>AI智能识别鸟类品种</p>
+              <button class="btn">开始识别</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-location-information"></i>
-              <h4>Migration Map</h4>
-              <p>Bird migration route map</p>
-              <button class="btn">View Map</button>
+              <h4>MigrationMap</h4>
+              <p>鸟类迁徙路线地图</p>
+              <button class="btn">查看地图</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-info"></i>
-              <h4>Birding Tips</h4>
-              <p>Bird conservation tips</p>
-              <button class="btn">Learn More</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Rescue section -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
-            <h3>Bird Rescue</h3>
-            <p>Report injured birds, find rescue centers, and learn first‑aid tips to help birds in need.</p>
-            <div class="section-divider"></div>
-          </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-warning"></i>
-              <h4>Report Injury</h4>
-              <p>Submit rescue reports with location & photos</p>
-              <button class="btn">Report Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-location"></i>
-              <h4>Rescue Centers</h4>
-              <p>Find nearest bird rescue & rehabilitation centers</p>
-              <button class="btn">Find Centers</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-first-aid-kit"></i>
-              <h4>First Aid Tips</h4>
-              <p>Basic steps to help a bird before professional care</p>
-              <button class="btn">Learn First Aid</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Forum section (redesigned) -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
-            <h3>Community Forum</h3>
-            <p>Expert tips, rescue assistance, and daily birdwatching stories – all in one place.</p>
-            <div class="section-divider"></div>
-          </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-star-on"></i>
-              <h4>Featured & Sticky</h4>
-              <p>Expert / admin pinned posts, guidelines, and essential resources</p>
-              <button class="btn">Explore Highlights</button>
-            </div>
-
-            <div class="card fade-in-up">
-              <i class="el-icon-warning-outline"></i>
-              <h4>Rescue Help</h4>
-              <p>Post urgent rescue requests or ask for help with injured birds</p>
-              <button class="btn">Ask for Rescue</button>
-            </div>
-
-            <div class="card fade-in-up">
-              <i class="el-icon-camera-solid"></i>
-              <h4>Birdwatching & Life</h4>
-              <p>Share daily sightings, bird photos, and casual conversations</p>
-              <button class="btn">Join Discussion</button>
-            </div>
-
-            <div class="card fade-in-up">
-              <i class="el-icon-camera-solid"></i>
-              <h4>Birdwatching & Life</h4>
-              <p>Share daily sightings, bird photos, and casual conversations</p>
-              <button class="btn">Join Discussion</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Game section -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
-            <h3>Bird Games</h3>
-            <p>Play fun bird‑themed games, challenge your friends, and earn badges.</p>
-            <div class="section-divider"></div>
-          </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-video-game"></i>
-              <h4>Flappy Bird</h4>
-              <p>Classic side‑scroller with bird characters</p>
-              <button class="btn">Play Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-puzzle-piece"></i>
-              <h4>2048 Bird</h4>
-              <p>Merge birds to reach the giant bird</p>
-              <button class="btn">Play Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-connection"></i>
-              <h4>Merge To Giant Bird</h4>
-              <p>Combine species to create rare birds</p>
-              <button class="btn">Play Now</button>
+              <h4>Tips</h4>
+              <p>鸟类保护小贴士</p>
+              <button class="btn">了解更多</button>
             </div>
           </div>
         </div>
@@ -570,301 +321,182 @@ export default {
 </template>
 
 <style scoped lang="scss">
-/* Root container */
-.bird-home-container {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-}
+  /* 根容器 */
+  .bird-home-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+  }
 
-/* Opening animation container */
-.opening-animation {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
-  overflow: hidden;
-
-  /* Sky background */
-  .sky-bg {
-    position: absolute;
+  /* 开场动画容器 */
+  .opening-animation {
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #bfd2f8 0%, #d2d9f4 50%, #dadff6 100%);
-  }
+    z-index: 9999;
+    overflow: hidden;
 
-  /* Welcome text */
-  .welcome-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    opacity: 0;
-    animation: textReveal 0.6s ease-out 3s forwards;
-    pointer-events: none;
-
-    h1 {
-      font-size: 56px;
-      margin-bottom: 20px;
-      font-weight: bold;
-
-      @media (max-width: 768px) {
-        font-size: 32px;
-      }
+    /* 蓝天背景 */
+    .sky-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #bfd2f8 0%, #d2d9f4 50%, #dadff6 100%);
     }
 
-    p {
-      font-size: 24px;
-
-      @media (max-width: 768px) {
-        font-size: 18px;
-      }
-    }
-  }
-
-  /* Cloud layer */
-  .clouds-layer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 20;
-  }
-
-  /* Cloud basic style */
-  .cloud {
-    position: absolute;
-    pointer-events: none;
-    filter: drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.2));
-  }
-
-  /* Left cloud animation - moving left */
-  .cloud-left {
-    animation: cloudMoveLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  /* Right cloud animation - moving right */
-  .cloud-right {
-    animation: cloudMoveRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-}
-
-/* Main page content */
-.main-content {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 0.8s ease-in-out;
-  z-index: 1;
-  overflow-y: auto;  /* Allow scrolling */
-  overflow-x: hidden;
-
-  &.visible {
-    opacity: 1;
-  }
-}
-
-/* Top image container */
-.image-container {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow: hidden;
-
-  .top-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .overlay-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    color: white;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
-    z-index: 2;
-
-    h2 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 20px;
-    }
-  }
-}
-
-.fade-in-up {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.6s ease-out;
-
-  &.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.content-below {
-  background: linear-gradient(135deg, #bfbbe4 0%, #6668d8 100%);
-  padding: 60px 20px;
-  color: white;
-
-  > * {
-    transition: opacity 0.2s linear, transform 0.2s linear;
-    opacity: 0;
-    transform: translateY(50px);
-  }
-
-  .section {
-    max-width: 1200px;
-    margin: 0 auto 60px;
-    text-align: center;
-
-    h3 {
-      font-size: 36px;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 18px;
-      line-height: 1.6;
-    }
-  }
-
-  .cards-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-    max-width: 1200px;
-    margin: 0 auto 60px;
-
-    .card {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      padding: 30px;
-      width: 280px;
+    /* 欢迎文字 */
+    .welcome-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       text-align: center;
-      transition: transform 0.3s, opacity 0.6s ease-out, transform 0.6s ease-out;
+      color: white;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+      opacity: 0;
+      animation: textReveal 0.6s ease-out 3s forwards;
+      pointer-events: none;
 
-      &:hover {
-        transform: translateY(-10px);
-        background: rgba(255, 255, 255, 0.25);
-      }
-
-      i {
-        font-size: 48px;
+      h1 {
+        font-size: 56px;
         margin-bottom: 20px;
-        display: block;
-      }
+        font-weight: bold;
 
-      h4 {
-        font-size: 24px;
-        margin-bottom: 15px;
+        @media (max-width: 768px) {
+          font-size: 32px;
+        }
       }
 
       p {
-        font-size: 14px;
-        margin-bottom: 20px;
-        opacity: 0.9;
-      }
+        font-size: 24px;
 
-      .btn {
-        background: rgba(255, 255, 255, 0.3);
-        border: 1px solid white;
-        color: white;
-        padding: 8px 20px;
-        border-radius: 25px;
-        cursor: pointer;
-        transition: all 0.3s;
-
-        &:hover {
-          background: white;
-          color: #667eea;
+        @media (max-width: 768px) {
+          font-size: 18px;
         }
       }
     }
-  }
-  /* Section frame */
-  .knowledge-cards-wrapper {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    border-radius: 24px;
-    padding: 40px 30px;
-    margin: 0 auto 60px;
-    max-width: 1200px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    position: relative;
-    transition: all 0.3s;
 
-    &::before {
-      content: '';
+    /* 云朵层 */
+    .clouds-layer {
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-      border-radius: 26px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 20;
     }
 
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    /* 云朵基础样式 */
+    .cloud {
+      position: absolute;
+      pointer-events: none;
+      filter: drop-shadow(8px 12px 20px rgba(0, 0, 0, 0.2));
+    }
 
-      &::before {
-        opacity: 1;
+    /* 左边云朵动画 - 向左散开 */
+    .cloud-left {
+      animation: cloudMoveLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+
+    /* 右边云朵动画 - 向右散开 */
+    .cloud-right {
+      animation: cloudMoveRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+  }
+
+  /* 主页面内容 */
+  .main-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.8s ease-in-out;
+    z-index: 1;
+    overflow-y: auto;  /* 允许滚动 */
+    overflow-x: hidden;
+
+    &.visible {
+      opacity: 1;
+    }
+  }
+
+  /* 顶部图片容器 */
+  .image-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+
+    .top-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+      z-index: 2;
+
+      h2 {
+        font-size: 48px;
+        margin-bottom: 20px;
       }
+
+      p {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .fade-in-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .content-below {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 20px;
+    color: white;
+
+    > * {
+      transition: opacity 0.2s linear, transform 0.2s linear;
+      opacity: 0;
+      transform: translateY(50px);
     }
 
     .section {
       max-width: 1200px;
-      margin: 0 auto 40px;
+      margin: 0 auto 60px;
       text-align: center;
 
       h3 {
         font-size: 36px;
         margin-bottom: 20px;
-        color: white;
       }
 
       p {
         font-size: 18px;
         line-height: 1.6;
-        color: rgba(255, 255, 255, 0.9);
       }
-
-      .section-divider {
-        width: 1000px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-        margin: 0 auto;
-        border-radius: 2px;
-      }
-
-
     }
 
     .cards-container {
@@ -873,7 +505,7 @@ export default {
       gap: 30px;
       flex-wrap: wrap;
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 0 auto 60px;
 
       .card {
         background: rgba(255, 255, 255, 0.15);
@@ -882,7 +514,7 @@ export default {
         padding: 30px;
         width: 280px;
         text-align: center;
-        transition: transform 0.3s;
+        transition: transform 0.3s, opacity 0.6s ease-out, transform 0.6s ease-out;
 
         &:hover {
           transform: translateY(-10px);
@@ -893,20 +525,17 @@ export default {
           font-size: 48px;
           margin-bottom: 20px;
           display: block;
-          color: white;
         }
 
         h4 {
           font-size: 24px;
           margin-bottom: 15px;
-          color: white;
         }
 
         p {
           font-size: 14px;
           margin-bottom: 20px;
           opacity: 0.9;
-          color: rgba(255, 255, 255, 0.9);
         }
 
         .btn {
@@ -925,410 +554,415 @@ export default {
         }
       }
     }
-  }
+    /*每部分的框*/
+    .knowledge-cards-wrapper {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 24px;
+      padding: 40px 30px;
+      margin: 0 auto 60px;
+      max-width: 1200px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      position: relative;
+      transition: all 0.3s;
 
-  /*Carousel container*/
-  .carousel-section {
-    max-width: 1200px;
-    margin: 0 auto 80px;
+      &::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
+        border-radius: 26px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
 
-    h3 {
-      font-size: 36px;
-      text-align: center;
-      margin-bottom: 40px;
-    }
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 
-    .news-carousel {
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        &::before {
+          opacity: 1;
+        }
+      }
 
-      .carousel-item {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
+      .section {
+        max-width: 1200px;
+        margin: 0 auto 40px;
+        text-align: center;
 
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        h3 {
+          font-size: 36px;
+          margin-bottom: 20px;
+          color: white;
         }
 
-        .carousel-overlay {
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          right: 0;
-          background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
-          padding: 40px 30px 30px;
-          color: white;
-          text-align: left;
+        p {
+          font-size: 18px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        .section-divider {
+          width: 1000px;
+          height: 3px;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+          margin: 0 auto;
+          border-radius: 2px;
+        }
+
+
+      }
+
+      .cards-container {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+        max-width: 1200px;
+        margin: 0 auto;
+
+        .card {
+          background: rgba(255, 255, 255, 0.15);
+          backdrop-filter: blur(10px);
+          border-radius: 16px;
+          padding: 30px;
+          width: 280px;
+          text-align: center;
+          transition: transform 0.3s;
+
+          &:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.25);
+          }
+
+          i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+            color: white;
+          }
 
           h4 {
-            font-size: 28px;
-            margin-bottom: 12px;
-            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: white;
           }
 
           p {
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 14px;
+            margin-bottom: 20px;
             opacity: 0.9;
+            color: rgba(255, 255, 255, 0.9);
           }
 
-          .read-more {
-            display: inline-block;
-            font-size: 14px;
-            color: #ffd966;
-            transition: transform 0.3s;
+          .btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid white;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
 
             &:hover {
-              transform: translateX(5px);
+              background: white;
+              color: #667eea;
+            }
+          }
+        }
+      }
+    }
+
+    /*轮播图容器*/
+    .carousel-section {
+      max-width: 1200px;
+      margin: 0 auto 80px;
+
+      h3 {
+        font-size: 36px;
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .news-carousel {
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+        .carousel-item {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          cursor: pointer;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .carousel-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+            padding: 40px 30px 30px;
+            color: white;
+            text-align: left;
+
+            h4 {
+              font-size: 28px;
+              margin-bottom: 12px;
+              font-weight: bold;
+            }
+
+            p {
+              font-size: 16px;
+              margin-bottom: 15px;
+              opacity: 0.9;
+            }
+
+            .read-more {
+              display: inline-block;
+              font-size: 14px;
+              color: #ffd966;
+              transition: transform 0.3s;
+
+              &:hover {
+                transform: translateX(5px);
+              }
             }
           }
         }
       }
     }
   }
-}
 
-/* Carousel indicator style */
-::v-deep .el-carousel__indicators {
-  bottom: 20px;
+  /* 轮播图指示器样式 */
+  ::v-deep .el-carousel__indicators {
+    bottom: 20px;
 
-  .el-carousel__button {
-    width: 30px;
-    height: 3px;
-    background-color: rgba(255, 255, 255, 0.5);
+    .el-carousel__button {
+      width: 30px;
+      height: 3px;
+      background-color: rgba(255, 255, 255, 0.5);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.8);
+      }
+    }
+
+    .is-active .el-carousel__button {
+      background-color: #ffd966;
+    }
+  }
+
+  ::v-deep .el-carousel__arrow {
+    background-color: rgba(0, 0, 0, 0.5);
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(0, 0, 0, 0.8);
     }
   }
 
-  .is-active .el-carousel__button {
-    background-color: #ffd966;
-  }
-}
-
-::v-deep .el-carousel__arrow {
-  background-color: rgba(0, 0, 0, 0.5);
-
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.8);
-  }
-}
-
-/* Left cloud move left animation */
-@keyframes cloudMoveLeft {
-  0% {
-    transform: translateX(0) scale(1);
-    opacity: 0.95;
-  }
-  100% {
-    transform: translateX(-500px) scale(0.8);
-    opacity: 0;
-  }
-}
-
-/* Right cloud move right animation */
-@keyframes cloudMoveRight {
-  0% {
-    transform: translateX(0) scale(1);
-    opacity: 0.95;
-  }
-  100% {
-    transform: translateX(500px) scale(0.8);
-    opacity: 0;
-  }
-}
-
-/* Top navigation bar */
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  transform: translateY(-100%);
-  transition: transform 0.3s ease-in-out;
-
-  &.navbar-visible {
-    transform: translateY(0);
+  /* 左边云朵向左移动动画 */
+  @keyframes cloudMoveLeft {
+    0% {
+      transform: translateX(0) scale(1);
+      opacity: 0.95;
+    }
+    100% {
+      transform: translateX(-500px) scale(0.8);
+      opacity: 0;
+    }
   }
 
-  .navbar-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  /* 右边云朵向右移动动画 */
+  @keyframes cloudMoveRight {
+    0% {
+      transform: translateX(0) scale(1);
+      opacity: 0.95;
+    }
+    100% {
+      transform: translateX(500px) scale(0.8);
+      opacity: 0;
+    }
+  }
 
-    .logo {
-      h3 {
-        margin: 0;
-        font-size: 24px;
-        color: #8fa0ca;
-        font-weight: bold;
-      }
+  /* 顶部导航栏 */
+  .top-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-in-out;
+
+    &.navbar-visible {
+      transform: translateY(0);
     }
 
-    .nav-menu {
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px 20px;
       display: flex;
-      gap: 30px;
+      justify-content: space-between;
       align-items: center;
 
-      .nav-item {
-        text-decoration: none;
-        color: #333;
-        font-size: 16px;
-        transition: color 0.3s;
-        cursor: pointer;
-
-        &:hover {
-          color: #f4f4f8;
+      .logo {
+        h3 {
+          margin: 0;
+          font-size: 24px;
+          color: #8fa0ca;
+          font-weight: bold;
         }
       }
 
-      /* Game top dropdown menu (expand on hover, not click dependent) */
-      .game-dropdown {
-        position: relative;
-        display: inline-flex;
+      .nav-menu {
+        display: flex;
+        gap: 30px;
         align-items: center;
 
-        .game-dropdown-menu {
-          position: absolute;
-          /* Keep dropdown menu close to Game to avoid "gap" when mouse moves from text to menu causing menu to disappear */
-          top: 100%;
-          left: 50%;
-          transform: translateX(-50%) translateY(0);
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-          z-index: 1001;
-
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          border-radius: 12px;
-          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-          min-width: 200px;
-          padding: 8px 0;
-
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .game-dropdown-item {
-          padding: 10px 20px;
-          font-size: 14px;
+        .nav-item {
+          text-decoration: none;
           color: #333;
+          font-size: 16px;
+          transition: color 0.3s;
           cursor: pointer;
-          transition: background 0.2s ease, color 0.2s ease;
 
           &:hover {
-            background: #f2f3ff;
             color: #6f5bb8;
           }
         }
 
-        &:hover {
-          .game-dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
+        .login-btn {
+          background: #6f5bb8;
+          color: white;
+          padding: 8px 20px;
+          border-radius: 25px;
+
+          &:hover {
+            background: #5a4a9e;
+            color: white;
           }
         }
-      }
 
-      .dropdown {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
+        .dropdown {
+          position: relative;
 
-        .dropdown-menu {
-          position: absolute;
-          top: 100%;
-          left: 50%;
-          transform: translateX(-50%) translateY(0);
-          opacity: 0;
-          visibility: hidden;
-          transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-          z-index: 1001;
+          .dropdown-toggle {
+            &::after {
+              content: ' ▾';
+              font-size: 12px;
+            }
+          }
 
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          border-radius: 12px;
-          box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-          min-width: 180px;
-          padding: 8px 0;
+          .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            min-width: 180px;
+            padding: 10px 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
 
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
+            .dropdown-item {
+              padding: 10px 20px;
+              cursor: pointer;
+              transition: background 0.3s;
+              color: #333;
+              font-size: 14px;
 
-          .dropdown-item {
-            padding: 10px 20px;
-            font-size: 14px;
-            color: #333;
-            cursor: pointer;
-            transition: background 0.2s ease, color 0.2s ease;
-            &:hover {
-              background: #f2f3ff;
-              color: #6f5bb8;
+              &:hover {
+                background: #f4f4f8;
+                color: #6f5bb8;
+              }
+            }
+          }
+
+          &:hover {
+            .dropdown-menu {
+              opacity: 1;
+              visibility: visible;
+              transform: translateY(0);
             }
           }
         }
+      }
+    }
+  }
 
-        &:hover {
-          .dropdown-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0);
+  /* 文字显现动画 */
+  @keyframes textReveal {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  /* 响应式调整 */
+  @media (max-width: 768px) {
+    .top-navbar {
+      .navbar-container {
+        padding: 10px 15px;
+
+        .logo h3 {
+          font-size: 18px;
+        }
+
+        .nav-menu {
+          gap: 15px;
+
+          .nav-item {
+            font-size: 14px;
+          }
+
+          .login-btn {
+            padding: 5px 12px;
           }
         }
       }
+    }
 
-      .login-btn {
-        background: #6f5bb8;
-        color: white;
-        padding: 8px 20px;
-        border-radius: 25px;
+    .cloud-left {
+      animation: cloudMoveLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+    }
 
-        &:hover {
-          background: #d4dcf6;
-          color: white;
-        }
+    .cloud-right {
+      animation: cloudMoveRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+    }
+
+    @keyframes cloudMoveLeft {
+      100% {
+        transform: translateX(-250px) scale(0.8);
+      }
+    }
+
+    @keyframes cloudMoveRight {
+      100% {
+        transform: translateX(250px) scale(0.8);
       }
     }
   }
-}
-
-/* Text reveal animation */
-@keyframes textReveal {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-/* Responsive adjustment */
-@media (max-width: 768px) {
-  .top-navbar {
-    .navbar-container {
-      padding: 10px 15px;
-
-      .logo h3 {
-        font-size: 18px;
-      }
-
-      .nav-menu {
-        gap: 15px;
-
-        .nav-item {
-          font-size: 14px;
-        }
-
-        .login-btn {
-          padding: 5px 12px;
-        }
-      }
-    }
-  }
-
-  .cloud-left {
-    animation: cloudMoveLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-  }
-
-  .cloud-right {
-    animation: cloudMoveRight 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
-  }
-
-  @keyframes cloudMoveLeft {
-    100% {
-      transform: translateX(-250px) scale(0.8);
-    }
-  }
-
-  @keyframes cloudMoveRight {
-    100% {
-      transform: translateX(250px) scale(0.8);
-    }
-  }
-}
-
-.nav-item {
-  cursor: pointer;
-}
-
-.logo h3 {
-  cursor: pointer;
-}
-.logout-btn {
-  background: #ff6b6b;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-  cursor: pointer;
-
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  }
-}
-
-.overlay-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-
-  padding: 80px 120px;
-  border-radius: 32px;
-  background: linear-gradient(135deg, rgba(103, 143, 230, 0.7), rgba(161, 191, 230, 0.7));
-  backdrop-filter: blur(5px);
-  box-shadow: 0 12px 40px rgba(63, 51, 128, 0.4);
-  z-index: 2;
-}
-
-.overlay-text h2 {
-  font-size: 144px; /* Original 72px -> doubled */
-  font-weight: 800;
-  color: #ffffff;
-  margin: 0 0 20px 0;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.3);
-  line-height: 1.1;
-}
-
-.overlay-text h2 span {
-  color: #ffd966;
-}
-
-.overlay-text .desc {
-  font-size: 60px; /* Original 30px -> doubled */
-  font-weight: 400;
-  color: rgba(255,255,255,0.95);
-  margin: 0 0 28px 0;
-  line-height: 1.3;
-}
-
-.overlay-text .author {
-  font-size: 44px; /* Original 22px -> doubled */
-  font-weight: 300;
-  color: rgba(255,255,255,0.75);
-  margin: 0;
-}
-
 </style>
