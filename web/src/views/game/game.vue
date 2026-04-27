@@ -1,51 +1,6 @@
 <template>
   <div class="game-page">
-    <!-- 顶部导航栏：页面打开就可见（不做首页那种滚动/开场动画控制） -->
-    <div class="top-navbar navbar-visible">
-      <div class="navbar-container">
-        <div class="logo">
-          <h3>BirdME</h3>
-        </div>
-
-        <div class="nav-menu">
-          <router-link to="/" class="nav-item">Homepage</router-link>
-
-          <!-- Knowledge 下拉菜单 - 主项可点击 -->
-          <div class="dropdown">
-            <span class="nav-item" :class="{ active: isKnowledgeActive }" @click="goToKnowledge">Knowledge ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
-              <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
-            </div>
-          </div>
-
-          <!-- Forum 下拉菜单 - 主项可点击 -->
-          <div class="dropdown">
-            <span class="nav-item" @click="goToForum">Forum ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
-              <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
-            </div>
-          </div>
-
-          <!-- Game 下拉菜单 - 主项可点击 -->
-          <div class="dropdown game-dropdown">
-            <span class="nav-item" @click="goToGame">Game ▾</span>
-            <div class="game-dropdown-menu">
-              <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
-              <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-              <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
-            </div>
-          </div>
-
-          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
-          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
-        </div>
-      </div>
-    </div>
-
+    <NavBar :showNavbar="true" />
     <div class="content-below">
       <div class="knowledge-cards-wrapper" id="game-flappy">
         <div class="section">
@@ -80,23 +35,6 @@
           </div>
         </div>
       </div>
-
-      <div class="knowledge-cards-wrapper" id="game-merge">
-        <div class="section">
-          <h3>Merge To Giant Bird</h3>
-          <p>Keep merging to evolve into a powerful giant bird.</p>
-          <div class="section-divider"></div>
-        </div>
-
-        <div class="cards-container" id="game-merge-card">
-          <div class="card">
-            <img :src="mergeImg" class="game-icon" alt="Merge To Giant Bird">
-            <h4>Merge To Giant Bird</h4>
-            <p>Strategic merges, satisfying evolution.</p>
-            <button class="btn" @click="selectGame('merge')">Start Game</button>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -105,221 +43,24 @@
 import flappyImg from '@/assets/images/flappy.png'
 import img2048 from '@/assets/images/2048.png'
 import mergeImg from '@/assets/images/merge.png'
+import NavBar from '@/components/NavBar/navbar.vue'
 
 export default {
   name: 'Game',
+  components: {
+    NavBar
+  },
   data() {
     return {
-      isLoggedIn: false,
       flappyImg,
       img2048,
-      mergeImg,
-      dropdowns: {
-        knowledge: false,
-        forum: false,
-        game: false
-      },
-      isKnowledgeActive: false
+      mergeImg
     }
   },
-  mounted() {
-    this.checkLoginStatus()
-  },
   methods: {
-    toggleDropdown(dropdown) {
-      Object.keys(this.dropdowns).forEach(key => {
-        if (key !== dropdown) {
-          this.dropdowns[key] = false
-        }
-      })
-      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
-    },
-    // goToKnowledgePage(tab) {
-    //   this.$router.push(`/knowledge/${tab}`)
-    // },
-    // goToFunFacts() {
-    //   this.$router.push('/knowledge/facts')
-    // },
-    // goToForumPage(tab) {
-    //   this.$router.push(`/forum/${tab}`)
-    // },
-    checkLoginStatus() {
-      this.isLoggedIn = sessionStorage.getItem('id') !== null
-    },
-
-    // // 顶部导航：如果已经在 /game 就别重复 push，避免干扰滚动
-    // goToGame() {
-    //   if (this.$route.path === '/game') return
-    //   if (this.isLoggedIn) {
-    //     this.$router.push('/game')
-    //   } else if (window.$showLoginDialog) {
-    //     window.$showLoginDialog('/game')
-    //   }
-    // },
-    //
-    // goToKnowledge() {
-    //   if (this.isLoggedIn) this.$router.push('/knowledge/migration')
-    //   else window.$showLoginDialog && window.$showLoginDialog('/knowledge/migration')
-    // },
-    //
-    // goToRescue() {
-    //   if (this.isLoggedIn) this.$router.push('/rescue')
-    //   else window.$showLoginDialog && window.$showLoginDialog('/rescue')
-    // },
-    //
-    // goToForum() {
-    //   if (this.isLoggedIn) this.$router.push('/forum')
-    //   else window.$showLoginDialog && window.$showLoginDialog('/forum')
-    // },
-    //
-    // goToPersonalPage() {
-    //   if (this.isLoggedIn) this.$router.push('/settings/index')
-    //   else window.$showLoginDialog && window.$showLoginDialog('/settings/index')
-    // },
-    //
-    // goToLogin() {
-    //   this.$router.push('/login')
-    // },
-    goToKnowledge() {
-      if (this.isLoggedIn) {
-        if (!this.$route.path.startsWith('/knowledge')) {
-          this.$router.push('/knowledge/migration')
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/knowledge/migration')
-      }
-    },
-
-    // 修改 goToKnowledgePage - 添加登录检查
-    goToKnowledgePage(tab) {
-      if (this.isLoggedIn) {
-        const targetPath = `/knowledge/${tab}`
-        if (this.$route.path !== targetPath) {
-          this.$router.push(targetPath)
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog(`/knowledge/${tab}`)
-      }
-    },
-
-    // 修改 goToFunFacts - 添加登录检查
-    goToFunFacts() {
-      if (this.isLoggedIn) {
-        const targetPath = '/knowledge/facts'
-        if (this.$route.path !== targetPath) {
-          this.$router.push(targetPath)
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/knowledge/facts')
-      }
-    },
-
-    // 修改 goToForum - 跳转到 forum 页面
-    goToForum() {
-      if (this.isLoggedIn) {
-        if (!this.$route.path.startsWith('/forum')) {
-          this.$router.push('/forum/birdwatching')
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/forum/birdwatching')
-      }
-    },
-
-    // 修改 goToForumPage - 添加登录检查
-    goToForumPage(tab) {
-      if (this.isLoggedIn) {
-        const targetPath = `/forum/${tab}`
-        if (this.$route.path !== targetPath) {
-          this.$router.push(targetPath)
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog(`/forum/${tab}`)
-      }
-    },
-
-    // 修改 goToGame - 跳转到 game 首页
-    goToGame() {
-      if (this.$route.path === '/game') return
-      if (this.isLoggedIn) {
-        this.$router.push('/game')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/game')
-      }
-    },
-
-    // 修改 selectGameFromNav - 添加登录检查
-    selectGameFromNav(gameKey) {
-      if (!this.isLoggedIn) {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/game/${gameKey}`)
-        }
-        return
-      }
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-      this.$router.push(targetPath)
-    },
-
-    // 修改 selectGame - 添加登录检查
     selectGame(gameKey) {
-      if (!this.isLoggedIn) {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/game/${gameKey}`)
-        }
-        return
-      }
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-      this.$router.push(targetPath)
-    },
-
-    // 修改 goToPersonalPage
-    goToPersonalPage() {
-      if (this.isLoggedIn) {
-        if (this.$route.path !== '/settings/index') {
-          this.$router.push('/settings/index')
-        }
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/settings/index')
-      }
-    },
-
-
-    handleLogout() {
-      // 清除所有登录信息
-      sessionStorage.removeItem('id')
-      sessionStorage.removeItem('username')
-      sessionStorage.removeItem('password')
-      sessionStorage.removeItem('name')
-      sessionStorage.removeItem('age')
-      sessionStorage.removeItem('phone')
-      sessionStorage.removeItem('avatarUrl')
-      sessionStorage.removeItem('role')
-
-      this.isLoggedIn = false
-      this.$message.success('Logged out successfully')
-
-      // 如果当前在需要登录的页面，跳转到首页
-      const needAuthPages = ['/identification', '/settings']
-      if (needAuthPages.includes(this.$route.path)) {
-        this.$router.push('/')
-      }
-    },
-
-
-    // selectGameFromNav(gameKey) {
-    //   const targetPath = `/game/${gameKey}`
-    //   if (this.$route.path === targetPath) return
-    //
-    //   this.$router.push(targetPath)
-    // },
-    //
-    // selectGame(gameKey) {
-    //   const targetPath = `/game/${gameKey}`
-    //   if (this.$route.path === targetPath) return
-    //
-    //   this.$router.push(targetPath)
-    // }
+      this.$router.push(`/game/${gameKey}`)
+    }
   }
 }
 </script>
@@ -331,176 +72,12 @@ export default {
   position: relative;
 }
 
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-
-  /* 始终可见 */
-  transform: translateY(0);
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: #333;
-  font-size: 20px;
-  cursor: pointer;
-  transition: color 0.3s;
-  &:hover {
-    color: #f4f4f8;
-  }
-}
-
-.login-btn {
-  background: #6f5bb8;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
-  &:hover {
-    background: #d4dcf6;
-    color: white;
-  }
-}
-
-.logout-btn {
-  background: #ff6b6b;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  }
-}
-
-/* Game 顶部下拉菜单（hover 展开，不依赖点击） */
-.game-dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  .game-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-    z-index: 1001;
-
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    padding: 8px 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .game-dropdown-item {
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-      &:hover {
-        background: #f2f3ff;
-        color: #6f5bb8;
-      }
-    }
-  }
-
-  &:hover {
-    .game-dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
-
-/* Dropdown styles for game page */
-.dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-    z-index: 1001;
-
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-width: 180px;
-    padding: 8px 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .dropdown-item {
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-      &:hover {
-        background: #f2f3ff;
-        color: #6f5bb8;
-      }
-    }
-  }
-
-  &:hover {
-    .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
-
-/* 复用首页渐变背景（需要给顶部固定导航预留空间） */
 .content-below {
   background: linear-gradient(135deg, #97a1d3 0%, #856ad5 100%);
-  padding: 110px 20px 80px;
+  padding: 100px 20px 80px;
   color: white;
 }
 
-/* 每部分的框（对齐 mainmenu:631 的 wrapper 风格） */
 .knowledge-cards-wrapper {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.25);
@@ -537,8 +114,7 @@ export default {
   }
 }
 
-/* wrapper 内标题（对齐 mainmenu:631 的 section） */
-.content-below .section {
+.section {
   max-width: 1200px;
   margin: 0 auto 40px;
   text-align: center;
@@ -565,8 +141,7 @@ export default {
   }
 }
 
-/* 对齐 mainmenu:638 的 cards-container */
-.content-below .cards-container {
+.cards-container {
   display: flex;
   justify-content: center;
   gap: 30px;
@@ -627,21 +202,6 @@ export default {
         color: #667eea;
       }
     }
-  }
-}
-
-@media (max-width: 768px) {
-  .nav-menu {
-    gap: 15px;
-  }
-
-  .nav-item {
-    font-size: 14px;
-  }
-
-  .login-btn,
-  .logout-btn {
-    padding: 5px 12px;
   }
 }
 </style>

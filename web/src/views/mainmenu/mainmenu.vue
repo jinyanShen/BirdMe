@@ -68,10 +68,10 @@ export default {
     },
     goToKnowledgePage(tab) {
       if (this.isLoggedIn) {
-        this.$router.push(`/knowledge/${tab}`)
+        this.$router.push(`/knowledge/index?tab=${tab}`)
       } else {
         if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/knowledge/${tab}`)
+          window.$showLoginDialog(`/knowledge/index?tab=${tab}`)
         }
       }
     },
@@ -371,6 +371,9 @@ export default {
           <div class="nav-menu">
             <router-link to="/" class="nav-item">Homepage</router-link>
 
+            <!-- Help 下拉菜单 -->
+            <span class="nav-item" @click="$router.push('/help')">Help</span>
+
             <!-- Knowledge 下拉菜单 - 修改：主项可点击跳转 -->
             <div class="dropdown">
               <span class="nav-item" :class="{ active: isKnowledgeActive }" @click="goToKnowledge">Knowledge ▾</span>
@@ -396,25 +399,16 @@ export default {
               <div class="game-dropdown-menu">
                 <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
                 <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-                <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
               </div>
             </div>
 
-            <span class="nav-item" @click="goToPersonalPage">Personal Settings</span>
+            <span class="nav-item" @click="goToPersonalPage">Settings</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-            <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
+            <span v-else class="nav-item logout-btn" @click="handleLogout">Logout</span>
           </div>
         </div>
       </div>
 
-
-      <!--      <div class="image-container">-->
-<!--        <img :src="bgGif" alt="background" class="top-image">-->
-<!--        <div class="overlay-text">-->
-<!--          <h2>Welcome to BirdME<br>Here you can identify birds, track migrations, and submit rescue reports</h2>-->
-<!--          <p>Group2_TOT | AI Bird Identification & Rescue System</p>-->
-<!--        </div>-->
-<!--      </div>-->
       <div class="image-container">
         <img :src="bgGif" alt="background" class="top-image">
         <div class="overlay-text">
@@ -553,12 +547,6 @@ export default {
               <i class="fas fa-th-large"></i>  <!-- 改为网格图标 -->
               <h4>2048 Bird</h4>
               <p>Merge birds to reach the giant bird</p>
-              <button class="btn">Play Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="fas fa-code-branch"></i>  <!-- 改为分支图标 -->
-              <h4>Merge To Giant Bird</h4>
-              <p>Combine species to create rare birds</p>
               <button class="btn">Play Now</button>
             </div>
           </div>
@@ -714,7 +702,7 @@ export default {
 }
 
 .content-below {
-  background: linear-gradient(135deg, #bfbbe4 0%, #6668d8 100%);
+  background: linear-gradient(135deg, #bfd3f8 0%, #095dfa 100%);
   padding: 60px 20px;
   color: white;
 
@@ -840,7 +828,7 @@ export default {
       h3 {
         font-size: 48px;  /* 原36px → 调大 */
         margin-bottom: 25px;
-        color: white;
+        color: #ffffff;
       }
 
       p {
@@ -1056,7 +1044,7 @@ export default {
   .navbar-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 15px 20px;
+    padding: 20px 0px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1064,8 +1052,8 @@ export default {
     .logo {
       h3 {
         margin: 0;
-        font-size: 28px;
-        color: #8fa0ca;
+        font-size: 32px;
+        color: #89a1dc;
         font-weight: bold;
       }
     }
@@ -1078,12 +1066,13 @@ export default {
       .nav-item {
         text-decoration: none;
         color: #333;
-        font-size: 20px;
+        font-size: 22px;
+        font-weight: bold;
         transition: color 0.3s;
         cursor: pointer;
 
         &:hover {
-          color: #f4f4f8;
+          color: #548ccb; /*导*/
         }
       }
 
@@ -1186,10 +1175,11 @@ export default {
       }
 
       .login-btn {
-        background: #6f5bb8;
+        background: #6589d9;
         color: white;
         padding: 8px 20px;
         border-radius: 25px;
+        margin-left: 80px;
 
         &:hover {
           background: #d4dcf6;
@@ -1328,7 +1318,7 @@ export default {
 }
 
 .logout-btn {
-  background: #ff6b6b;
+  background: #f36a6a;
   color: white !important;
   padding: 8px 20px;
   border-radius: 25px;
@@ -1336,7 +1326,7 @@ export default {
   cursor: pointer;
 
   &:hover {
-    background: #ff5252;
+    background: #e36969;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
   }
