@@ -31,10 +31,12 @@ export default {
 
 <style lang="scss" scoped>
 .app-main {
-  width: 100%; /* 设置宽度为屏幕宽度的80% */  
-  max-width: 1250px; /* 设置最大宽度为1200px，以防止在大屏幕上变得过大 */  
+  width: 100%;
+  max-width: calc(100vw - 280px);
   margin-left: 30px;
   margin-top: 20px;
-  background-color: #fff; /* 设置背景颜色为白色 */
+  background-color: #fff;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 </style>

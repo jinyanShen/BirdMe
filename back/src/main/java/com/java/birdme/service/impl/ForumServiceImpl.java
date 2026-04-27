@@ -1,6 +1,7 @@
 package com.java.birdme.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.java.birdme.bean.ForumPost;
 import com.java.birdme.bean.ForumReply;
 import com.java.birdme.dao.ForumPostMapper;
@@ -46,7 +47,10 @@ public class ForumServiceImpl implements ForumService {
 
     @Override
     public void incrementViewCount(Integer id) {
-        forumPostMapper.incrementViewCount(id);
+        UpdateWrapper<ForumPost> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("id", id);
+        updateWrapper.setSql("view_count = view_count + 1");
+        forumPostMapper.update(null, updateWrapper);
     }
 
     @Override
@@ -65,7 +69,6 @@ public class ForumServiceImpl implements ForumService {
     @Override
     public ForumPost updatePost(ForumPost post) {
         post.setUpdatedAt(new Date());
-        // 保留原有的浏览量和回复数
         ForumPost existingPost = forumPostMapper.selectById(post.getId());
         if (existingPost != null) {
             post.setViewCount(existingPost.getViewCount());
@@ -87,15 +90,14 @@ public class ForumServiceImpl implements ForumService {
     public ForumReply createReply(ForumReply reply) {
         reply.setCreatedAt(new Date());
         forumReplyMapper.insert(reply);
-        
-        // Update post reply count
+
         ForumPost post = forumPostMapper.selectById(reply.getPostId());
         if (post != null) {
             post.setReplyCount(post.getReplyCount() + 1);
             post.setUpdatedAt(new Date());
             forumPostMapper.updateById(post);
         }
-        
+
         return reply;
     }
 
@@ -112,19 +114,17 @@ public class ForumServiceImpl implements ForumService {
     @Override
     public List<ForumPost> searchPosts(String keyword, String category) {
         QueryWrapper<ForumPost> queryWrapper = new QueryWrapper<>();
-        
-        // 搜索标题和内容
-        queryWrapper.and(wrapper -> 
+
+        queryWrapper.and(wrapper ->
             wrapper.like("title", keyword)
                    .or()
                    .like("content", keyword)
         );
-        
-        // 如果指定了分类，添加分类过滤
+
         if (category != null && !category.isEmpty() && !"all".equals(category)) {
             queryWrapper.eq("category", category);
         }
-        
+
         queryWrapper.orderByDesc("is_pinned", "created_at");
         return forumPostMapper.selectList(queryWrapper);
     }

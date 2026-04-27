@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS user (
                                     phone VARCHAR(20),
                                     avatar_url VARCHAR(255),
                                     role VARCHAR(20) NOT NULL DEFAULT 'user',
+                                    rescue_station_id INTEGER,
                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -89,6 +90,19 @@ VALUES(10, 'user8', '123456', 0, 'Zheng Shi', 24, '13800000010', 'http://localho
 INSERT INTO "user"
 (id, username, password, "role", name, age, phone, avatar_url, created_at)
 VALUES(12, 'user11', '123456', 0, '111', 11, '11', '', '2026-03-29 14:20:25');
+
+-- Insert rescue station users (role=2)
+INSERT INTO "user"
+(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
+VALUES(20, 'rescue1', '123456', 2, 'Wildlife Rescue Center Manager', 35, '13900000001', '', 1, '2026-04-14 10:00:00');
+
+INSERT INTO "user"
+(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
+VALUES(21, 'rescue2', '123456', 2, 'Bird Rescue Sanctuary Manager', 28, '13900000002', '', 2, '2026-04-14 10:00:00');
+
+INSERT INTO "user"
+(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
+VALUES(22, 'rescue3', '123456', 2, 'Animal Welfare League Manager', 42, '13900000003', '', 3, '2026-04-14 10:00:00');
 
 
 

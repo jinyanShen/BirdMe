@@ -67,7 +67,7 @@
               </a>
             </div>
 
-            <!-- 加载中状态 -->
+            <!-- Loading state -->
             <div v-if="loadingWiki" class="wiki-card loading">
               <div class="loading-content">
                 <i class="el-icon-loading"></i>
@@ -75,7 +75,7 @@
               </div>
             </div>
 
-            <!-- 维基百科内容 -->
+            <!-- Wikipedia content -->
             <div v-else-if="wikiData && !wikiError" class="wiki-card">
               <div class="wiki-summary">
                 <img v-if="wikiData.thumbnail" :src="wikiData.thumbnail" class="wiki-image" :alt="wikiData.title">
@@ -96,7 +96,7 @@
               </div>
             </div>
 
-            <!-- 维基百科信息不可用时的提示 -->
+            <!-- Notice when Wikipedia information is not available -->
             <div v-else-if="wikiError" class="wiki-card error">
               <div class="error-content">
                 <i class="el-icon-warning"></i>
@@ -248,11 +248,11 @@ export default {
             this.form = data.data
             this.$message.success(`Identified as: ${this.form.name}`);
 
-            // 重置维基百科数据
+            // Reset Wikipedia data
             this.wikiData = null;
             this.wikiError = false;
 
-            // 获取维基百科信息
+            // Fetch Wikipedia information
             this.fetchWikipediaInfo(this.form.name);
           } else {
             this.$message.error(data.msg);
@@ -267,10 +267,10 @@ export default {
     },
 
     /**
-     * 获取维基百科信息
+     * Fetch Wikipedia information
      */
     async fetchWikipediaInfo(birdName) {
-      // 清除之前的定时器
+      // Clear previous timer
       if (this.wikiDebounceTimer) {
         clearTimeout(this.wikiDebounceTimer);
       }
@@ -279,17 +279,17 @@ export default {
       this.wikiError = false;
       this.wikiData = null;
 
-      // 防抖：延迟500ms再请求
+      // Debounce: delay 500ms before request
       this.wikiDebounceTimer = setTimeout(async () => {
         try {
-          // 构建搜索查询
+          // Build search query
           const searchQuery = `${birdName} bird`;
 
-          // 使用维基百科API
+          // Use Wikipedia API
           const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(birdName)}`;
           const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&format=json&origin=*`;
 
-          // 先尝试直接获取页面
+          // Try to get page directly first
           const directResponse = await fetch(apiUrl);
 
           if (directResponse.ok) {
@@ -303,14 +303,14 @@ export default {
                 categories: []
               };
 
-              // 获取分类信息
+              // Fetch category information
               await this.fetchWikiCategories(birdName);
               this.loadingWiki = false;
               return;
             }
           }
 
-          // 如果直接获取失败，尝试搜索
+          // If direct fetch fails, try search
           const searchResponse = await fetch(searchUrl);
           const searchData = await searchResponse.json();
 
@@ -346,7 +346,7 @@ export default {
     },
 
     /**
-     * 获取维基百科分类信息
+     * Get Wikipedia category information
      */
     async fetchWikiCategories(pageTitle) {
       try {

@@ -13,7 +13,7 @@ export const constantRoutes = [
     path: '/',
     component: MainMenu,
     name: 'MainMenu',
-    meta: { title: '鸟类保护主页' },
+    meta: { title: 'Bird Conservation Home' },
     hidden: true
   },
   {
@@ -25,36 +25,27 @@ export const constantRoutes = [
   {
     path: '/knowledge',
     component: () => import('@/views/knowledge/index'),
-    name: 'knowledge',
-    meta: { title: 'Bird knowledge', requiresAuth: true },
+    redirect: '/knowledge/index',
+    hidden: true,
+    meta: { title: 'Knowledge', requiresAuth: true },
     children: [
       {
-        path: 'migration',
-        component: () => import('@/views/knowledge/BirdMigration'),
-        name: 'BirdMigration',
-        meta: { title: 'Bird Migration', requiresAuth: true }
-      },
-      {
-        path: 'identification',
-        component: () => import('@/views/knowledge/BirdIdentification'),
-        name: 'BirdIdentification',
-        meta: { title: 'Bird Identification', requiresAuth: true }
+        path: 'index',
+        component: () => import('@/views/knowledge/index'),
+        name: 'KnowledgeMain',
+        meta: { title: 'Knowledge' }
       },
       {
         path: 'facts',
         component: () => import('@/views/knowledge/FunFacts'),
         name: 'FunFacts',
         meta: { title: 'Fun Facts', requiresAuth: true }
-      },
-      {
-        path: '',
-        redirect: 'migration'  // 默认显示迁徙页面
       }
     ]
   },
   {
     path: '/settings',
-    component: Layout,
+    component: () => import('@/views/settings/index'),
     redirect: '/settings/index',
     hidden: true,
     meta: { requiresAuth: true },
@@ -68,17 +59,42 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/game',
-    component: () => import('@/views/game/game'),
-    name: 'Game',
-    meta: { title: 'Game' }
+    path: '/help',
+    component: () => import('@/views/help/index'),
+    redirect: '/help/index',
+    hidden: true,
+    meta: { title: 'Help' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/help/index'),
+        name: 'Help',
+        meta: { title: 'Help' }
+      }
+    ]
   },
   {
-    path: '/game/:gameKey',
-    component: () => import('@/views/game/gameSubpage'),
-    name: 'GameSubpage',
+    path: '/game',
+    // component: Layout,
+    component: () => import('@/views/game/GameContainer'),
+    redirect: '/game/index',
     hidden: true,
-    meta: { title: 'Game' }
+    meta: { title: 'Game' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/game/game'),
+        name: 'Game',
+        meta: { title: 'Game' }
+      },
+      {
+        path: ':gameKey',
+        component: () => import('@/views/game/gameSubpage'),
+        name: 'GameSubpage',
+        hidden: true,
+        meta: { title: 'Game' }
+      }
+    ]
   },
   {
     path: '/admin',
@@ -122,7 +138,8 @@ export const constantRoutes = [
   {
     path: '/forum',
     component: () => import('@/views/forum/Forum'),
-    name: 'Forum',
+    redirect: '/forum/birdwatching',
+    hidden: true,
     meta: { title: 'Forum' },
     children: [
       {
@@ -136,15 +153,15 @@ export const constantRoutes = [
         component: () => import('@/views/forum/Forum'),
         name: 'ForumQA',
         meta: { title: 'Q&A' }
+      },
+      {
+        path: 'post/:id',
+        component: () => import('@/views/forum/PostDetail'),
+        name: 'PostDetail',
+        hidden: true,
+        meta: { title: 'Post Detail' }
       }
     ]
-  },
-  {
-    path: '/forum/post/:id',
-    component: () => import('@/views/forum/PostDetail'),
-    name: 'PostDetail',
-    hidden: true,
-    meta: { title: 'Post Detail' }
   },
 ]
 
@@ -160,5 +177,5 @@ const createRouter = () => new Router({
 
 const router = createRouter()
 
-// 删除所有路由守卫代码，让 permission.js 处理
+// Delete all route guard code, let permission.js handle
 export default router

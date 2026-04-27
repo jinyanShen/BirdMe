@@ -1,14 +1,15 @@
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
-import { logout } from '@/api/login'
+import router from '@/router'
+import { logoutSys } from '@/api/login'
 
-// 创建axios实例
+// Create axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // api的base_url
-  timeout: 300000 // 请求超时时间
+  baseURL: process.env.VUE_APP_BASE_API, // api base_url
+  timeout: 300000 // Request timeout
 })
 
-// request拦截器
+// Request interceptor
 service.interceptors.request.use(
   config => {
     return config
@@ -19,35 +20,43 @@ service.interceptors.request.use(
   }
 )
 
-// response拦截器
+// Response interceptor
 service.interceptors.response.use(
   response => {
     const res = response.data
     const config = response.config
-    // 二进制流处理
+    // Binary stream handling
     if (config && config.responseType === 'blob') {
       return response
     }
-    if (res.code === 401) {
-      MessageBox.confirm('登录状态已过期，请您重新登录', '系统提示', {
-        confirmButtonText: '重新登录',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        logout()
-      })
-    } else {
-      return res
-    }
+
+    return res
   },
   error => {
-    console.log('请求异常：' + error)
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 2000
-    })
-    return Promise.reject(error)
+    console.log('Request error: ' + error)
+
+    if (error.response.status === 401) {
+      MessageBox.confirm('Login status expired, please login again', 'System', {
+        confirmButtonText: 'Login',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        logoutSys().then(res => {
+          sessionStorage.clear();
+          router.replace({
+            path: '/login',
+          })
+        })
+      })
+    }else {
+      Message({
+        message: error.message,
+        type: 'error',
+        duration: 2000
+      })
+      return Promise.reject(error)
+    }
+
   }
 )
 

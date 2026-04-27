@@ -2,6 +2,12 @@
   <div class="user-management">
     <div class="toolbar">
       <div class="search-box">
+        <el-select v-model="searchRole" placeholder="Select role" clearable @change="handleSearch" style="width: 150px; margin-right: 10px;">
+          <el-option label="All Roles" :value="null" />
+          <el-option label="Admin" :value="1" />
+          <el-option label="User" :value="0" />
+          <el-option label="Rescue Station" :value="2" />
+        </el-select>
         <el-input
           v-model="searchKeyword"
           placeholder="Search by name or username"
@@ -30,10 +36,10 @@
         <el-table-column prop="name" label="Name" width="150" />
         <el-table-column prop="age" label="Age" width="80" />
         <el-table-column prop="phone" label="Phone" width="150" />
-        <el-table-column prop="role" label="Role" width="100">
+        <el-table-column prop="role" label="Role" width="120">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.role === 1 ? 'danger' : 'primary'">
-              {{ scope.row.role === 1 ? 'Admin' : 'User' }}
+            <el-tag :type="scope.row.role === 1 ? 'danger' : (scope.row.role === 2 ? 'success' : 'primary')">
+              {{ scope.row.role === 1 ? 'Admin' : (scope.row.role === 2 ? 'Rescue Station' : 'User') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -128,6 +134,7 @@ export default {
       loading: false,
       submitLoading: false,
       searchKeyword: '',
+      searchRole: null,
       dialogVisible: false,
       isEdit: false,
       dialogTitle: 'Add User',
@@ -200,14 +207,16 @@ export default {
           offset: this.pageInfo.offset,
           pageSize: this.pageInfo.pageSize,
           data: {
-            name: this.searchKeyword
+            name: this.searchKeyword,
+            role: this.searchRole
           }
         })
         if (response.data.length > 0) {
           this.userList = response.data
           this.pageInfo.total = response.totalCount
         } else {
-          this.$message.error(response.msg || 'Failed to fetch user list')
+          this.userList = []
+          this.pageInfo.total = 0
         }
       } catch (error) {
         console.error('Error fetching user list:', error)

@@ -2,7 +2,7 @@
   <div class="navbar">
     <div class="right-menu">
         <div class="right-menu-item">
-          <el-button :style="{ borderRadius: '20px', backgroundColor: '#f5a537', color: 'white' }" @click="logout()">退出</el-button>
+          <el-button :style="{ borderRadius: '20px', backgroundColor: '#f5a537', color: 'white' }" @click="logout()">Logout</el-button>
         </div>
         <div class="right-menu-item">
           <img class="img" :src="avatarUrl" width="30px" height="30px"/>
@@ -27,17 +27,17 @@ export default {
   },
   methods: {
     async logout() {
-      this.$confirm('是否确认退出系统？', '提示', {
-        confirmButtonText: '退出',
-        cancelButtonText: '取消',
+      this.$confirm('Are you sure you want to logout?', 'Confirm', {
+        confirmButtonText: 'Logout',
+        cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(async() => {
         logoutSys()
         sessionStorage.clear()
         this.$router.push(`/login`)
-        this.$message.success('退出成功')
+        this.$message.success('Logout successful')
       }).catch(() => {
-        this.$message.info('取消退出')
+        this.$message.info('Logout cancelled')
       })
     },
   }

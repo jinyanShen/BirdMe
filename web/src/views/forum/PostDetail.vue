@@ -1,49 +1,11 @@
 <template>
   <div class="post-detail-container">
-    <!-- 顶部导航栏 -->
-    <div class="top-navbar">
-      <div class="navbar-container">
-        <div class="logo">
-          <h3 @click="goToHome" style="cursor: pointer;">BirdME</h3>
-        </div>
-        <div class="nav-menu">
-          <span class="nav-item" @click="goToHome">Homepage</span>
-          <div class="dropdown">
-            <span class="nav-item">Knowledge ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
-              <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
-            </div>
-          </div>
-          <div class="dropdown">
-            <span class="nav-item" :class="{ active: true }">Forum ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToForum('birdwatching')">Bird Watching</div>
-              <div class="dropdown-item" @click="goToForum('qa')">Q&A</div>
-            </div>
-          </div>
-          <div class="dropdown">
-            <span class="nav-item">Game ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToGamePage('flappy')">Flappy</div>
-              <div class="dropdown-item" @click="goToGamePage('2048')">2048</div>
-              <div class="dropdown-item" @click="goToGamePage('merge')">Merge</div>
-            </div>
-          </div>
-          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
-          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 主要内容区 -->
+    <!-- Main content area -->
     <div class="post-detail-content">
       <div v-if="loading" class="loading">Loading...</div>
       <div v-else-if="!post" class="empty-state">Post not found</div>
       <div v-else>
-        <!-- 帖子详情 -->
+        <!-- Post detail -->
         <div class="post-detail">
           <div class="post-header">
             <h1 class="post-title">
@@ -60,29 +22,29 @@
               <span class="post-tag">{{ post.tag }}</span>
             </div>
           </div>
-          
+
           <div v-if="post.imageUrl" class="post-image">
             <img :src="post.imageUrl" alt="Post image" />
           </div>
-          
+
           <div class="post-content">
             {{ post.content }}
           </div>
-          
+
           <div class="post-stats">
             <span><i class="icon-eye"></i> {{ post.viewCount }} views</span>
             <span><i class="icon-message"></i> {{ post.replyCount }} replies</span>
           </div>
         </div>
 
-        <!-- 回复列表 -->
+        <!-- Reply list -->
         <div class="replies-section">
           <h3 class="replies-title">Replies ({{ replies.length }})</h3>
-          
+
           <div v-if="replies.length === 0" class="no-replies">
             No replies yet. Be the first to reply!
           </div>
-          
+
           <div v-else class="replies-list">
             <div v-for="reply in replies" :key="reply.id" class="reply-item">
               <div class="reply-header">
@@ -97,11 +59,11 @@
           </div>
         </div>
 
-        <!-- 回复表单 -->
+        <!-- Reply form -->
         <div class="reply-form-section" v-if="isLoggedIn">
           <h3>Leave a Reply</h3>
-          <textarea 
-            v-model="replyContent" 
+          <textarea
+            v-model="replyContent"
             class="reply-input"
             placeholder="Write your reply..."
             rows="4"
@@ -114,7 +76,7 @@
           Please <a href="#" @click.prevent="goToLogin">login</a> to leave a reply.
         </div>
 
-        <!-- 返回按钮 -->
+        <!-- Back button -->
         <button class="back-btn" @click="goBack">← Back to Forum</button>
       </div>
     </div>
@@ -144,7 +106,7 @@ export default {
     checkLoginStatus() {
       this.isLoggedIn = sessionStorage.getItem('id') !== null
     },
-    
+
     async loadPostDetail() {
       this.loading = true
       try {
@@ -152,7 +114,7 @@ export default {
         const postResponse = await getPostById(postId)
         if (postResponse && postResponse.code === 200) {
           this.post = postResponse.data
-          
+
           const repliesResponse = await getReplies(postId)
           if (repliesResponse && repliesResponse.code === 200) {
             this.replies = repliesResponse.data || []
@@ -166,19 +128,19 @@ export default {
         this.loading = false
       }
     },
-    
+
     async submitReply() {
       if (!this.replyContent.trim()) {
         alert('Please enter reply content')
         return
       }
-      
+
       this.submitting = true
       try {
         const userId = sessionStorage.getItem('id')
         const username = sessionStorage.getItem('username') || 'User'
         const userAvatar = sessionStorage.getItem('avatarUrl')
-        
+
         const replyData = {
           postId: parseInt(this.$route.params.id),
           content: this.replyContent,
@@ -186,7 +148,7 @@ export default {
           authorName: username,
           authorAvatar: userAvatar
         }
-        
+
         const response = await createReply(replyData)
         if (response && response.code === 200) {
           alert('Reply submitted successfully!')
@@ -200,78 +162,30 @@ export default {
         this.submitting = false
       }
     },
-    
-    goToHome() {
-      this.$router.push('/')
-    },
-    
-    goToKnowledgePage(tab) {
-      if (this.isLoggedIn) {
-        this.$router.push(`/knowledge/${tab}`)
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog(`/knowledge/${tab}`)
-        }
-      }
-    },
-    
-    goToFunFacts() {
-      if (this.isLoggedIn) {
-        this.$router.push('/knowledge/facts')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge/facts')
-        }
-      }
-    },
-    
-    goToForum(category) {
-      this.$router.push(`/forum?category=${category}`)
-    },
-    
-    goToGamePage(game) {
-      this.$router.push(`/game/${game}`)
-    },
-    
-    goToPersonalPage() {
-      if (this.isLoggedIn) {
-        this.$router.push('/center')
-      } else {
-        if (window.$showLoginDialog) {
-          window.$showLoginDialog('/center')
-        }
-      }
-    },
-    
+
     goToLogin() {
       this.$router.push('/login')
     },
-    
-    handleLogout() {
-      sessionStorage.clear()
-      this.isLoggedIn = false
-      this.$router.push('/')
-    },
-    
+
     goBack() {
       this.$router.push('/forum')
     },
-    
+
     formatDate(dateStr) {
       if (!dateStr) return ''
       const date = new Date(dateStr)
       const now = new Date()
       const diff = now - date
-      
+
       const minutes = Math.floor(diff / 60000)
       const hours = Math.floor(diff / 3600000)
       const days = Math.floor(diff / 86400000)
-      
+
       if (minutes < 1) return 'Just now'
       if (minutes < 60) return `${minutes}m ago`
       if (hours < 24) return `${hours}h ago`
       if (days < 7) return `${days}d ago`
-      
+
       return date.toLocaleDateString()
     }
   }
@@ -284,135 +198,12 @@ export default {
   background: #f5f7fa;
 }
 
-/* 顶部导航栏 */
-.top-navbar {
-  background: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.logo h3 {
-  margin: 0;
-  color: #22b3c1;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.nav-item {
-  color: #333;
-  text-decoration: none;
-  font-size: 15px;
-  cursor: pointer;
-  transition: color 0.3s;
-  position: relative;
-}
-
-.nav-item:hover {
-  color: #22b3c1;
-}
-
-.nav-item.active {
-  color: #22b3c1;
-}
-
-.dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-}
-
-.dropdown .dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%) translateY(0);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-  z-index: 1001;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-  min-width: 180px;
-  padding: 8px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
-
-.dropdown .dropdown-menu .dropdown-item {
-  padding: 10px 20px;
-  font-size: 14px;
-  color: #333;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.dropdown .dropdown-menu .dropdown-item:hover {
-  background: #e0f7fa;
-  color: #22b3c1;
-}
-
-.dropdown:hover .dropdown-menu {
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(-50%) translateY(0);
-}
-
-.login-btn {
-  background: #22b3c1;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-}
-
-.login-btn:hover {
-  background: #1a9aa8;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
-}
-
-.logout-btn {
-  background: #ff6b6b;
-  color: white !important;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-}
-
-.logout-btn:hover {
-  background: #ff5252;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-}
-
-/* 主要内容区 */
 .post-detail-content {
   max-width: 900px;
   margin: 0 auto;
   padding: 30px 20px;
 }
 
-/* 帖子详情 */
 .post-detail {
   background: white;
   border-radius: 16px;
@@ -521,7 +312,6 @@ export default {
   font-size: 14px;
 }
 
-/* 回复区域 */
 .replies-section {
   background: white;
   border-radius: 16px;
@@ -586,7 +376,6 @@ export default {
   color: #666;
 }
 
-/* 回复表单 */
 .reply-form-section {
   background: white;
   border-radius: 16px;
@@ -665,7 +454,6 @@ export default {
   text-decoration: underline;
 }
 
-/* 返回按钮 */
 .back-btn {
   padding: 12px 30px;
   background: white;
@@ -686,7 +474,6 @@ export default {
   box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
 }
 
-/* 加载和空状态 */
 .loading, .empty-state {
   text-align: center;
   padding: 60px 20px;

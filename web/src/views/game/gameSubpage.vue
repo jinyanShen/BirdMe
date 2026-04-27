@@ -1,60 +1,24 @@
 <template>
   <div class="game-subpage-page">
-    <div class="top-navbar navbar-visible">
-      <div class="navbar-container">
-        <div class="logo">
-          <h3>BirdME</h3>
-        </div>
-
-        <div class="nav-menu">
-          <router-link to="/" class="nav-item">Homepage</router-link>
-
-          <div class="dropdown">
-            <span class="nav-item">Knowledge ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
-              <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-              <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
-            </div>
-          </div>
-
-          <div class="dropdown">
-            <span class="nav-item">Forum ▾</span>
-            <div class="dropdown-menu">
-              <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
-              <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
-            </div>
-          </div>
-
-          <div class="dropdown game-dropdown">
-            <span class="nav-item">Game ▾</span>
-            <div class="game-dropdown-menu">
-              <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
-              <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-              <div class="game-dropdown-item" @click="selectGameFromNav('merge')">Merge To Giant Bird</div>
-            </div>
-          </div>
-
-          <span class="nav-item" @click="goToPersonalPage">Personal Setting</span>
-          <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
-          <span v-else class="nav-item logout-btn" @click="handleLogout">LogOut</span>
-        </div>
-      </div>
-    </div>
-
+    <NavBar :showNavbar="true" />
     <div class="content-below">
       <div class="knowledge-cards-wrapper">
         <div class="section">
           <h3>{{ gameTitle }}</h3>
-          <p>Coming soon. This space will host the game.</p>
           <div class="section-divider"></div>
         </div>
 
         <div class="cards-container">
-          <div class="card">
+          <div v-if="gameKey === 'flappy'" class="card game-container">
+            <iframe src="/clumsy-bird/index.html" frameborder="0" width="100%" height="800px"></iframe>
+          </div>
+          <div v-else-if="gameKey === '2048'" class="card game-container">
+            <iframe src="https://ng2048.github.io/" frameborder="0" width="100%" height="800px"></iframe>
+          </div>
+          <div v-else class="card">
             <i class="el-icon-info"></i>
-            <h4>{{ gameTitle }}</h4>
-            <p>Under construction. Use the menu to switch games.</p>
+            <h4>Game Not Found</h4>
+            <p>The requested game does not exist.</p>
             <button class="btn" @click="goBack">Back to Games</button>
           </div>
         </div>
@@ -64,17 +28,12 @@
 </template>
 
 <script>
+import NavBar from '@/components/NavBar/navbar.vue'
+
 export default {
   name: 'GameSubpage',
-  data() {
-    return {
-      isLoggedIn: false,
-      dropdowns: {
-        knowledge: false,
-        forum: false,
-        game: false
-      }
-    }
+  components: {
+    NavBar
   },
   computed: {
     gameKey() {
@@ -84,81 +43,11 @@ export default {
       const map = {
         flappy: 'Flappy Bird',
         '2048': '2048 Bird',
-        merge: 'Merge To Giant Bird'
       }
       return map[this.gameKey] || 'Game'
     }
   },
-  mounted() {
-    this.checkLoginStatus()
-  },
   methods: {
-    toggleDropdown(dropdown) {
-      Object.keys(this.dropdowns).forEach(key => {
-        if (key !== dropdown) {
-          this.dropdowns[key] = false
-        }
-      })
-      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
-    },
-    goToKnowledgePage(tab) {
-      this.$router.push(`/knowledge/${tab}`)
-    },
-    goToFunFacts() {
-      this.$router.push('/knowledge/facts')
-    },
-    goToForumPage(tab) {
-      this.$router.push(`/forum/${tab}`)
-    },
-    checkLoginStatus() {
-      this.isLoggedIn = sessionStorage.getItem('id') !== null
-    },
-
-    goToGame() {
-      if (this.$route.path === '/game') return
-      this.$router.push('/game')
-    },
-
-    selectGameFromNav(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path === targetPath) return
-
-      this.$router.push(targetPath)
-    },
-
-    goToKnowledge() {
-      if (this.isLoggedIn) this.$router.push('/identification')
-      else window.$showLoginDialog && window.$showLoginDialog('/identification')
-    },
-
-    goToRescue() {
-      if (this.isLoggedIn) this.$router.push('/rescue')
-      else window.$showLoginDialog && window.$showLoginDialog('/rescue')
-    },
-
-    goToForum() {
-      if (this.isLoggedIn) this.$router.push('/forum')
-      else window.$showLoginDialog && window.$showLoginDialog('/forum')
-    },
-
-    goToPersonalPage() {
-      if (this.isLoggedIn) this.$router.push('/center')
-      else window.$showLoginDialog && window.$showLoginDialog('/center')
-    },
-
-    goToLogin() {
-      this.$router.push('/login')
-    },
-
-    handleLogout() {
-      sessionStorage.clear()
-      this.isLoggedIn = false
-      if (this.$message && this.$message.success) {
-        this.$message.success('Logged out successfully')
-      }
-      this.$router.push('/login')
-    },
-
     goBack() {
       this.$router.push('/game')
     }
@@ -173,171 +62,9 @@ export default {
   position: relative;
 }
 
-.top-navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  transform: translateY(0);
-}
-
-.navbar-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-menu {
-  display: flex;
-  gap: 30px;
-  align-items: center;
-}
-
-.nav-item {
-  text-decoration: none;
-  color: #333;
-  font-size: 16px;
-  cursor: pointer;
-  transition: color 0.3s;
-
-  &:hover {
-    color: #f4f4f8;
-  }
-}
-
-.login-btn {
-  background: #6f5bb8;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
-
-  &:hover {
-    background: #d4dcf6;
-    color: white;
-  }
-}
-
-.logout-btn {
-  background: #ff6b6b;
-  color: white;
-  padding: 8px 20px;
-  border-radius: 25px;
-  transition: all 0.3s;
-
-  &:hover {
-    background: #ff5252;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
-  }
-}
-
-.game-dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  .game-dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-    z-index: 1001;
-
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-width: 200px;
-    padding: 8px 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .game-dropdown-item {
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-      &:hover {
-        background: #f2f3ff;
-        color: #6f5bb8;
-      }
-    }
-  }
-
-  &:hover {
-    .game-dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
-
-/* Dropdown styles for game subpage */
-.dropdown {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-
-  .dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(0);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
-    z-index: 1001;
-
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    min-width: 180px;
-    padding: 8px 0;
-
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-
-    .dropdown-item {
-      padding: 10px 20px;
-      font-size: 14px;
-      color: #333;
-      cursor: pointer;
-      transition: background 0.2s ease, color 0.2s ease;
-      &:hover {
-        background: #f2f3ff;
-        color: #6f5bb8;
-      }
-    }
-  }
-
-  &:hover {
-    .dropdown-menu {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-  }
-}
-
 .content-below {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 110px 20px 80px;
+  padding: 100px 20px 80px;
   color: white;
 }
 
@@ -356,6 +83,10 @@ export default {
   &:hover {
     border-color: rgba(255, 255, 255, 0.4);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+
+    &::before {
+      opacity: 1;
+    }
   }
 
   &::before {
@@ -371,10 +102,6 @@ export default {
     opacity: 0;
     transition: opacity 0.3s;
   }
-
-  &:hover::before {
-    opacity: 1;
-  }
 }
 
 .section {
@@ -386,12 +113,6 @@ export default {
     font-size: 36px;
     margin-bottom: 20px;
     color: white;
-  }
-
-  p {
-    font-size: 18px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
   }
 
   .section-divider {
@@ -463,6 +184,16 @@ export default {
       }
     }
   }
+
+  .game-container {
+    overflow: hidden;
+    padding: 0;
+
+    iframe {
+      border-radius: 16px;
+      width: 100%;
+      height: 600px;
+    }
+  }
 }
 </style>
-
