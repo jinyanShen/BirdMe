@@ -413,7 +413,8 @@ export default {
 <style scoped>
 .forum-container {
   min-height: 100vh;
-  background: #f5f7fa;
+  background: linear-gradient(135deg, #f6e6d1 0%, #fa9209 100%);
+
 }
 
 .forum-content {
@@ -423,11 +424,13 @@ export default {
 }
 
 .search-bar {
-  background: white;
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 16px;
   padding: 25px;
   margin-bottom: 25px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .search-container {
@@ -436,9 +439,10 @@ export default {
 }
 
 .search-input {
+  background: rgba(255, 255, 255, 0.8);
   flex: 1;
   padding: 12px 20px;
-  border: 2px solid #e0f7fa;
+  border: 2px solid #ff943c;
   border-radius: 25px;
   font-size: 15px;
   transition: all 0.3s;
@@ -446,13 +450,13 @@ export default {
 
 .search-input:focus {
   outline: none;
-  border-color: #22b3c1;
-  box-shadow: 0 0 0 3px rgba(34, 179, 193, 0.1);
+  border-color: #c1b422;
+  box-shadow: 0 0 0 3px rgba(193, 119, 34, 0.1);
 }
 
 .search-btn {
   padding: 12px 30px;
-  background: #22b3c1;
+  background: #f1a77f;
   color: white;
   border: none;
   border-radius: 25px;
@@ -462,14 +466,14 @@ export default {
 }
 
 .search-btn:hover {
-  background: #1a9aa8;
+  background: #da8262;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.3);
+  box-shadow: 0 4px 12px rgba(193, 90, 34, 0.3);
 }
 
 .post-btn {
   padding: 12px 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #d89a9a 0%, #da5f5f 100%);
   color: white;
   border: none;
   border-radius: 25px;
@@ -483,17 +487,19 @@ export default {
 
 .post-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(234, 137, 102, 0.4);
 }
 
 .category-tabs {
   display: flex;
   gap: 20px;
   margin-bottom: 25px;
-  background: white;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .tab-item {
@@ -506,20 +512,22 @@ export default {
 }
 
 .tab-item:hover {
-  color: #22b3c1;
-  background: #e0f7fa;
+  color: #da8a39;
+  background: #f1ceb5;
 }
 
 .tab-item.active {
-  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
+  background: linear-gradient(135deg, #fda373 0%, #e4b88a 100%);
   color: white;
 }
 
 .post-list {
-  background: white;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
   border-radius: 16px;
   padding: 25px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
 }
 
 .loading, .empty-state {
@@ -530,9 +538,15 @@ export default {
 }
 
 .post-item {
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  padding: 30px;
   border-bottom: 1px solid #f0f0f0;
   transition: all 0.3s;
+  margin-bottom: 20px;
+  border-radius: 12px;
 }
 
 .post-item:last-child {
@@ -544,8 +558,8 @@ export default {
 }
 
 .post-item.pinned {
-  background: #fffbf0;
-  border-left: 4px solid #ffc107;
+  background: #ffd8a4;
+  border-left: 4px solid #67462b;
 }
 
 .post-header {
@@ -581,7 +595,7 @@ export default {
 }
 
 .pinned-badge {
-  background: #ffc107;
+  background: #ffeab1;
   color: #333;
   padding: 2px 8px;
   border-radius: 4px;
@@ -590,7 +604,7 @@ export default {
 }
 
 .qa-badge {
-  background: #22b3c1;
+  background: #e37f54;
   color: white;
   padding: 2px 8px;
   border-radius: 4px;
@@ -650,7 +664,7 @@ export default {
 }
 
 .edit-btn:hover {
-  background: #22b3c1;
+  background: #fa9f6c;
   color: white;
 }
 
@@ -666,7 +680,7 @@ export default {
 }
 
 .pin-btn:hover {
-  background: #ffc107;
+  background: #ff5e07;
   color: #333;
 }
 
@@ -748,7 +762,7 @@ export default {
 .form-control {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e0f7fa;
+  border: 2px solid #ffb16e;
   border-radius: 10px;
   font-size: 15px;
   transition: all 0.3s;
@@ -764,8 +778,8 @@ export default {
 
 .form-control:focus {
   outline: none;
-  border-color: #22b3c1;
-  box-shadow: 0 0 0 3px rgba(34, 179, 193, 0.1);
+  border-color: #c88467;
+  box-shadow: 0 0 0 3px rgba(193, 82, 34, 0.1);
 }
 
 .quill-editor {
@@ -798,7 +812,7 @@ export default {
 
 .btn-submit {
   padding: 12px 30px;
-  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
+  background: linear-gradient(135deg, #fa822e 0%, #ffb489 100%);
   color: white;
   border: none;
   border-radius: 25px;
@@ -809,7 +823,7 @@ export default {
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(34, 179, 193, 0.4);
+  box-shadow: 0 4px 12px rgba(248, 161, 76, 0.4);
 }
 
 .btn-submit:disabled {

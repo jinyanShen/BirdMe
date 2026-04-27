@@ -20,22 +20,25 @@ export default {
 
       newsList: [
         {
-          "id": 1,
-          "title": "Spring Bird Migration Protection Action",
-          "description": "Bird migration corridor protection work is being carried out nationwide, volunteers are being recruited",
-          "image": "https://picsum.photos/800/400?random=1"
+          id: 1,
+          title: "Indigenous Groups Track Epic Bird Migration",
+          description: "Communities in Australia and Alaska collaborate to track migratory birds and protect their routes.",
+          image: "https://picsum.photos/800/400?random=1",
+          url: "https://www.theguardian.com/australia-news/2026/apr/26/indigenous-groups-australia-alaska-track-short-tailed-shearwater-bird"
         },
         {
-          "id": 2,
-          "title": "3 New Bird Nature Reserves Established",
-          "description": "Protected area expanded by 2,000 hectares, providing more habitats for migratory birds",
-          "image": "https://picsum.photos/800/400?random=2"
+          id: 2,
+          title: "Endangered Birds Learn to Sing Again",
+          description: "Scientists help critically endangered birds recover their lost songs to improve breeding success.",
+          image: "https://picsum.photos/800/400?random=2",
+          url: "https://www.theguardian.com/environment/2026/mar/04/wild-birds-teach-honeyeaters-sing-songs"
         },
         {
-          "id": 3,
-          "title": "AI Bird Recognition System Launched",
-          "description": "Take a photo to identify 500+ bird species",
-          "image": "https://picsum.photos/800/400?random=3"
+          id: 3,
+          title: "One Bird Inspires a Conservation Movement",
+          description: "A pet cockatiel sparks a nationwide effort to build habitats and protect bird populations.",
+          image: "https://picsum.photos/800/400?random=3",
+          url: "https://www.washingtonpost.com/climate-solutions/2026/01/10/texas-bird-conservation-movement/"
         }
       ]
     }
@@ -58,6 +61,96 @@ export default {
     this.checkLoginStatus()
   },
   methods: {
+    // ========== Knowledge 板块 ==========
+    goToIdentification() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/index?tab=identification')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/knowledge/index?tab=identification')
+      }
+    },
+
+    goToMigrationMap() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/index?tab=migration')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/knowledge/index?tab=migration')
+      }
+    },
+
+    goToBirdingTips() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/index?tab=tips')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/knowledge/index?tab=tips')
+      }
+    },
+    goToReportInjury() {
+      if (this.isLoggedIn) {
+        this.$router.push('/help/index')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/help/index')
+      }
+    },
+
+    goToRescueCenters() {
+      if (this.isLoggedIn) {
+        this.$router.push('/help/index')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/help/index')
+      }
+    },
+
+    goToFirstAid() {
+      if (this.isLoggedIn) {
+        this.$router.push('/help/index')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/help/index')
+      }
+    },
+
+    // ========== Forum 板块 ==========
+    goToFeaturedPosts() {
+      if (this.isLoggedIn) {
+        this.$router.push('/forum/birdwatching')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/forum/birdwatching')
+      }
+    },
+
+    goToRescueHelp() {
+      if (this.isLoggedIn) {
+        this.$router.push('/forum/qa')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/forum/qa')
+      }
+    },
+
+    goToBirdwatching() {
+      if (this.isLoggedIn) {
+        this.$router.push('/forum/birdwatching')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/forum/birdwatching')
+      }
+    },
+
+    // ========== Game 板块 ==========
+    goToFlappyBird() {
+      if (this.isLoggedIn) {
+        this.$router.push('/game/flappy')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/game/flappy')
+      }
+    },
+
+    goTo2048Bird() {
+      if (this.isLoggedIn) {
+        this.$router.push('/game/2048')
+      } else if (window.$showLoginDialog) {
+        window.$showLoginDialog('/game/2048')
+      }
+    },
+
     toggleDropdown(dropdown) {
       Object.keys(this.dropdowns).forEach(key => {
         if (key !== dropdown) {
@@ -120,10 +213,9 @@ export default {
       }
     },
 
-    goToNews(id) {
-      console.log('点击新闻', id)
+    goToNews(url) {
+      window.open(url, '_blank')
     },
-
     goToHome() {
       if (this.$route.path === '/') {
         return
@@ -425,7 +517,7 @@ export default {
           <h3>News about Birds</h3>
           <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
             <el-carousel-item v-for="(item, index) in newsList" :key="index">
-              <div class="carousel-item" @click="goToNews(item.id)">
+              <div class="carousel-item" @click="goToNews(item.url)">
                 <img :src="item.image" :alt="item.title">
                 <div class="carousel-overlay">
                   <h4>{{ item.title }}</h4>
@@ -435,6 +527,29 @@ export default {
               </div>
             </el-carousel-item>
           </el-carousel>
+        </div>
+
+        <!-- Rescue 板块 -->
+        <div class="knowledge-cards-wrapper">
+          <div class="section fade-in-up">
+            <h3>Bird Rescue</h3>
+            <p>Report injured birds, find rescue centers, and learn first‑aid tips to help birds in need.</p>
+            <div class="section-divider"></div>
+          </div>
+          <div class="cards-container">
+            <div class="card fade-in-up">
+              <i class="el-icon-warning"></i>
+              <h4>Injury & Rescue</h4>
+              <p>Submit rescue reports and find rescue centers.</p>
+              <button class="btn" @click="goToReportInjury">Report Now</button>
+            </div>
+            <div class="card fade-in-up">
+              <i class="el-icon-first-aid-kit"></i>
+              <h4>First Aid</h4>
+              <p>Contact directly in case of emergency. No need Login!</p>
+              <button class="btn" @click="goToFirstAid">Go First Aid</button>
+            </div>
+          </div>
         </div>
 
         <div class="knowledge-cards-wrapper">
@@ -449,53 +564,25 @@ export default {
               <i class="el-icon-camera"></i>
               <h4>Identification</h4>
               <p>AI-powered bird species recognition</p>
-              <button class="btn">Start Identifying</button>
+              <button class="btn" @click="goToIdentification">Start Identifying</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-location-information"></i>
               <h4>Migration Map</h4>
               <p>Bird migration route map</p>
-              <button class="btn">View Map</button>
+              <button class="btn" @click="goToMigrationMap">View Map</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-info"></i>
               <h4>Birding Tips</h4>
               <p>Bird conservation tips</p>
-              <button class="btn">Learn More</button>
+              <button class="btn" @click="goToBirdingTips">Learn More</button>
             </div>
           </div>
         </div>
 
-        <!-- Rescue 板块 -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
-            <h3>Bird Rescue</h3>
-            <p>Report injured birds, find rescue centers, and learn first‑aid tips to help birds in need.</p>
-            <div class="section-divider"></div>
-          </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-warning"></i>
-              <h4>Report Injury</h4>
-              <p>Submit rescue reports with location & photos</p>
-              <button class="btn">Report Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-location"></i>
-              <h4>Rescue Centers</h4>
-              <p>Find nearest bird rescue & rehabilitation centers</p>
-              <button class="btn">Find Centers</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="el-icon-first-aid-kit"></i>
-              <h4>First Aid Tips</h4>
-              <p>Basic steps to help a bird before professional care</p>
-              <button class="btn">Learn First Aid</button>
-            </div>
-          </div>
-        </div>
 
         <!-- Forum 板块（重新设计版） -->
         <div class="knowledge-cards-wrapper">
@@ -505,27 +592,20 @@ export default {
             <div class="section-divider"></div>
           </div>
           <div class="cards-container">
+
             <div class="card fade-in-up">
-              <i class="el-icon-star-on"></i>
-              <h4>Featured & Sticky</h4>
-              <p>Expert / admin pinned posts, guidelines, and essential resources</p>
-              <button class="btn">Explore Highlights</button>
+              <i class="el-icon-camera-solid"></i>
+              <h4>Birdwatching & Life</h4>
+              <p>Share daily sightings, bird photos, and casual conversations</p>
+              <button class="btn" @click="goToBirdwatching">Join Discussion</button>
             </div>
 
             <div class="card fade-in-up">
               <i class="el-icon-warning-outline"></i>
               <h4>Rescue Help</h4>
               <p>Post urgent rescue requests or ask for help with injured birds</p>
-              <button class="btn">Ask for Rescue</button>
+              <button class="btn" @click="goToRescueHelp">Ask for Rescue</button>
             </div>
-
-            <div class="card fade-in-up">
-              <i class="el-icon-camera-solid"></i>
-              <h4>Birdwatching & Life</h4>
-              <p>Share daily sightings, bird photos, and casual conversations</p>
-              <button class="btn">Join Discussion</button>
-            </div>
-
           </div>
         </div>
 
@@ -541,13 +621,13 @@ export default {
               <i class="fas fa-dove"></i>  <!-- 改为鸽子图标 -->
               <h4>Flappy Bird</h4>
               <p>Classic side‑scroller with bird characters</p>
-              <button class="btn">Play Now</button>
+              <button class="btn" @click="goToFlappyBird">Play Now</button>
             </div>
             <div class="card fade-in-up">
               <i class="fas fa-th-large"></i>  <!-- 改为网格图标 -->
               <h4>2048 Bird</h4>
               <p>Merge birds to reach the giant bird</p>
-              <button class="btn">Play Now</button>
+              <button class="btn" @click="goTo2048Bird">Play Now</button>
             </div>
           </div>
         </div>

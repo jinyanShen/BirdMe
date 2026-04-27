@@ -73,13 +73,13 @@ export default {
 }
 
 .content-below {
-  background: linear-gradient(135deg, #97a1d3 0%, #856ad5 100%);
+  background: linear-gradient(135deg, #b6d0f6 0%, #5d52fa 100%);
   padding: 100px 20px 80px;
   color: white;
 }
 
 .knowledge-cards-wrapper {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 24px;
   padding: 40px 30px;

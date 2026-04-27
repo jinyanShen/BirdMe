@@ -298,7 +298,7 @@ export default {
 /* Profile Page Styles */
 .profile-page {
   padding-top: 100px;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  background: linear-gradient(135deg, #e0effa 0%, #3bacff 100%);
   min-height: 100vh;
 }
 
@@ -315,7 +315,7 @@ export default {
 
 .section-title h1 {
   font-size: 36px;
-  color: #22b3c1;
+  color: #227fc1;
   margin-bottom: 15px;
   font-weight: 700;
 }
@@ -340,7 +340,7 @@ export default {
 }
 
 .card-header {
-  background: linear-gradient(135deg, #4dd0e1 0%, #22b3c1 100%);
+  background: linear-gradient(135deg, #4dade1 0%, #226cc1 100%);
   color: white;
   padding: 20px 30px;
 }
@@ -362,7 +362,7 @@ export default {
 }
 
 .custom-input:focus {
-  border-color: #4dd0e1;
+  border-color: #4da3e1;
   box-shadow: 0 0 0 2px rgba(77, 208, 225, 0.2);
 }
 
@@ -371,13 +371,13 @@ export default {
 }
 
 .avatar-uploader {
-  border: 2px dashed #b2ebf2;
+  border: 2px dashed #b2ccf2;
   border-radius: 8px;
   transition: all 0.3s ease;
 }
 
 .avatar-uploader:hover {
-  border-color: #4dd0e1;
+  border-color: #4d92e1;
   background-color: #e0f7fa;
 }
 
@@ -388,7 +388,7 @@ export default {
 
 .upload-icon {
   font-size: 40px;
-  color: #4dd0e1;
+  color: #4d9ee1;
   margin-bottom: 15px;
 }
 
@@ -403,7 +403,7 @@ export default {
 }
 
 .submit-btn {
-  background: linear-gradient(135deg, #4dd0e1 0%, #22b3c1 100%);
+  background: linear-gradient(135deg, #4d9ee1 0%, #2297c1 100%);
   border: none;
   padding: 12px 40px;
   font-size: 16px;
@@ -414,8 +414,8 @@ export default {
 
 .submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(77, 208, 225, 0.4);
-  background: linear-gradient(135deg, #22b3c1 0%, #0097a7 100%);
+  box-shadow: 0 5px 15px rgba(77, 158, 225, 0.4);
+  background: linear-gradient(135deg, #227fc1 0%, #0067a7 100%);
 }
 
 /* Reports Section Styles */
@@ -432,7 +432,7 @@ export default {
 }
 
 .page-header h2 {
-  color: #22b3c1;
+  color: #226cc1;
   margin-bottom: 10px;
   font-size: 32px;
   font-weight: 700;
@@ -480,7 +480,7 @@ export default {
 
 .loading-container i {
   font-size: 50px;
-  color: #22b3c1;
+  color: #2284c1;
   margin-bottom: 20px;
   display: block;
 }
@@ -542,7 +542,7 @@ export default {
 
 .detail-item i {
   margin-right: 10px;
-  color: #22b3c1;
+  color: #2272c1;
   font-size: 16px;
   width: 20px;
   text-align: center;
@@ -553,7 +553,7 @@ export default {
   padding: 12px;
   background: #f8f9fa;
   border-radius: 8px;
-  border-left: 3px solid #22b3c1;
+  border-left: 3px solid #183c80;
 }
 
 .description p {
@@ -583,7 +583,7 @@ export default {
 }
 
 .click-hint {
-  color: #22b3c1;
+  color: #2289c1;
   font-size: 12px;
   opacity: 0;
   transition: opacity 0.3s ease;
