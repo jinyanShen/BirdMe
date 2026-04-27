@@ -20,22 +20,25 @@ export default {
 
       newsList: [
         {
-          "id": 1,
-          "title": "Spring Bird Migration Protection Action",
-          "description": "Bird migration corridor protection work is being carried out nationwide, volunteers are being recruited",
-          "image": "https://picsum.photos/800/400?random=1"
+          id: 1,
+          title: "Indigenous Groups Track Epic Bird Migration",
+          description: "Communities in Australia and Alaska collaborate to track migratory birds and protect their routes.",
+          image: "https://picsum.photos/800/400?random=1",
+          url: "https://www.theguardian.com/australia-news/2026/apr/26/indigenous-groups-australia-alaska-track-short-tailed-shearwater-bird"
         },
         {
-          "id": 2,
-          "title": "3 New Bird Nature Reserves Established",
-          "description": "Protected area expanded by 2,000 hectares, providing more habitats for migratory birds",
-          "image": "https://picsum.photos/800/400?random=2"
+          id: 2,
+          title: "Endangered Birds Learn to Sing Again",
+          description: "Scientists help critically endangered birds recover their lost songs to improve breeding success.",
+          image: "https://picsum.photos/800/400?random=2",
+          url: "https://www.theguardian.com/environment/2026/mar/04/wild-birds-teach-honeyeaters-sing-songs"
         },
         {
-          "id": 3,
-          "title": "AI Bird Recognition System Launched",
-          "description": "Take a photo to identify 500+ bird species",
-          "image": "https://picsum.photos/800/400?random=3"
+          id: 3,
+          title: "One Bird Inspires a Conservation Movement",
+          description: "A pet cockatiel sparks a nationwide effort to build habitats and protect bird populations.",
+          image: "https://picsum.photos/800/400?random=3",
+          url: "https://www.washingtonpost.com/climate-solutions/2026/01/10/texas-bird-conservation-movement/"
         }
       ]
     }
@@ -120,8 +123,8 @@ export default {
       }
     },
 
-    goToNews(id) {
-      console.log('点击新闻', id)
+    goToNews(url) {
+      window.open(url, '_blank')
     },
 
     goToHome() {
@@ -431,7 +434,7 @@ export default {
           <h3>News about Birds</h3>
           <el-carousel :interval="3000" arrow="always" height="400px" class="news-carousel">
             <el-carousel-item v-for="(item, index) in newsList" :key="index">
-              <div class="carousel-item" @click="goToNews(item.id)">
+              <div class="carousel-item" @click="goToNews(item.url)">
                 <img :src="item.image" :alt="item.title">
                 <div class="carousel-overlay">
                   <h4>{{ item.title }}</h4>
