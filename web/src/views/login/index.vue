@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-wrapper" ref="panel" @mousemove="onPanelMouseMove" @mouseleave="onPanelMouseLeave">
-      <!-- 左侧品牌区域 -->
+      <!-- Left brand area -->
       <div class="login-left" ref="leftPanel">
         <div class="brand-section">
           <h1 class="brand-name">BIRDME</h1>
@@ -24,11 +24,11 @@
               :style="getCharacterStyle(c)"
             >
               <div class="monster">
-                <!-- 鸟冠 -->
+                <!-- Bird crown -->
                 <div class="bird-crown"></div>
-                <!-- 倒三角鸟嘴 -->
+                <!-- Inverted triangle beak -->
                 <div class="bird-beak"></div>
-                <!-- 眼睛 -->
+                <!-- Eyes -->
                 <div class="monster-eyes">
                   <div class="eye eye-left"><div class="pupil"></div></div>
                   <div class="eye eye-right"><div class="pupil"></div></div>
@@ -37,14 +37,14 @@
             </div>
           </div>
 
-          <!-- 图片已注释 -->
+          <!-- Image commented -->
           <!-- <div class="brand-image" aria-hidden="true">
             <img src="@/assets/images/bg.jpg" alt="Bird">
           </div> -->
         </div>
       </div>
 
-      <!-- 右侧登录表单 -->
+      <!-- Right login form -->
       <div class="login-right">
         <div class="login-card">
           <div class="login-header">
@@ -74,7 +74,7 @@
             <div class="form-group">
               <label>Password</label>
               <div class="input-wrapper">
-                <i class="input-icon fas fa-lock"></i> <!-- 锁图标 -->
+                <i class="input-icon fas fa-lock"></i> <!-- Lock icon -->
                 <el-input
                   ref="password"
                   v-model="loginForm.password"
@@ -204,20 +204,20 @@ export default {
       },
       isDragOver: false,
 
-      // 动画角色状态
+      // Animation character state
       lookMode: 'mouse', // mouse | input | away
       passwordVisible: false,
       gaze: { x: 0, y: 0 }, // -1..1
       head: { x: 0, y: 0 }, // px
       neck: { stretch: 0 }, // 0..1
 
-      // 4只角色：不同形状、高低错落、底边对齐、层级复刻参考图
+      // 4 characters: different shapes, staggered heights, bottom aligned, layered per reference image
       characters: [
         {
           id: 'main',
           isMain: true,
           variant: 'purple',
-          shape: 'rect', // 长方形（主角色，最下层）
+          shape: 'rect', // Rectangle (main character, bottom layer)
           offsetX: 0,
           offsetY: 0,
           scale: 1,
@@ -228,7 +228,7 @@ export default {
           id: 'buddy1',
           isMain: false,
           variant: 'black',
-          shape: 'rect-round', // 全圆角正方形
+          shape: 'rect-round', // Full rounded square
           offsetX: 170,
           offsetY: 20,
           scale: 0.85,
@@ -239,7 +239,7 @@ export default {
           id: 'buddy2',
           isMain: false,
           variant: 'yellow',
-          shape: 'semicircle', // 半圆
+          shape: 'semicircle', // Semicircle
           offsetX: -140,
           offsetY: 20,
           scale: 0.9,
@@ -250,7 +250,7 @@ export default {
           id: 'buddy3',
           isMain: false,
           variant: 'orange',
-          shape: 'ellipse', // 椭圆（最上层）
+          shape: 'ellipse', // Ellipse (top layer)
           offsetX: -20,
           offsetY: 70,
           scale: 0.95,
@@ -264,7 +264,7 @@ export default {
     //this.normalizeCharacterHeight();
   },
   methods: {
-    // 鼠标在整个面板移动
+    // Mouse moves on the entire panel
     onPanelMouseMove(e) {
       if (this.lookMode !== 'mouse') return;
       const rect = this.$refs.leftPanel?.getBoundingClientRect?.();
@@ -278,7 +278,7 @@ export default {
       this.setNeckStretch(Math.min(0.25, Math.hypot(nx, ny) * 0.18));
     },
 
-    // 鼠标移出整个面板 → 眼睛复位
+    // Mouse leaves the entire panel -> eyes reset
     onPanelMouseLeave() {
       if (this.lookMode !== 'mouse') return;
       this.relaxPose();
@@ -303,7 +303,7 @@ export default {
         }
       }
 
-      // 副角色：轻微眼睛跟随，无颈部拉伸
+      // Side character: slight eye tracking, no neck stretch
       const damp = 0.55
       return {
         ...base,
@@ -369,11 +369,11 @@ export default {
         const tx = tr.left + tr.width / 2
         const ty = tr.top + tr.height / 2
 
-        // 映射到左侧面板的归一化空间
+        // Map to normalized space of left panel
         const nx = ((tx - sr.left) / sr.width) * 2 - 1
         const ny = ((ty - sr.top) / sr.height) * 2 - 1
 
-        // "扯脖子瞅"：更强的头部偏移 + 颈部拉伸
+        // "Neck stretch look": stronger head offset + neck stretch
         this.setGaze(nx * 1.05, ny * 1.05)
         this.setHeadOffset(nx * 16, ny * 10)
         this.setNeckStretch(Math.min(1, 0.35 + Math.min(0.65, Math.abs(nx) * 0.3 + Math.max(0, -ny) * 0.5)))
@@ -419,7 +419,7 @@ export default {
     //             sessionStorage.setItem('role', res.data.role)
     //             this.$message.success("Login successful")
     //
-    //             // 根据角色重定向
+    //             // Redirect based on role
     //             if (res.data.role === 1) {
     //               // Admin user - redirect to admin panel
     //               this.$router.push({ path: '/admin/users' })
@@ -447,6 +447,8 @@ export default {
           login(this.loginForm.username, this.loginForm.password)
             .then(res => {
               if (res.code === 200) {
+                window.isLoginModalShown = false;
+
                 sessionStorage.setItem('id', res.data.id)
                 sessionStorage.setItem('username', res.data.username)
                 sessionStorage.setItem('password', res.data.password)
@@ -455,15 +457,27 @@ export default {
                 sessionStorage.setItem('phone', res.data.phone)
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
+                if (res.data.rescueStationId) {
+                  sessionStorage.setItem('rescueStationId', res.data.rescueStationId)
+                }
                 this.$message.success("Login successful")
 
-                // 获取重定向地址
-                const redirect = this.$route.query.redirect
-                if (redirect) {
-                  this.$router.push(decodeURIComponent(redirect))
+                if (res.data.role === 1) {
+                  // Admin user - redirect to admin panel
+                  this.$router.push({ path: '/admin/users' })
+                }else if (res.data.role === 2) {
+                  // Rescue user - redirect to reports
+                  this.$router.push({ path: '/admin/reports' })
                 } else {
-                  // 默认跳转到首页
-                  this.$router.push('/')
+                  // Regular user - redirect to identification page
+                  // Get redirect address
+                  const redirect = this.$route.query.redirect
+                  if (redirect) {
+                    this.$router.push(decodeURIComponent(redirect))
+                  } else {
+                    // Default redirect to home page
+                    this.$router.push('/')
+                  }
                 }
               } else {
                 this.loading = false
@@ -551,7 +565,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* 全局样式变量 */
+/* Global style variables */
 :root {
   --primary-color: #8aa8e2;
   --secondary-color: #9ab5e2;
@@ -588,7 +602,7 @@ export default {
   animation: fadeIn 0.5s ease;
 }
 
-/* 左侧品牌区域 */
+/* Left brand area */
 .login-left {
   flex: 1;
   background: linear-gradient(135deg, #7295e3 0%, #90afe3 50%, #f1f4f8 100%);
@@ -688,7 +702,7 @@ export default {
       scale(var(--char-scale, 1))
       translate(var(--head-x, 0px), var(--head-y, 0px))
       translateZ(0);
-      transform-origin: 50% 100%; // 固定底部中心，确保底边不动
+      transform-origin: 50% 100%; // Fixed bottom center, ensure bottom edge stays still
       will-change: transform, filter;
       user-select: none;
       transition: filter 180ms ease;
@@ -699,7 +713,7 @@ export default {
         filter: saturate(0.95) brightness(0.98);
       }
 
-      // 层级完全复刻参考图：橙色(最上) > 黑色 > 黄色 > 紫色(最下)
+      // Layer exactly like reference: orange(top) > black > yellow > purple(bottom)
       &.character--orange {
         z-index: 4;
         animation-duration: 4.5s;
@@ -720,29 +734,29 @@ export default {
         animation-duration: 3.1s;
       }
 
-      // 不同形状样式
+      // Different shape styles
       &.character--rect {
         .monster {
-          border-radius: 26px 26px 0 0; // 长方形（仅顶部圆角）
+          border-radius: 26px 26px 0 0; // Rectangle (only top rounded)
         }
       }
 
       &.character--rect-round {
         .monster {
-          border-radius: 26px; // 全圆角正方形
+          border-radius: 26px; // Full rounded square
         }
       }
 
       &.character--semicircle {
         .monster {
-          border-radius: 100px 100px 0 0; // 半圆
+          border-radius: 100px 100px 0 0; // Semicircle
           height: 100%;
         }
       }
 
       &.character--ellipse {
         .monster {
-          border-radius: 50% / 30% 30% 0 0; // 椭圆
+          border-radius: 50% / 30% 30% 0 0; // Ellipse
         }
       }
     }
@@ -753,13 +767,13 @@ export default {
       background: var(--char-body, rgba(255, 255, 255, 0.22));
       box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
       position: relative;
-      transform-origin: 50% 100%; // 固定底部中心，伸缩只向上
+      transform-origin: 50% 100%; // Fixed bottom center, stretch only upward
       border: 1px solid rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(6px);
       transition: transform 140ms ease;
       overflow: visible;
 
-      // 伸脖子：仅向上拉伸，底边不动
+      // Neck stretch: only stretch upward, bottom edge stays still
       --skew: calc(var(--stretch) * -6deg);
       --scale: calc(1 + var(--stretch) * 0.12);
 
@@ -773,7 +787,7 @@ export default {
         rotate(-2deg);
     }
     /* ======================
-      鸟冠（头顶）
+      Bird crown (top of head)
     ====================== */
     .bird-crown {
       position: absolute;
@@ -798,7 +812,7 @@ export default {
     .bird-crown::after { height: 22px; }
 
     /* ======================
-      倒三角鸟嘴
+      Inverted triangle beak
     ====================== */
     .bird-beak {
       position: absolute;
@@ -809,7 +823,7 @@ export default {
       height: 0;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
-      border-top: 13px solid #ffcc33; /* 黄色小鸟嘴 */
+      border-top: 13px solid #ffcc33; /* Yellow small beak */
       z-index: 10;
     }
 
@@ -879,7 +893,7 @@ export default {
   }
 }
 
-/* 右侧登录表单 */
+/* Right login form */
 .login-right {
   flex: 1;
   padding: 60px;
@@ -950,7 +964,7 @@ export default {
           .el-input__suffix {
             display: flex;
             align-items: center;
-            right: 12px; // 与右边距保持距离
+            right: 12px; // Keep distance from right margin
           }
 
           .el-input__suffix-inner {
@@ -1069,7 +1083,7 @@ export default {
   }
 }
 
-/* 按钮样式 */
+/* Button style */
 .main-button {
   background: linear-gradient(135deg, #465ccd 0%, #5885e4 100%);
   color: #ffffff;
@@ -1115,7 +1129,7 @@ export default {
   }
 }
 
-/* 加载动画 */
+/* Loading animation */
 .spinner {
   width: 20px;
   height: 20px;
@@ -1125,7 +1139,7 @@ export default {
   animation: spin 0.8s linear infinite;
 }
 
-/* 注册弹窗 */
+/* Register dialog */
 .register-dialog ::v-deep .el-dialog {
   border-radius: 20px;
   overflow: hidden;
@@ -1283,7 +1297,7 @@ export default {
   }
 }
 
-/* 动画效果 */
+/* Animation effect */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1350,7 +1364,7 @@ export default {
   }
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 992px) {
   .login-wrapper {
     flex-direction: column;

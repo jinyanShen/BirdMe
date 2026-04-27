@@ -14,10 +14,10 @@
         <el-image :src="url"></el-image>
       </el-menu-item>
       <el-menu-item index="1" v-show="role=='0'">
-        <span slot="title">鸟类识别</span>
+        <span slot="title">Bird Identification</span>
       </el-menu-item>
       <el-menu-item index="2" v-show="role=='0'">
-        <span slot="title">个人中心</span>
+        <span slot="title">Personal Center</span>
       </el-menu-item>
     </el-menu>
   </div>
@@ -50,14 +50,14 @@ export default {
   height: 30px;
   line-height: 30px;
   font-size: 16px;
-  background-color: #409EFF !important;/* 蓝色背景 */
-  color: #ffffff; /* 激活时文本颜色 */
+  background-color: #409EFF !important;/* Blue background */
+  color: #ffffff; /* Active text color */
 }
 .custom-menu .el-menu-item {
   height: 30px;
   line-height: 30px;
   font-size: 16px;
-  color: #333; /* 非激活时文本颜色 */
+  color: #333; /* Inactive text color */
 }
 .custom-menu .el-menu-item span {
   display: inline-block !important;

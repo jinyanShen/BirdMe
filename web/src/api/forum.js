@@ -9,7 +9,7 @@ export function getPosts(category, keyword) {
   if (keyword && keyword.trim()) {
     params.keyword = keyword
   }
-  
+
   return request({
     url: '/forum/posts',
     method: 'get',

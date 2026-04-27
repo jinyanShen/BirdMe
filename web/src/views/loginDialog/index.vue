@@ -10,10 +10,10 @@
   >
     <div class="login-wrapper" ref="panel" @mousemove="onPanelMouseMove" @mouseleave="onPanelMouseLeave">
 
-      <!-- 关闭按钮 -->
+      <!-- Close button -->
       <div class="login-close-btn" @click="handleClose">×</div>
 
-      <!-- 左侧品牌区域 -->
+      <!-- Left brand area -->
       <div class="login-left" ref="leftPanel">
         <div class="brand-section">
           <h1 class="brand-name">BIRDME</h1>
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <!-- 右侧登录表单 -->
+      <!-- Right login form -->
       <div class="login-right">
         <div class="login-card">
           <div class="login-header">
@@ -101,7 +101,7 @@
                   </template>
                 </el-input>
 
-                <!--眼睛独立放在这里，完全不受输入框影响 -->
+                <!-- Eye icon placed here, completely unaffected by input box -->
                 <i class="eye-float-icon"
                    :class="passwordVisible ? 'fas fa-eye-slash' : 'fas fa-eye'"
                    @click="togglePasswordVisible"
@@ -449,11 +449,14 @@ export default {
                 sessionStorage.setItem('phone', res.data.phone)
                 sessionStorage.setItem('avatarUrl', res.data.avatarUrl)
                 sessionStorage.setItem('role', res.data.role)
+                if (res.data.rescueStationId) {
+                  sessionStorage.setItem('rescueStationId', res.data.rescueStationId)
+                }
 
                 this.$message.success("Login successful")
                 this.dialogVisible = false
 
-                console.log('跳转到:', savedRedirectPath)
+                console.log('Redirect to:', savedRedirectPath)
 
                 setTimeout(() => {
                   if (savedRedirectPath && savedRedirectPath !== '/' && savedRedirectPath !== '/login') {
@@ -561,7 +564,7 @@ export default {
 </script>
 
 <style lang="scss">
-/* 变量 */
+/* Variables */
 :root {
   --primary-color: #8aa8e2;
   --secondary-color: #9ab5e2;
@@ -572,7 +575,7 @@ export default {
   --border-color: #949bca;
 }
 
-/* 弹窗外层 */
+/* Dialog outer layer */
 .login-dialog.el-dialog {
   box-shadow: none !important;
   border-radius: 30px !important;
@@ -609,7 +612,7 @@ export default {
   position: relative;
 }
 
-/* 左侧品牌区域 */
+/* Left brand area */
 .login-left {
   flex: 1;
   background: linear-gradient(135deg, #7295e3 0%, #90afe3 50%, #f1f4f8 100%);
@@ -802,7 +805,7 @@ export default {
   }
 }
 
-/* 右侧登录表单 */
+/* Right login form */
 .login-right {
   flex:1;
   padding:60px;
@@ -841,7 +844,7 @@ export default {
       .input-wrapper {
         position: relative;
 
-        /* 独立眼睛图标：永远固定，不受任何影响 */
+        /* Independent eye icon: always fixed, not affected by anything */
         .eye-float-icon {
           position: absolute;
           right: 20px;
@@ -903,7 +906,7 @@ export default {
   }
 }
 
-/* 按钮 */
+/* Button */
 .main-button {
   background:linear-gradient(135deg, #465ccd 0%, #5885e4 100%);
   color:#fff; border:none; border-radius:12px; padding:15px 30px;
@@ -933,7 +936,7 @@ export default {
   animation:spin 0.8s linear infinite; display:inline-block;
 }
 
-/* 注册弹窗 */
+/* Register dialog */
 ::v-deep .register-dialog {
   .el-dialog { border-radius:20px; overflow:hidden; }
   .el-dialog__header {
@@ -990,7 +993,7 @@ export default {
   button { padding:12px 35px; font-size:14px; font-weight:600; }
 }
 
-/* 动画 */
+/* Animation */
 @keyframes fadeIn { from{opacity:0; transform:scale(0.9);} to{opacity:1; transform:scale(1);} }
 @keyframes slideInLeft { from{opacity:0; transform:translateX(-50px);} to{opacity:1; transform:translateX(0);} }
 @keyframes slideInRight { from{opacity:0; transform:translateX(50px);} to{opacity:1; transform:translateX(0);} }
@@ -1001,7 +1004,7 @@ export default {
   100% { transform:translate(-50%,0) translate(var(--char-x,0),var(--char-y,0)) scale(var(--char-scale,1)) translate(var(--head-x,0),var(--head-y,0)) translateY(0) translateZ(0); }
 }
 
-/* 关闭按钮 */
+/* Close button */
 .login-close-btn {
   position:absolute; right:20px; top:20px;
   width:36px; height:36px; border-radius:50%;
@@ -1017,7 +1020,7 @@ export default {
   transform:scale(1.1);
 }
 
-/* 响应式 */
+/* Responsive */
 @media (max-width: 992px) {
   .login-wrapper {
     flex-direction: column;

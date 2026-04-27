@@ -1,7 +1,7 @@
-<!-- BirdMigration.vue - 鸟类迁徙展示页面（增强版） -->
+<!-- BirdMigration.vue - Enhanced Bird Migration Display Page -->
 <template>
   <div class="migration-page">
-    <!-- 地图容器 - 放在最上面 -->
+    <!-- Map container - placed at top -->
     <div class="map-wrapper">
       <div class="map-container" ref="mapContainer">
         <div id="migrationMap" class="map"></div>
@@ -9,10 +9,10 @@
       </div>
     </div>
 
-    <!-- 下方内容区域 -->
+    <!-- Content area below -->
     <div class="content-wrapper">
       <div class="container">
-        <!-- 第一行：鸟类选择和基本信息 -->
+        <!-- First row: Bird selection and basic info -->
         <div class="bird-selection-row">
           <div class="selection-card">
             <div class="card-header">
@@ -63,7 +63,7 @@
           </div>
         </div>
 
-        <!-- 体型信息框 -->
+        <!-- Size info box -->
         <div class="size-info-row" v-if="birdSizeInfo && Object.keys(birdSizeInfo).length > 0">
           <div class="size-card">
             <div class="card-header">
@@ -87,7 +87,7 @@
           </div>
         </div>
 
-        <!-- 第二行：关于鸟类的详细信息（融合本地描述和维基百科） -->
+        <!-- Second row: Detailed information about birds (combining local description and Wikipedia) -->
         <div class="knowledge-row" v-if="selectedBirdData">
           <div class="knowledge-card">
             <div class="card-header">
@@ -98,26 +98,26 @@
               </a>
             </div>
 
-            <!-- 加载中状态 -->
+            <!-- Loading state -->
             <div v-if="loadingWiki" class="knowledge-content loading">
               <i class="el-icon-loading"></i>
               <span>Loading information...</span>
             </div>
 
-            <!-- 加载完成 -->
+            <!-- Loading complete -->
             <div v-else class="knowledge-content">
-              <!-- 本地描述 -->
+              <!-- Local description -->
               <div class="local-description" v-if="selectedBirdData.description">
                 <p>{{ selectedBirdData.description }}</p>
               </div>
 
-              <!-- 维基百科内容 -->
+              <!-- Wikipedia content -->
               <div v-if="wikiData && !wikiError" class="wiki-section">
                 <div class="wiki-summary">
                   <img v-if="wikiData.thumbnail" :src="wikiData.thumbnail" class="wiki-image" :alt="wikiData.title">
                   <div class="wiki-text">
                     <p>{{ wikiData.extract }}</p>
-                    <!-- 展开/收起按钮 -->
+                    <!-- Expand/collapse button -->
                     <div v-if="wikiData.hasMore" class="expand-button">
                       <el-button type="text" @click="expandWikiContent">
                         {{ wikiData.showFull ? 'Show less ↑' : 'Read more ↓' }}
@@ -138,7 +138,7 @@
                 </div>
               </div>
 
-              <!-- 维基百科信息不可用时的提示 -->
+              <!-- Notice when Wikipedia information is not available -->
               <div v-else-if="wikiError" class="wiki-unavailable">
                 <i class="el-icon-info"></i>
                 <span>Additional Wikipedia information is not available for this species.</span>
@@ -180,9 +180,9 @@ export default {
       wikiData: null,
       loadingWiki: false,
       wikiError: false,
-      // 体型信息
+      // Size information
       birdSizeInfo: {},
-      // 防抖定时器
+      // Debounce timer
       wikiDebounceTimer: null
     }
   },
@@ -194,7 +194,7 @@ export default {
         this.selectedVelocityData = this.velocityData[birdName];
         console.log('Selected bird data:', this.selectedBirdData);
 
-        // 重置维基百科数据和体型信息
+        // Reset Wikipedia data and size information
         this.wikiData = null;
         this.wikiError = false;
         this.birdSizeInfo = {};
@@ -204,7 +204,7 @@ export default {
             this.updateMap();
           }, 100);
 
-          // 获取维基百科信息
+          // Fetch Wikipedia information
           this.fetchWikipediaInfo(birdName);
         }
       });
@@ -239,7 +239,7 @@ export default {
     },
 
     /**
-     * 获取维基百科信息（增强版 - 获取更长的内容）
+     * Fetch Wikipedia information (enhanced version - get longer content)
      */
     async fetchWikipediaInfo(birdName) {
       if (this.wikiDebounceTimer) {
@@ -254,11 +254,11 @@ export default {
         try {
           const searchQuery = `${birdName} bird`;
 
-          // 使用能返回更多内容的 API
+          // Use API that can return more content
           const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(birdName)}&prop=extracts&explaintext=1&exsectionformat=plain&format=json&origin=*`;
           const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&srlimit=5&format=json&origin=*`;
 
-          // 先尝试直接获取页面
+          // Try to get page directly first
           const directResponse = await fetch(apiUrl);
           const directData = await directResponse.json();
 
@@ -280,20 +280,20 @@ export default {
               categories: []
             };
 
-            // 获取缩略图
+            // Fetch thumbnail
             await this.fetchThumbnail(page.title);
-            // 获取分类信息
+            // Fetch category information
             await this.fetchWikiCategories(page.title);
-            // 提取体型信息
+            // Extract size information
             this.extractSizeInfo(fullExtract);
-            // 更新保育状态（如果本地数据没有）
+            // Update conservation status (if not in local data)
             this.updateConservationStatusFromWiki(fullExtract);
 
             this.loadingWiki = false;
             return;
           }
 
-          // 如果直接获取失败，尝试搜索
+          // If direct fetch fails, try search
           const searchResponse = await fetch(searchUrl);
           const searchData = await searchResponse.json();
 
@@ -341,7 +341,7 @@ export default {
     },
 
     /**
-     * 获取页面缩略图
+     * Get page thumbnail
      */
     async fetchThumbnail(pageTitle) {
       try {
@@ -357,7 +357,7 @@ export default {
     },
 
     /**
-     * 获取维基百科分类信息
+     * Get Wikipedia category information
      */
     async fetchWikiCategories(pageTitle) {
       try {
@@ -380,12 +380,12 @@ export default {
     },
 
     /**
-     * 从维基百科内容中提取体型信息
+     * Extract size information from Wikipedia content
      */
     extractSizeInfo(content) {
       const sizeInfo = {};
 
-      // 匹配长度信息（支持多种格式）
+      // Match length information (supports various formats)
       const lengthPatterns = [
         /(?:Length|Body length)[:\s]+([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:cm|centimeters|centimetres|mm|millimeters)/i,
         /([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:cm|centimeters|centimetres)\s*(?:in length|long)/i,
@@ -402,7 +402,7 @@ export default {
         }
       }
 
-      // 匹配体重信息
+      // Match weight information
       const weightPatterns = [
         /(?:Weight|Mass)[:\s]+([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:kg|kilograms|g|grams)/i,
         /weighs?\s+(?:about\s+)?([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:kg|kilograms|g|grams)/i,
@@ -414,7 +414,7 @@ export default {
         const match = content.match(pattern);
         if (match) {
           let weightValue = match[1];
-          // 如果是克，可能转换为千克显示更友好
+          // If in grams, convert to kg for better display
           if (match[0].includes('g') && !match[0].includes('kg') && parseFloat(weightValue) > 100) {
             weightValue = (parseFloat(weightValue) / 1000).toFixed(1) + ' kg';
           } else {
@@ -425,7 +425,7 @@ export default {
         }
       }
 
-      // 匹配翼展信息
+      // Match wingspan information
       const wingspanPatterns = [
         /(?:Wingspan|Wing span)[:\s]+([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:cm|centimeters|centimetres|m|meters)/i,
         /wingspan\s+(?:of|is|measures)\s+([\d.]+(?:\s*-\s*[\d.]+)?)\s*(?:cm|centimeters|m|meters)/i,
@@ -437,7 +437,7 @@ export default {
         const match = content.match(pattern);
         if (match) {
           let wingspanValue = match[1];
-          // 如果是米，转换为厘米显示更直观
+          // If in meters, convert to cm for better display
           if (match[0].includes('m') && !match[0].includes('cm') && parseFloat(wingspanValue) < 5) {
             wingspanValue = (parseFloat(wingspanValue) * 100).toFixed(0) + ' cm';
           } else {
@@ -452,15 +452,15 @@ export default {
     },
 
     /**
-     * 从维基百科内容中提取保育状态
+     * Extract conservation status from Wikipedia content
      */
     updateConservationStatusFromWiki(content) {
-      // 如果本地数据已经有保育状态，就不覆盖
+      // If local data already has conservation status, don't override
       if (this.selectedBirdData && this.selectedBirdData.conservationStatus) {
         return;
       }
 
-      // 保育状态关键词映射
+      // Conservation status keyword mapping
       const statusMap = {
         'Least Concern': ['least concern', 'lc', 'least-concern'],
         'Near Threatened': ['near threatened', 'nt', 'near-threatened'],
@@ -481,7 +481,7 @@ export default {
     },
 
     /**
-     * 展开/收起维基百科内容
+     * Expand/collapse Wikipedia content
      */
     expandWikiContent() {
       if (this.wikiData && this.wikiData.fullExtract) {
@@ -832,7 +832,7 @@ export default {
   min-height: 100vh;
 }
 
-/* 地图容器 - 占据上半部分 */
+/* Map container - occupies upper half */
 .map-wrapper {
   width: 100%;
   height: 50vh;
@@ -871,7 +871,7 @@ export default {
   isolation: isolate;
 }
 
-/* 下方内容区域 */
+/* Content area below */
 .content-wrapper {
   background: #f5f7fa;
   border-radius: 24px 24px 0 0;
@@ -889,7 +889,7 @@ export default {
   z-index: 11;
 }
 
-/* 卡片通用样式 */
+/* Card common styles */
 .selection-card,
 .info-card,
 .size-card,
@@ -911,7 +911,7 @@ export default {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-/* 第一行布局 */
+/* First row layout */
 .bird-selection-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -919,7 +919,7 @@ export default {
   margin-bottom: 24px;
 }
 
-/* 体型信息行 */
+/* Size info row */
 .size-info-row {
   margin-bottom: 24px;
 }
@@ -996,14 +996,14 @@ export default {
   font-weight: 500;
 }
 
-/* 保育状态颜色 */
+/* Conservation status colors */
 .status-lc { color: #2ecc71; }
 .status-nt { color: #f39c12; }
 .status-vu { color: #e67e22; }
 .status-en { color: #e74c3c; }
 .status-cr { color: #c0392b; }
 
-/* 知识卡片 */
+/* Knowledge card */
 .knowledge-row {
   margin-bottom: 24px;
 }
@@ -1134,7 +1134,7 @@ export default {
   font-size: 20px;
 }
 
-/* 响应式设计 */
+/* Responsive design */
 @media (max-width: 1024px) {
   .bird-selection-row {
     grid-template-columns: 1fr;

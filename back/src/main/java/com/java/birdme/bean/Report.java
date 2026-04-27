@@ -1,6 +1,7 @@
 package com.java.birdme.bean;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -35,6 +36,11 @@ public class Report {
      * Longitude
      */
     private Double longitude;
+    /**
+     * Name
+     */
+    @TableField(exist = false)
+    private String name;
     /**
      * Location
      */
@@ -117,6 +123,14 @@ public class Report {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getLocation() {

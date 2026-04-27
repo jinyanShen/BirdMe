@@ -15,42 +15,31 @@ import java.util.Date;
  */
 @TableName("user")
 public class User {
-    /**
-     * User unique identifier id
-     */
     @TableId(value="id", type= IdType.AUTO)
     private Integer id;
-    /**
-     * Username (unique)
-     */
+
     private String username;
-    /**
-     * User password
-     */
+
     private String password;
+
     /**
-     * User role 0-regular user, 1-admin
+     * User role 0-regular user, 1-admin, 2-rescue station
      */
     private Integer role;
-    /**
-     * User's real name
-     */
+
     private String name;
-    /**
-     * User age
-     */
+
     private Integer age;
-    /**
-     * User phone number (unique)
-     */
+
     private String phone;
-    /**
-     * User avatar url
-     */
+
     private String avatarUrl;
+
     /**
-     * Creation time
+     * Associated rescue station ID (for rescue station role)
      */
+    private Integer rescueStationId;
+
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createdAt;
 
@@ -116,6 +105,14 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public Integer getRescueStationId() {
+        return rescueStationId;
+    }
+
+    public void setRescueStationId(Integer rescueStationId) {
+        this.rescueStationId = rescueStationId;
     }
 
     public Date getCreatedAt() {

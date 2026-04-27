@@ -7,7 +7,7 @@
       </div>
       <nav class="sidebar-nav">
         <ul class="nav-list">
-          <li class="nav-item">
+          <li class="nav-item" v-if="role==='1'">
             <router-link to="/admin/dashboard" class="nav-link" :class="{ active: $route.path === '/admin/dashboard' }">
               <i class="fas fa-chart-pie"></i>
               <span>Dashboard</span>
@@ -19,13 +19,13 @@
               <span>Reports</span>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="role==='1'">
             <router-link to="/admin/rescue-stations" class="nav-link" :class="{ active: $route.path === '/admin/rescue-stations' }">
               <i class="fas fa-map-marker-alt"></i>
               <span>Rescue Stations</span>
             </router-link>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="role==='1'">
             <router-link to="/admin/users" class="nav-link" :class="{ active: $route.path === '/admin/users' }">
               <i class="fas fa-users"></i>
               <span>Users</span>
@@ -53,7 +53,7 @@
               <img :src="userAvatar" alt="User" />
             </div>
             <div v-if="showUserMenu" class="user-menu">
-              <router-link to="/identification" class="menu-item">Bird Identification</router-link>
+              <router-link v-if="role==='1'" to="/" class="menu-item">Homepage</router-link>
               <a href="#" @click="handleLogout" class="menu-item">Logout</a>
             </div>
           </div>
@@ -72,7 +72,8 @@ export default {
   data() {
     return {
       userAvatar: '',
-      showUserMenu: false
+      showUserMenu: false,
+      role: sessionStorage.getItem('role')
     }
   },
   computed: {
@@ -107,6 +108,8 @@ export default {
   display: flex;
   min-height: 100vh;
   background-color: #f5f7fa;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 .sidebar {
@@ -189,6 +192,8 @@ export default {
   margin-left: 250px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  max-width: 100vw;
 }
 
 .top-header {
@@ -274,5 +279,8 @@ export default {
   flex: 1;
   padding: 30px;
   overflow-y: auto;
+  overflow-x: hidden;
+  width: calc(100% - 30px);
+  box-sizing: border-box;
 }
 </style>

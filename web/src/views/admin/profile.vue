@@ -72,7 +72,7 @@ export default {
         password: ''
       },
       originalUserInfo: {},
-      defaultAvatar: 'https://via.placeholder.com/150',
+      defaultAvatar: '#',
       loading: false,
       submitLoading: false,
       rules: {
@@ -115,9 +115,8 @@ export default {
     async fetchUserInfo() {
       this.loading = true
       try {
-        // 这里应该从后端获取当前用户信息
-        // 暂时使用模拟数据
-        const userId = sessionStorage.getItem('userId') || 1
+        // Get current user information
+        const userId = sessionStorage.getItem('id')
         const response = await getCurrentUser(userId)
         if (response.code === 200) {
           this.userInfo = response.data
@@ -138,7 +137,7 @@ export default {
         if (valid) {
           this.submitLoading = true
           try {
-            // 移除密码字段如果为空
+            // Remove password field if empty
             const updateData = { ...this.userInfo }
             if (!updateData.password) {
               delete updateData.password
@@ -148,7 +147,7 @@ export default {
             if (response.code === 200) {
               this.$message.success('Profile updated successfully')
               this.originalUserInfo = { ...this.userInfo }
-              // 更新sessionStorage中的头像
+              // Update avatar in sessionStorage
               if (this.userInfo.avatarUrl) {
                 sessionStorage.setItem('avatarUrl', this.userInfo.avatarUrl)
               }

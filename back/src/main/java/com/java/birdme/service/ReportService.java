@@ -33,6 +33,11 @@ public interface ReportService {
     PageResp page(PageReq<Report> pageReq);
 
     /**
+     * Query with pagination (for rescue station role)
+     */
+    PageResp pageMy(PageReq<Report> pageReq);
+
+    /**
      * Get all reports
      */
     ReturnResp all();
@@ -41,27 +46,27 @@ public interface ReportService {
      * Delete reports
      */
     ReturnResp delete(List<Integer> ids);
-    
+
     /**
      * Get reports by submitter ID
      */
     List<Report> getReportsBySubmitterId(String submitterId);
-    
+
     /**
      * Get reports by rescue station ID
      */
     List<Report> getReportsByRescueStationId(Integer rescueStationId);
-    
+
     /**
      * Get reports by status
      */
     List<Report> getReportsByStatus(String status);
-    
+
     /**
      * Update report status
      */
     ReturnResp updateReportStatus(Integer reportId, String status, String notes);
-    
+
     /**
      * Get report statistics
      */
