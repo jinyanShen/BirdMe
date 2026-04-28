@@ -29,16 +29,16 @@
           </div>
         </div>
 
-        <!-- Game 下拉菜单 -->
-        <div class="dropdown game-dropdown">
-          <span class="nav-item" @click="goToGame">Game ▾</span>
-          <div class="game-dropdown-menu">
-            <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
-            <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-          </div>
-        </div>
+<!--        &lt;!&ndash; Game 下拉菜单 &ndash;&gt;-->
+<!--        <div class="dropdown game-dropdown">-->
+<!--          <span class="nav-item" @click="goToGame">Game ▾</span>-->
+<!--          <div class="game-dropdown-menu">-->
+<!--            <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>-->
+<!--            <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>-->
+<!--          </div>-->
+<!--        </div>-->
 
-        <span class="nav-item" @click="goToPersonalPage">Settings</span>
+        <span class="nav-item" @click="goToPersonalPage">About</span>
         <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
         <span v-else class="nav-item logout-btn" @click="handleLogout">Logout</span>
       </div>
@@ -190,7 +190,7 @@ export default {
 
     .nav-menu {
       display: flex;
-      gap: 40px;
+      gap: 30px;
       align-items: center;
 
       .nav-item {

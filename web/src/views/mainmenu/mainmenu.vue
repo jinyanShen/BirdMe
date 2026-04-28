@@ -485,16 +485,16 @@ export default {
               </div>
             </div>
 
-            <!-- Game 下拉菜单 - 修改：主项可点击跳转 -->
-            <div class="dropdown game-dropdown">
-              <span class="nav-item" @click="goToGame">Game ▾</span>
-              <div class="game-dropdown-menu">
-                <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>
-                <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>
-              </div>
-            </div>
+<!--            &lt;!&ndash; Game 下拉菜单 - 修改：主项可点击跳转 &ndash;&gt;-->
+<!--            <div class="dropdown game-dropdown">-->
+<!--              <span class="nav-item" @click="goToGame">Game ▾</span>-->
+<!--              <div class="game-dropdown-menu">-->
+<!--                <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>-->
+<!--                <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>-->
+<!--              </div>-->
+<!--            </div>-->
 
-            <span class="nav-item" @click="goToPersonalPage">Settings</span>
+            <span class="nav-item" @click="goToPersonalPage">About</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
             <span v-else class="nav-item logout-btn" @click="handleLogout">Logout</span>
           </div>
@@ -609,28 +609,28 @@ export default {
           </div>
         </div>
 
-        <!-- Game 板块 -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
-            <h3>Bird Games</h3>
-            <p>Play fun bird‑themed games, challenge your friends, and earn badges.</p>
-            <div class="section-divider"></div>
-          </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="fas fa-dove"></i>  <!-- 改为鸽子图标 -->
-              <h4>Flappy Bird</h4>
-              <p>Classic side‑scroller with bird characters</p>
-              <button class="btn" @click="goToFlappyBird">Play Now</button>
-            </div>
-            <div class="card fade-in-up">
-              <i class="fas fa-th-large"></i>  <!-- 改为网格图标 -->
-              <h4>2048 Bird</h4>
-              <p>Merge birds to reach the giant bird</p>
-              <button class="btn" @click="goTo2048Bird">Play Now</button>
-            </div>
-          </div>
-        </div>
+<!--        &lt;!&ndash; Game 板块 &ndash;&gt;-->
+<!--        <div class="knowledge-cards-wrapper">-->
+<!--          <div class="section fade-in-up">-->
+<!--            <h3>Bird Games</h3>-->
+<!--            <p>Play fun bird‑themed games, challenge your friends, and earn badges.</p>-->
+<!--            <div class="section-divider"></div>-->
+<!--          </div>-->
+<!--          <div class="cards-container">-->
+<!--            <div class="card fade-in-up">-->
+<!--              <i class="fas fa-dove"></i>  &lt;!&ndash; 改为鸽子图标 &ndash;&gt;-->
+<!--              <h4>Flappy Bird</h4>-->
+<!--              <p>Classic side‑scroller with bird characters</p>-->
+<!--              <button class="btn" @click="goToFlappyBird">Play Now</button>-->
+<!--            </div>-->
+<!--            <div class="card fade-in-up">-->
+<!--              <i class="fas fa-th-large"></i>  &lt;!&ndash; 改为网格图标 &ndash;&gt;-->
+<!--              <h4>2048 Bird</h4>-->
+<!--              <p>Merge birds to reach the giant bird</p>-->
+<!--              <button class="btn" @click="goTo2048Bird">Play Now</button>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
 
       </div>
 
@@ -1140,7 +1140,7 @@ export default {
 
     .nav-menu {
       display: flex;
-      gap: 40px;
+      gap: 30px;
       align-items: center;
 
       .nav-item {

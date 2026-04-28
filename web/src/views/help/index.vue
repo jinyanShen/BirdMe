@@ -3,7 +3,7 @@
     <NavBar :showNavbar="true" />
     <div class="help-header">
       <h1>Help Center</h1>
-      <p>Get assistance with bird rescue and reporting</p>
+      <p>Find rescue stations nearby for bird rescuing and reporting :)</p>
     </div>
     <div class="map-section">
       <div class="map-controls">
