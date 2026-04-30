@@ -484,16 +484,6 @@ export default {
                 <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
               </div>
             </div>
-
-<!--            &lt;!&ndash; Game 下拉菜单 - 修改：主项可点击跳转 &ndash;&gt;-->
-<!--            <div class="dropdown game-dropdown">-->
-<!--              <span class="nav-item" @click="goToGame">Game ▾</span>-->
-<!--              <div class="game-dropdown-menu">-->
-<!--                <div class="game-dropdown-item" @click="selectGameFromNav('flappy')">Flappy Bird</div>-->
-<!--                <div class="game-dropdown-item" @click="selectGameFromNav('2048')">2048 Bird</div>-->
-<!--              </div>-->
-<!--            </div>-->
-
             <span class="nav-item" @click="goToPersonalPage">About</span>
             <span v-if="!isLoggedIn" class="nav-item login-btn" @click="goToLogin">Login</span>
             <span v-else class="nav-item logout-btn" @click="handleLogout">Logout</span>
@@ -511,7 +501,6 @@ export default {
       </div>
 
       <div class="content-below">
-
         <!-- 轮播图容器 -->
         <div class="carousel-section fade-in-up">
           <h3>News about Birds</h3>
@@ -543,7 +532,7 @@ export default {
               <p>Submit rescue reports and find rescue centers.</p>
               <button class="btn" @click="goToReportInjury">Report Now</button>
             </div>
-            <div class="card fade-in-up">
+            <div class="card fade-in-up emergency-first-aid">
               <i class="el-icon-first-aid-kit"></i>
               <h4>First Aid</h4>
               <p>Contact directly in case of emergency. No need Login!</p>
@@ -585,8 +574,8 @@ export default {
 
 
         <!-- Forum 板块（重新设计版） -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
+        <div class="knowledge-cards-wrapper forum-wrapper-shadow">
+        <div class="section fade-in-up">
             <h3>Community Forum</h3>
             <p>Expert tips, rescue assistance, and daily birdwatching stories – all in one place.</p>
             <div class="section-divider"></div>
@@ -608,32 +597,7 @@ export default {
             </div>
           </div>
         </div>
-
-<!--        &lt;!&ndash; Game 板块 &ndash;&gt;-->
-<!--        <div class="knowledge-cards-wrapper">-->
-<!--          <div class="section fade-in-up">-->
-<!--            <h3>Bird Games</h3>-->
-<!--            <p>Play fun bird‑themed games, challenge your friends, and earn badges.</p>-->
-<!--            <div class="section-divider"></div>-->
-<!--          </div>-->
-<!--          <div class="cards-container">-->
-<!--            <div class="card fade-in-up">-->
-<!--              <i class="fas fa-dove"></i>  &lt;!&ndash; 改为鸽子图标 &ndash;&gt;-->
-<!--              <h4>Flappy Bird</h4>-->
-<!--              <p>Classic side‑scroller with bird characters</p>-->
-<!--              <button class="btn" @click="goToFlappyBird">Play Now</button>-->
-<!--            </div>-->
-<!--            <div class="card fade-in-up">-->
-<!--              <i class="fas fa-th-large"></i>  &lt;!&ndash; 改为网格图标 &ndash;&gt;-->
-<!--              <h4>2048 Bird</h4>-->
-<!--              <p>Merge birds to reach the giant bird</p>-->
-<!--              <button class="btn" @click="goTo2048Bird">Play Now</button>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-
       </div>
-
     </div>
   </div>
 </template>
@@ -837,12 +801,10 @@ export default {
       }
 
       h4 {
-        font-size: 28px;  /* 原24px → 调大 */
         margin-bottom: 18px;
       }
 
       p {
-        font-size: 18px;  /* 原14px → 调大 */
         margin-bottom: 25px;
         opacity: 0.9;
       }
@@ -851,9 +813,8 @@ export default {
         background: rgba(255, 255, 255, 0.3);
         border: 1px solid white;
         color: white;
-        padding: 10px 24px;  /* 原8px 20px → 调大 */
+        padding: 10px 24px;
         border-radius: 25px;
-        font-size: 16px;  /* 新增 */
         cursor: pointer;
         transition: all 0.3s;
 
@@ -866,123 +827,57 @@ export default {
   }
   /*每部分的框*/
   .knowledge-cards-wrapper {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.03) !important;
+    box-shadow: 0 10px 30px rgba(39, 3, 58, 0.25) !important;
+    border: 2px solid #60d7ff !important;
     border-radius: 24px;
-    padding: 50px 40px;  /* 原40px 30px → 调大 */
+    padding: 50px 40px;
     margin: 0 auto 60px;
     max-width: 1200px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     position: relative;
     transition: all 0.3s;
 
-    &::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-      border-radius: 26px;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.3s;
+    /* 容器大标题：加粗 + 阴影 */
+    .section h3 {
+      font-weight: bold !important;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
     }
 
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.4);
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-
-      &::before {
-        opacity: 1;
-      }
+    .section p {
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
     }
 
-    .section {
-      max-width: 1200px;
-      margin: 0 auto 50px;  /* 原40px → 调大 */
-      text-align: center;
-
-      h3 {
-        font-size: 48px;  /* 原36px → 调大 */
-        margin-bottom: 25px;
-        color: #ffffff;
-      }
-
-      p {
-        font-size: 24px;  /* 原18px → 调大 */
-        line-height: 1.6;
-        color: rgba(255, 255, 255, 0.9);
-      }
-
-      .section-divider {
-        width: 1000px;
-        height: 3px;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
-        margin: 0 auto;
-        border-radius: 2px;
-      }
+    .card {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 2px solid #40add3 !important;
+      box-shadow: 0 0 12px rgba(122, 138, 255, 0.25) !important;
     }
 
-    .cards-container {
-      display: flex;
-      justify-content: center;
-      gap: 30px;
-      flex-wrap: wrap;
-      max-width: 1200px;
-      margin: 0 auto;
+    /* 卡片标题：取消加粗 */
+    .card h4 {
+      font-size: 32px !important;
+      font-weight: normal !important;  // ✅ 关键：取消加粗
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+    }
 
-      .card {
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(10px);
-        border-radius: 16px;
-        padding: 35px;  /* 原30px → 调大 */
-        width: 300px;  /* 原280px → 调大 */
-        text-align: center;
-        transition: transform 0.3s;
+    .card p {
+      font-weight: 700 !important;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+    }
 
-        &:hover {
-          transform: translateY(-10px);
-          background: rgba(255, 255, 255, 0.25);
-        }
+    .card .btn {
+      background: rgba(255, 255, 255, 0.95) !important;
+      color: #3a00e8 !important;
+      border: none !important;
+      font-weight: 900 !important;
+      font-size: 18px !important;
+      padding: 12px 28px !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 
-        i {
-          font-size: 64px;  /* 原48px → 调大 */
-          margin-bottom: 25px;
-          display: block;
-          color: white;
-        }
-
-        h4 {
-          font-size: 28px;  /* 原24px → 调大 */
-          margin-bottom: 18px;
-          color: white;
-        }
-
-        p {
-          font-size: 18px;  /* 原14px → 调大 */
-          margin-bottom: 25px;
-          opacity: 0.9;
-          color: rgba(255, 255, 255, 0.9);
-        }
-
-        .btn {
-          background: rgba(255, 255, 255, 0.3);
-          border: 1px solid white;
-          color: white;
-          padding: 10px 24px;  /* 原8px 20px → 调大 */
-          border-radius: 25px;
-          font-size: 16px;  /* 新增 */
-          cursor: pointer;
-          transition: all 0.3s;
-
-          &:hover {
-            background: white;
-            color: #667eea;
-          }
-        }
+      &:hover {
+        background: white !important;
+        color: #ff1c1c !important;
+        transform: scale(1.05);
       }
     }
   }
@@ -1346,30 +1241,52 @@ export default {
         font-size: 14px;
       }
     }
-    .knowledge-cards-wrapper {
-      padding: 30px 20px;
-      .section {
-        h3 {
-          font-size: 36px;
-        }
-        p {
-          font-size: 18px;
-        }
+    /*每部分的框*/
+    /* 紧急救助 First Aid — 超高醒目紧急急救红 */
+    .knowledge-cards-wrapper .card.emergency-first-aid {
+      background: #d80027 !important;
+      border: 3px solid #ff3355 !important;
+      box-shadow: 0 0 30px rgba(255, 0, 30, 0.75),
+      0 0 60px rgba(255, 0, 30, 0.4) !important;
+
+      /* 图标白色 */
+      i {
+        color: #ffffff !important;
+        font-size: 70px !important;
       }
-      .cards-container .card {
-        width: 260px;
-        padding: 25px;
-        h4 {
-          font-size: 22px;
-        }
-        p {
-          font-size: 14px;
-        }
-        i {
-          font-size: 48px;
-        }
+
+      /* 标题白色 */
+      h4 {
+        color: #ffffff !important;
+        font-weight: 900 !important;
+        font-size: 32px !important;
+      }
+
+      /* 描述白色 */
+      p {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+      }
+
+      /* 按钮急救红配色 */
+      .btn {
+        background: #ffffff !important;
+        border: 2px solid #ffffff !important;
+        color: #d80027 !important;
+        font-weight: 900 !important;
+        font-size: 18px !important;
+        padding: 12px 28px !important;
+      }
+
+      &:hover {
+        background: #b00020 !important;
+        transform: translateY(-10px) !important;
+        box-shadow: 0 15px 45px rgba(255, 0, 30, 0.85),
+        0 0 80px rgba(255, 0, 30, 0.5) !important;
       }
     }
+
+
     .carousel-section {
       h3 {
         font-size: 36px;
@@ -1454,5 +1371,35 @@ export default {
   color: rgba(255,255,255,0.75);
   margin: 0;
 }
+
+
+
+/* 优化版：First Aid 急救卡片（半透明 + 融洽版） */
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid {
+  background: rgba(225, 16, 46, 0.75) !important; // 透明度设为 0.7
+  border: 2px solid #60d7ff !important;
+  box-shadow: 0 0 20px rgba(87, 0, 17, 0.5) !important;
+}
+
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid:hover {
+  box-shadow: 0 10px 30px rgba(214, 39, 78, 0.6) !important;
+}
+
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid h4,
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid p,
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid i {
+  color: #ffffff !important;
+}
+
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid .btn {
+  background: #d3fffa !important;
+  color: #ff006a !important;
+  font-weight: bold !important;
+}
+
+.knowledge-cards-wrapper .cards-container .card.emergency-first-aid .btn:hover {
+  background: #f8f8f8 !important;
+}
+
 
 </style>

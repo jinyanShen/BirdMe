@@ -490,7 +490,8 @@ export default {
 }
 
 .container {
-  max-width: 800px;
+  /* 去掉固定max-width，改成和导航一样的宽 */
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -501,6 +502,8 @@ export default {
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   margin-bottom: 60px;
+  /* 去掉宽度限制，让它占满container */
+  width: 100%;
 }
 
 .upload-section {
@@ -520,7 +523,7 @@ export default {
 .section-header h3,
 .section-header h4 {
   margin: 0;
-  font-size: 18px;
+  font-size: 28px;
   color: #333;
   display: flex;
   align-items: center;
@@ -529,13 +532,13 @@ export default {
 
 .section-header h4 i {
   color: #22b3c1;
-  font-size: 20px;
+  font-size: 30px;
 }
 
 .wiki-link {
   color: #22b3c1;
   text-decoration: none;
-  font-size: 13px;
+  font-size: 23px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -556,7 +559,7 @@ export default {
 .result-section h4 {
   color: #333;
   margin: 0 0 20px 0;
-  font-size: 18px;
+  font-size: 28px;
 }
 
 .result-card {
@@ -568,13 +571,13 @@ export default {
 }
 
 .result-card .bird-icon {
-  font-size: 48px;
+  font-size: 58px;
   color: #22b3c1;
   margin-bottom: 15px;
 }
 
 .result-card .bird-name {
-  font-size: 24px;
+  font-size: 34px;
   font-weight: 600;
   color: #22b3c1;
   margin: 0 0 15px 0;
@@ -582,7 +585,7 @@ export default {
 
 .result-card .bird-description {
   color: #666;
-  font-size: 14px;
+  font-size: 24px;
   line-height: 1.6;
   margin: 0 0 20px 0;
 }
@@ -593,7 +596,7 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-bottom: 10px;
-  font-size: 13px;
+  font-size: 23px;
   padding: 5px 0;
 }
 
@@ -620,7 +623,6 @@ export default {
   justify-content: center;
 }
 
-/* Wikipedia Section */
 .wikipedia-section {
   margin-top: 30px;
   padding-top: 20px;
@@ -663,11 +665,11 @@ export default {
 
 .loading-content i,
 .error-content i {
-  font-size: 32px;
+  font-size: 42px;
 }
 
 .error-content .error-hint {
-  font-size: 12px;
+  font-size: 22px;
   color: #ccc;
   margin-top: 8px;
 }
@@ -694,7 +696,7 @@ export default {
   margin: 0;
   line-height: 1.6;
   color: #555;
-  font-size: 14px;
+  font-size: 24px;
 }
 
 .wiki-categories {
@@ -707,7 +709,7 @@ export default {
 }
 
 .category-label {
-  font-size: 13px;
+  font-size: 23px;
   color: #8492a6;
   margin-right: 8px;
 }
@@ -718,7 +720,6 @@ export default {
   color: #22b3c1;
 }
 
-/* Tips Section */
 .tips-section {
   margin-top: 30px;
   padding: 20px;
@@ -729,7 +730,7 @@ export default {
 .tips-section h4 {
   color: #333;
   margin: 0 0 15px 0;
-  font-size: 16px;
+  font-size: 26px;
 }
 
 .tips-section ul {
@@ -739,12 +740,11 @@ export default {
 
 .tips-section li {
   color: #666;
-  font-size: 14px;
+  font-size: 24px;
   margin-bottom: 8px;
   line-height: 1.5;
 }
 
-/* Rescue Section */
 .rescue-section {
   padding: 30px;
   border-bottom: 1px solid #eaeaea;
@@ -753,7 +753,7 @@ export default {
 .rescue-section h4 {
   color: #333;
   margin: 0 0 20px 0;
-  font-size: 18px;
+  font-size: 28px;
 }
 
 .rescue-card {
@@ -786,12 +786,12 @@ export default {
 .station-item h6 {
   margin: 0 0 5px 0;
   color: #22b3c1;
-  font-size: 14px;
+  font-size: 24px;
 }
 
 .station-item p {
   margin: 0 0 5px 0;
-  font-size: 13px;
+  font-size: 23px;
   color: #666;
 }
 
@@ -801,7 +801,6 @@ export default {
   color: #666;
 }
 
-/* Report Section */
 .report-section {
   padding: 30px;
 }
@@ -809,7 +808,7 @@ export default {
 .report-section h4 {
   color: #333;
   margin: 0 0 20px 0;
-  font-size: 18px;
+  font-size: 28px;
 }
 
 .report-card {
@@ -828,7 +827,6 @@ export default {
   text-align: center;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .identification-page {
     padding-top: 60px;
@@ -845,7 +843,7 @@ export default {
   }
 
   .result-card .bird-name {
-    font-size: 20px;
+    font-size: 30px;
   }
 
   .result-card .action-buttons {
