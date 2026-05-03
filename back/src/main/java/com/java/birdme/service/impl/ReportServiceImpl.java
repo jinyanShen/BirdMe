@@ -1,6 +1,7 @@
 package com.java.birdme.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.java.birdme.bean.*;
 import com.java.birdme.dao.ReportMapper;
@@ -123,6 +124,11 @@ public class ReportServiceImpl implements ReportService {
 
         Page<Report> reportPage = reportMapper.selectPage(page, wrapper);
         List<Report> records = reportPage.getRecords();
+        if (CollectionUtils.isNotEmpty(records)){
+            for (Report record : records) {
+                record.setSubmitter(userMapper.selectById(record.getSubmitterId()).getName());
+            }
+        }
 
         return PageResp.page(pageReq.getOffset(), pageReq.getPageSize(), (int) reportPage.getTotal(), records);
     }

@@ -87,42 +87,47 @@
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="Bird Name" prop="birdName">
-              <el-input v-model="form.birdName" placeholder="Please enter bird name" />
+              <el-input v-model="form.birdName" placeholder="Please enter bird name" :disabled="isFormDisabled" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="Species" prop="species">
-              <el-input v-model="form.species" placeholder="Please enter species" />
+              <el-input v-model="form.species" placeholder="Please enter species" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="Location" prop="location">
-              <el-input v-model="form.location" placeholder="Please enter location" />
+              <el-input v-model="form.location" placeholder="Please enter location" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="Injury Type" prop="injuryType">
-              <el-input v-model="form.injuryType" placeholder="Please enter injury type" />
+              <el-input v-model="form.injuryType" placeholder="Please enter injury type" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="Latitude" prop="latitude">
-              <el-input v-model.number="form.latitude" type="number" placeholder="Latitude" />
+              <el-input v-model.number="form.latitude" type="number" placeholder="Latitude" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="Longitude" prop="longitude">
-              <el-input v-model.number="form.longitude" type="number" placeholder="Longitude" />
+              <el-input v-model.number="form.longitude" type="number" placeholder="Longitude" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row :gutter="20">
         <el-form-item label="Description" prop="injuryDescription">
-          <el-input v-model="form.injuryDescription" type="textarea" :rows="3" placeholder="Please enter injury description" />
+          <el-input v-model="form.injuryDescription" type="textarea" :rows="3" placeholder="Please enter injury description" :disabled="isFormDisabled"/>
         </el-form-item>
+        <el-form-item label="ImageUrl" prop="imageUrl">
+          <el-image :src="form.imageUrl" style="width: 200px; height: 200px;"></el-image>
+        </el-form-item>
+        </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="Status" prop="status">
@@ -136,7 +141,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="Submitter ID" prop="submitterId">
-              <el-input v-model="form.submitterId" placeholder="Submitter ID" />
+              <el-input v-model="form.submitter" placeholder="Submitter ID" :disabled="isFormDisabled"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -169,6 +174,7 @@ export default {
   },
   data() {
     return {
+      userId: sessionStorage.getItem("id"),
       reportList: [],
       loading: false,
       submitLoading: false,
@@ -192,6 +198,7 @@ export default {
         injuryDescription: '',
         status: 'PENDING',
         submitterId: '',
+        submitter: '',
         notes: ''
       },
       rules: {
@@ -222,6 +229,11 @@ export default {
       this.rescueStationId = parseInt(sessionStorage.getItem('rescueStationId')) || null
     }
     this.fetchReportList()
+  },
+  computed: {
+    isFormDisabled() {
+      return this.form.submitterId !== '' && this.form.submitterId !== this.userId
+    }
   },
   methods: {
     async fetchReportList() {
@@ -344,6 +356,7 @@ export default {
         injuryDescription: '',
         status: 'PENDING',
         submitterId: '',
+        submitter: '',
         notes: ''
       }
       if (this.$refs.reportForm) {

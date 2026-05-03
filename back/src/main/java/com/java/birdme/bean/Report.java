@@ -75,6 +75,8 @@ public class Report {
      * Submitter ID
      */
     private String submitterId;
+    @TableField(exist = false)
+    private String submitter;
     /**
      * Rescue station ID
      */
@@ -195,6 +197,14 @@ public class Report {
 
     public void setSubmitterId(String submitterId) {
         this.submitterId = submitterId;
+    }
+
+    public String getSubmitter() {
+        return submitter;
+    }
+
+    public void setSubmitter(String submitter) {
+        this.submitter = submitter;
     }
 
     public Integer getRescueStationId() {
