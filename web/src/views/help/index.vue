@@ -91,6 +91,13 @@
         <el-form-item label="Description" prop="injuryDescription">
           <el-input type="textarea" v-model="rescueForm.injuryDescription" rows="4" placeholder="Describe the bird's condition"></el-input>
         </el-form-item>
+        <el-form-item label="Image" prop="imageUrl">
+          <UploadImg
+            ref="uploadImg"
+            buttonText="Upload image"
+            @image-uploaded="handleAvatarUploaded"
+          />
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="rescueDialogVisible = false">Cancel</el-button>
@@ -105,10 +112,13 @@ import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
 import { insertReport } from '@/api/report'
 import { geocode, searchNearbyPetHospitals } from '@/api/help'
 import NavBar from '@/components/NavBar/navbar.vue'
+import UploadImg from '@/components/UploadImg/index.vue'
+
 export default {
   name: 'Help',
   components: {
-    NavBar
+    NavBar,
+    UploadImg
   },
   data() {
     return {
@@ -133,7 +143,8 @@ export default {
         birdName: '',
         species: '',
         injuryType: '',
-        injuryDescription: ''
+        injuryDescription: '',
+        imageUrl: ''
       },
       rescueFormRules: {
         birdName: [{ required: true, message: 'Please enter bird name', trigger: 'blur' }],
@@ -592,6 +603,12 @@ export default {
       this.rescueForm.injuryType = ''
       this.rescueForm.injuryDescription = ''
       this.rescueDialogVisible = true
+
+      this.$nextTick(() => {
+        if (this.$refs.uploadImg) {
+          this.$refs.uploadImg.reset()
+        }
+      })
     },
 
     resetRescueForm() {
@@ -603,11 +620,35 @@ export default {
         birdName: '',
         species: '',
         injuryType: '',
-        injuryDescription: ''
+        injuryDescription: '',
+        imageUrl: ''
       }
       if (this.$refs.rescueFormRef) {
         this.$refs.rescueFormRef.resetFields()
       }
+    },
+
+    handleAvatarUploaded(data) {
+      const { file } = data;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('http://localhost:8080/file/upload', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          if(data.code === 200){
+            this.rescueForm.imageUrl = 'http://localhost:8080/file/download?id=' + data.data.id;
+            this.$message.success('Image uploaded successfully');
+          }else{
+            this.$message.error(data.msg);
+          }
+        })
+        .catch(error => {
+          this.$message.error('Image upload failed');
+        });
     },
 
     async submitRescueForm() {
@@ -640,6 +681,7 @@ export default {
           longitude: this.rescueForm.longitude,
           injuryType: this.rescueForm.injuryType,
           injuryDescription: this.rescueForm.injuryDescription,
+          imageUrl: this.rescueForm.imageUrl,
           submitterId: userId ? userId.toString() : null,
           rescueStationId: rescueStationId
         }
