@@ -14,19 +14,44 @@
             class="dock-row"
             :class="m.role === 'user' ? 'is-user' : 'is-assistant'"
           >
-            <div class="dock-bubble">{{ m.text }}</div>
+            <div class="dock-bubble">
+              <div v-if="m.images && m.images.length" class="dock-msg-images">
+                <img v-for="(src, ii) in m.images" :key="ii" :src="src" alt="" />
+              </div>
+              <span v-if="m.text">{{ m.text }}</span>
+            </div>
           </div>
         </div>
-        <div class="dock-input-row">
-          <el-input
-            v-model="draft"
-            type="textarea"
-            :rows="2"
-            placeholder="Talk to birdme"
-            resize="none"
-            @keyup.enter.native.exact.prevent="send"
-          />
-          <el-button type="primary" class="dock-send" :loading="loading" @click="send">Send</el-button>
+        <div class="dock-compose">
+          <div v-if="pendingFiles.length" class="dock-pending-images">
+            <div v-for="(p, pi) in pendingFiles" :key="p.key" class="dock-pending-item">
+              <img :src="p.preview" alt="" />
+              <button type="button" class="dock-remove-img" title="Remove" @click="removePending(pi)">×</button>
+            </div>
+          </div>
+          <div class="dock-input-row">
+            <input
+              ref="imageInput"
+              type="file"
+              class="dock-file-input"
+              accept="image/*"
+              multiple
+              @change="onPickImages"
+            >
+            <el-button type="default" class="dock-image-btn" title="Add image" @click="$refs.imageInput.click()">
+              <i class="el-icon-picture-outline" />
+            </el-button>
+            <el-input
+              v-model="draft"
+              type="textarea"
+              :rows="2"
+              placeholder="Talk to birdme (optional if you send an image)"
+              resize="none"
+              class="dock-text-input"
+              @keyup.enter.native.exact.prevent="send"
+            />
+            <el-button type="primary" class="dock-send" :loading="loading" @click="send">Send</el-button>
+          </div>
         </div>
       </div>
     </transition>
@@ -43,7 +68,9 @@
 </template>
 
 <script>
-import { sendDifyChatAndNavigate } from '@/api/dify'
+import { sendDifyChatAndNavigate, uploadDifyFile } from '@/api/dify'
+
+const MAX_CHAT_IMAGES = 4
 
 export default {
   name: 'DifyChatDock',
@@ -53,22 +80,93 @@ export default {
       draft: '',
       loading: false,
       conversationId: '',
-      messages: []
+      messages: [],
+      pendingFiles: []
     }
   },
+  beforeDestroy() {
+    this.revokeAllPending()
+  },
   methods: {
+    onPickImages(e) {
+      const input = e.target
+      const picked = Array.from(input.files || [])
+      input.value = ''
+      for (const file of picked) {
+        if (!file.type || !file.type.startsWith('image/')) {
+          this.$message.warning('Only image files are allowed')
+          continue
+        }
+        if (this.pendingFiles.length >= MAX_CHAT_IMAGES) {
+          this.$message.warning(`You can attach up to ${MAX_CHAT_IMAGES} images`)
+          break
+        }
+        this.pendingFiles.push({
+          key: `${Date.now()}-${Math.random()}`,
+          file,
+          preview: URL.createObjectURL(file)
+        })
+      }
+    },
+    removePending(index) {
+      const p = this.pendingFiles[index]
+      if (p && p.preview) {
+        URL.revokeObjectURL(p.preview)
+      }
+      this.pendingFiles.splice(index, 1)
+    },
+    revokeAllPending() {
+      this.pendingFiles.forEach(p => {
+        if (p.preview) URL.revokeObjectURL(p.preview)
+      })
+      this.pendingFiles = []
+    },
     async send() {
       const query = (this.draft || '').trim()
-      if (!query || this.loading) return
+      const hasPending = this.pendingFiles.length > 0
+      if ((!query && !hasPending) || this.loading) return
 
-      this.messages.push({ role: 'user', text: query })
-      this.draft = ''
       this.loading = true
-      this.$nextTick(this.scrollToBottom)
 
       try {
+        let files
+        const previews = this.pendingFiles.map(p => p.preview)
+        if (hasPending) {
+          const ids = []
+          for (const pf of this.pendingFiles) {
+            const up = await uploadDifyFile(pf.file)
+            if (up.code !== 200 || !up.data || !up.data.uploadFileId) {
+              this.$message.error(up.msg || 'Image upload failed')
+              return
+            }
+            ids.push(up.data.uploadFileId)
+          }
+          files = ids.map(upload_file_id => ({
+            type: 'image',
+            transfer_method: 'local_file',
+            upload_file_id
+          }))
+        }
+
+        const displayText = query || '(Image)'
+        this.messages.push({
+          role: 'user',
+          text: displayText,
+          images: hasPending ? previews.slice() : undefined
+        })
+        if (hasPending) {
+          this.revokeAllPending()
+        }
+        this.draft = ''
+        this.$nextTick(this.scrollToBottom)
+
+        const effectiveQuery = query || 'Describe this image.'
         const res = await sendDifyChatAndNavigate(
-          { query, conversationId: this.conversationId || undefined },
+          {
+            query: effectiveQuery,
+            conversationId: this.conversationId || undefined,
+            ...(files ? { files } : {})
+          },
           this.$router
         )
 
@@ -223,13 +321,96 @@ export default {
   border-bottom-left-radius: 4px;
 }
 
+.dock-compose {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+}
+
+.dock-pending-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 10px 0;
+}
+
+.dock-pending-item {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.dock-remove-img {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.65);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.dock-msg-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+
+  img {
+    max-width: 160px;
+    max-height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    vertical-align: middle;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+  }
+}
+
+.is-assistant .dock-msg-images img {
+  border-color: #e2e8f0;
+}
+
 .dock-input-row {
   display: flex;
   gap: 8px;
   align-items: flex-end;
   padding: 10px;
-  background: #fff;
-  border-top: 1px solid #e2e8f0;
+}
+
+.dock-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dock-image-btn {
+  flex-shrink: 0;
+  align-self: stretch;
+  min-height: 54px;
+  padding: 0 12px;
+  font-size: 18px;
+}
+
+.dock-text-input {
+  flex: 1;
+  min-width: 0;
 }
 
 .dock-input-row ::v-deep .el-textarea__inner {
