@@ -602,6 +602,7 @@ export default {
       this.rescueForm.species = ''
       this.rescueForm.injuryType = ''
       this.rescueForm.injuryDescription = ''
+      this.rescueForm.imageUrl = ''
       this.rescueDialogVisible = true
 
       this.$nextTick(() => {
