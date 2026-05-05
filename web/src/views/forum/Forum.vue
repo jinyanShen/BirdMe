@@ -444,7 +444,7 @@ export default {
   padding: 12px 20px;
   border: 2px solid #ff943c;
   border-radius: 25px;
-  font-size: 15px;
+  font-size: 18px;
   transition: all 0.3s;
 }
 
@@ -462,7 +462,7 @@ export default {
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .search-btn:hover {
@@ -479,7 +479,7 @@ export default {
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 15px;
+  font-size: 18px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -508,7 +508,7 @@ export default {
   cursor: pointer;
   transition: all 0.3s;
   color: #666;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .tab-item:hover {
@@ -534,7 +534,7 @@ export default {
   text-align: center;
   padding: 60px 20px;
   color: #999;
-  font-size: 16px;
+  font-size: 19px;
 }
 
 .post-item {
@@ -587,10 +587,10 @@ export default {
 }
 
 .post-title {
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   line-height: 1.4;
 }
 
@@ -599,7 +599,7 @@ export default {
   color: #333;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 16px;
   margin-right: 8px;
 }
 
@@ -608,7 +608,7 @@ export default {
   color: white;
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 16px;
   margin-right: 8px;
 }
 
@@ -644,7 +644,7 @@ export default {
   align-items: center;
   gap: 5px;
   color: #999;
-  font-size: 14px;
+  font-size: 18px;
 }
 
 .post-actions {
@@ -660,7 +660,7 @@ export default {
   border-radius: 15px;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 13px;
+  font-size: 17px;
 }
 
 .edit-btn:hover {
@@ -726,14 +726,14 @@ export default {
 
 .dialog-header h3 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
   color: #333;
 }
 
 .close-btn {
   background: none;
   border: none;
-  font-size: 30px;
+  font-size: 32px;
   color: #999;
   cursor: pointer;
   transition: color 0.3s;
@@ -803,7 +803,7 @@ export default {
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .btn-cancel:hover {
@@ -818,7 +818,7 @@ export default {
   border-radius: 25px;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 15px;
+  font-size: 18px;
 }
 
 .btn-submit:hover:not(:disabled) {

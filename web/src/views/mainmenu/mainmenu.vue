@@ -867,7 +867,7 @@ export default {
 
     .card .btn {
       background: rgba(255, 255, 255, 0.95) !important;
-      color: #3a00e8 !important;
+      color: #253dbc !important;
       border: none !important;
       font-weight: 900 !important;
       font-size: 18px !important;

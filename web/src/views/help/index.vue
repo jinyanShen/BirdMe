@@ -726,7 +726,7 @@ export default {
   }
 
   p {
-    font-size: 14px;
+    font-size: 18px;
     color: #666;
     margin: 0;
   }

@@ -20,6 +20,14 @@
           <i class="el-icon-picture"></i>
           <span>Bird Identification</span>
         </div>
+        <div
+          class="tab-item"
+          :class="{ active: currentTab === 'funFacts' }"
+          @click="switchTab('funFacts')"
+        >
+          <i class="el-icon-facts"></i>
+          <span>Fun facts</span>
+        </div>
       </div>
 
       <!-- Subpage content -->
@@ -32,12 +40,14 @@
 import BirdMigration from './BirdMigration.vue'
 import BirdIdentification from './BirdIdentification.vue'
 import NavBar from '@/components/NavBar/navbar.vue'
+import FunFacts from "@/views/knowledge/FunFacts.vue";
 
 export default {
   name: 'Knowledge',
   components: {
     BirdMigration,
     BirdIdentification,
+    FunFacts,
     NavBar
   },
   data() {
@@ -51,8 +61,8 @@ export default {
         return BirdMigration
       } else if (this.currentTab === 'identification') {
         return BirdIdentification
-      }
-      return BirdMigration
+      } else if (this.currentTab === 'funFacts')
+      return FunFacts
     }
   },
   methods: {
@@ -62,7 +72,7 @@ export default {
     },
     updateTabFromRoute() {
       const tab = this.$route.query.tab
-      if (tab === 'migration' || tab === 'identification') {
+      if (tab === 'migration' || tab === 'identification' || tab === 'funFacts') {
         this.currentTab = tab
       } else {
         this.currentTab = 'migration'
@@ -81,7 +91,7 @@ export default {
 <style scoped>
 .knowledge-page {
   padding-top: 100px;
-  background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+  background: linear-gradient(135deg, #e0f5fa 0%, #63c9e8 100%);
   min-height: 100vh;
 }
 
@@ -110,17 +120,17 @@ export default {
   cursor: pointer;
   transition: all 0.3s;
   color: #666;
-  font-size: 16px;
+  font-size: 19px;
   font-weight: 500;
 }
 
 .tab-item:hover {
-  background: #e0f7fa;
-  color: #22b3c1;
+  background: #e0f3fa;
+  color: #2289c1;
 }
 
 .tab-item.active {
-  background: linear-gradient(135deg, #22b3c1 0%, #4dd0e1 100%);
+  background: linear-gradient(135deg, #3a79cc 0%, #a6d1e3 100%);
   color: white;
 }
 
