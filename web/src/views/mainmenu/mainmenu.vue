@@ -1478,7 +1478,7 @@ export default {
 
     .footer-column {
       h4 {
-        font-size: 24px;
+        font-size: 28px;
         margin-bottom: 20px;
         color: #ffd966;
         font-weight: bold;
@@ -1498,14 +1498,14 @@ export default {
       }
 
       .footer-description {
-        font-size: 16px;
+        font-size: 22px;
         line-height: 1.6;
         margin-bottom: 15px;
         opacity: 0.9;
       }
 
       .footer-tagline {
-        font-size: 14px;
+        font-size: 18px;
         font-style: italic;
         color: #ffd966;
       }
@@ -1520,7 +1520,7 @@ export default {
           display: flex;
           align-items: center;
           gap: 10px;
-          font-size: 14px;
+          font-size: 18px;
           line-height: 1.5;
 
           i {
@@ -1542,7 +1542,7 @@ export default {
           color: white;
           text-decoration: none;
           transition: all 0.3s;
-          font-size: 14px;
+          font-size: 18px;
           display: inline-block;
 
           &:hover {
@@ -1560,7 +1560,7 @@ export default {
         .social-icon {
           color: white;
           text-decoration: none;
-          font-size: 14px;
+          font-size: 18px;
           display: inline-flex;
           align-items: center;
           gap: 10px;
@@ -1586,7 +1586,7 @@ export default {
 
     p {
       margin: 10px 0;
-      font-size: 14px;
+      font-size: 18px;
       opacity: 0.8;
     }
 
