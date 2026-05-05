@@ -552,7 +552,7 @@ export default {
             <div class="card fade-in-up">
               <i class="el-icon-camera"></i>
               <h4>Identification</h4>
-              <p>AI-powered bird species recognition</p>
+              <p>AI bird species recognition</p>
               <button class="btn" @click="goToIdentification">Start Identifying</button>
             </div>
 
@@ -584,7 +584,7 @@ export default {
 
             <div class="card fade-in-up">
               <i class="el-icon-camera-solid"></i>
-              <h4>Birdwatching & Life</h4>
+              <h4>Bird & Life</h4>
               <p>Share daily sightings, bird photos, and casual conversations</p>
               <button class="btn" @click="goToBirdwatching">Join Discussion</button>
             </div>
@@ -597,12 +597,69 @@ export default {
             </div>
           </div>
         </div>
+        <!-- ========== 新增 Footer 页脚部分 ========== -->
+        <footer class="site-footer fade-in-up">
+          <div class="footer-container">
+            <div class="footer-column">
+              <h4>BirdME</h4>
+              <p class="footer-description">AI Bird Identification & Rescue System</p>
+              <p class="footer-tagline">Protect birds, protect our future</p>
+            </div>
+
+            <div class="footer-column">
+              <h4>Contact Us</h4>
+              <ul class="contact-list">
+                <li>
+                  <i class="el-icon-phone-outline"></i>
+                  <span>+86 3146430</span>
+                </li>
+                <li>
+                  <i class="el-icon-message"></i>
+                  <span> http://csi420-01-vm2.ucd.ie</span>
+                </li>
+                <li>
+                  <i class="el-icon-location-outline"></i>
+                  <span>Beijing University of Technology, Beijing, China</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="footer-column">
+              <h4>Quick Links</h4>
+              <ul class="quick-links">
+                <li><a @click="goToKnowledge">Knowledge</a></li>
+                <li><a @click="goToRescueHelp">Help</a></li>
+                <li><a @click="goToForum">Community Forum</a></li>
+                <li><a @click="goToPersonalPage">Setting</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-column">
+              <h4>Follow Us</h4>
+              <div class="social-links">
+                <a href="#" class="social-icon"><i class="el-icon-odometer"></i> Twitter</a>
+                <a href="#" class="social-icon"><i class="el-icon-camera"></i> Instagram</a>
+                <a href="#" class="social-icon"><i class="el-icon-share"></i> Facebook</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="footer-bottom">
+            <p>&copy; 2024 BirdME | Group2_TOT. All rights reserved.</p>
+            <p class="footer-privacy">
+              <a @click="goToHome">Privacy Policy</a> |
+              <a @click="goToHome">Terms of Service</a>
+            </p>
+          </div>
+        </footer>
       </div>
     </div>
   </div>
+
 </template>
 
 <style scoped lang="scss">
+
 
 .bird-home-container {
   position: relative;
@@ -867,7 +924,7 @@ export default {
 
     .card .btn {
       background: rgba(255, 255, 255, 0.95) !important;
-      color: #253dbc !important;
+      color: #2317c8 !important;
       border: none !important;
       font-weight: 900 !important;
       font-size: 18px !important;
@@ -1244,8 +1301,8 @@ export default {
     /*每部分的框*/
     /* 紧急救助 First Aid — 超高醒目紧急急救红 */
     .knowledge-cards-wrapper .card.emergency-first-aid {
-      background: #d80027 !important;
-      border: 3px solid #ff3355 !important;
+      background: #ff0000 !important;
+      border: 3px solid #f36a6a !important;
       box-shadow: 0 0 30px rgba(255, 0, 30, 0.75),
       0 0 60px rgba(255, 0, 30, 0.4) !important;
 
@@ -1402,4 +1459,190 @@ export default {
 }
 
 
+/* ========== Footer 页脚样式 ========== */
+.site-footer {
+  margin-top: 80px;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-radius: 30px 30px 0 0;
+  padding: 50px 40px 20px;
+  border-top: 2px solid rgba(255, 255, 255, 0.2);
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: 40px;
+
+    .footer-column {
+      h4 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #ffd966;
+        font-weight: bold;
+        position: relative;
+        display: inline-block;
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 0;
+          width: 40px;
+          height: 3px;
+          background: #ffd966;
+          border-radius: 2px;
+        }
+      }
+
+      .footer-description {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+        opacity: 0.9;
+      }
+
+      .footer-tagline {
+        font-size: 14px;
+        font-style: italic;
+        color: #ffd966;
+      }
+
+      .contact-list, .quick-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          margin-bottom: 12px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          font-size: 14px;
+          line-height: 1.5;
+
+          i {
+            font-size: 18px;
+            color: #ffd966;
+            min-width: 24px;
+          }
+
+          span {
+            opacity: 0.9;
+          }
+        }
+      }
+
+      .quick-links li {
+        cursor: pointer;
+
+        a {
+          color: white;
+          text-decoration: none;
+          transition: all 0.3s;
+          font-size: 14px;
+          display: inline-block;
+
+          &:hover {
+            color: #ffd966;
+            transform: translateX(5px);
+          }
+        }
+      }
+
+      .social-links {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .social-icon {
+          color: white;
+          text-decoration: none;
+          font-size: 14px;
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          transition: all 0.3s;
+
+          i {
+            font-size: 18px;
+          }
+
+          &:hover {
+            color: #ffd966;
+            transform: translateX(5px);
+          }
+        }
+      }
+    }
+  }
+
+  .footer-bottom {
+    text-align: center;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+    p {
+      margin: 10px 0;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .footer-privacy {
+      a {
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #ffd966;
+        }
+      }
+    }
+  }
+}
+
+/* 响应式调整 - 添加 footer 的响应式 */
+@media (max-width: 768px) {
+  .site-footer {
+    padding: 40px 20px 20px;
+    margin-top: 50px;
+
+    .footer-container {
+      grid-template-columns: 1fr;
+      gap: 30px;
+      text-align: center;
+
+      .footer-column {
+        h4::after {
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        .contact-list li {
+          justify-content: center;
+        }
+
+        .quick-links li a:hover {
+          transform: translateX(0);
+        }
+
+        .social-links .social-icon {
+          justify-content: center;
+
+          &:hover {
+            transform: translateX(0);
+          }
+        }
+      }
+    }
+
+    .footer-bottom {
+      text-align: center;
+    }
+  }
+}
 </style>
