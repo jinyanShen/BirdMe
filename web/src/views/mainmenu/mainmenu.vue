@@ -505,88 +505,102 @@ export default {
           </el-carousel>
         </div>
 
-        <!-- Rescue 板块 -->
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
+        <!-- Rescue 板块 - 改为横向长条 -->
+        <div class="horizontal-section-wrapper">
+          <div class="section-header fade-in-up">
             <h3>Bird Rescue</h3>
             <p>Report injured birds, find rescue centers, and learn first‑aid tips to help birds in need.</p>
             <div class="section-divider"></div>
           </div>
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-warning"></i>
-              <h4>Injury & Rescue</h4>
-              <p>Submit rescue reports and find rescue centers.</p>
+          <div class="horizontal-cards-container">
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-warning"></i></div>
+              <div class="card-content">
+                <h4>Injury & Rescue</h4>
+                <p>Submit rescue reports and find rescue centers.</p>
+              </div>
               <button class="btn" @click="goToReportInjury">Report Now</button>
             </div>
-            <div class="card fade-in-up emergency-first-aid">
-              <i class="el-icon-first-aid-kit"></i>
-              <h4>First Aid</h4>
-              <p>Contact directly in case of emergency. No need Login!</p>
+            <div class="horizontal-card emergency-first-aid fade-in-up">
+              <div class="card-icon"><i class="el-icon-first-aid-kit"></i></div>
+              <div class="card-content">
+                <h4>First Aid</h4>
+                <p>Contact directly in case of emergency. No need Login!</p>
+              </div>
               <button class="btn" @click="goToFirstAid">Go First Aid</button>
             </div>
           </div>
         </div>
 
-        <div class="knowledge-cards-wrapper">
-          <div class="section fade-in-up">
+        <!-- Knowledge Base 板块 - 改为横向长条 -->
+        <div class="horizontal-section-wrapper">
+          <div class="section-header fade-in-up">
             <h3>Knowledge Base</h3>
             <p>A collection featuring bird identification, migration route maps, and educational resources.</p>
             <div class="section-divider"></div>
           </div>
-
-          <div class="cards-container">
-            <div class="card fade-in-up">
-              <i class="el-icon-camera"></i>
-              <h4>Identification</h4>
-              <p>AI bird species recognition</p>
+          <div class="horizontal-cards-container four-cards">
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-camera"></i></div>
+              <div class="card-content">
+                <h4>Identification</h4>
+                <p>AI bird species recognition</p>
+              </div>
               <button class="btn" @click="goToIdentification">Start Identifying</button>
             </div>
 
-            <div class="card fade-in-up">
-              <i class="el-icon-location-information"></i>
-              <h4>Migration Map</h4>
-              <p>Bird migration route map</p>
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-location-information"></i></div>
+              <div class="card-content">
+                <h4>Migration Map</h4>
+                <p>Bird migration route map</p>
+              </div>
               <button class="btn" @click="goToMigrationMap">View Map</button>
             </div>
 
-            <div class="card fade-in-up">
-              <i class="el-icon-info"></i>
-              <h4>Fun facts</h4>
-              <p>Know more about birds!</p>
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-info"></i></div>
+              <div class="card-content">
+                <h4>Fun facts</h4>
+                <p>Know more about birds!</p>
+              </div>
               <button class="btn" @click="goToBirdingTips">Learn More</button>
             </div>
 
-            <div class="card fade-in-up">
-              <i class="el-icon-info"></i>
-              <h4>Heat Map</h4>
-              <p>Injury condition about birds</p>
-              <button class="btn" @click="goToBirdingTips">View Diagram</button>
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-info"></i></div>
+              <div class="card-content">
+                <h4>Heat Map</h4>
+                <p>Injury condition about birds</p>
+              </div>
+              <button class="btn" @click="goToHeatMap">View Diagram</button>
             </div>
           </div>
         </div>
 
-
-        <!-- Forum 板块（重新设计版） -->
-        <div class="knowledge-cards-wrapper forum-wrapper-shadow">
-        <div class="section fade-in-up">
+        <!-- Forum 板块 - 改为横向长条 -->
+        <div class="horizontal-section-wrapper forum-wrapper-shadow">
+          <div class="section-header fade-in-up">
             <h3>Community Forum</h3>
             <p>Expert tips, rescue assistance, and daily birdwatching stories – all in one place.</p>
             <div class="section-divider"></div>
           </div>
-          <div class="cards-container">
-
-            <div class="card fade-in-up">
-              <i class="el-icon-camera-solid"></i>
-              <h4>Bird & Life</h4>
-              <p>Share daily sightings, bird photos, and casual conversations</p>
+          <div class="horizontal-cards-container">
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-camera-solid"></i></div>
+              <div class="card-content">
+                <h4>Bird & Life</h4>
+                <p>Share daily sightings, bird photos, and casual conversations</p>
+              </div>
               <button class="btn" @click="goToBirdwatching">Join Discussion</button>
             </div>
 
-            <div class="card fade-in-up">
-              <i class="el-icon-warning-outline"></i>
-              <h4>Rescue Help</h4>
-              <p>Post urgent rescue requests or ask for help with injured birds</p>
+            <div class="horizontal-card fade-in-up">
+              <div class="card-icon"><i class="el-icon-warning-outline"></i></div>
+              <div class="card-content">
+                <h4>Rescue Help</h4>
+                <p>Post urgent rescue requests or ask for help with injured birds</p>
+              </div>
               <button class="btn" @click="goToRescueHelp">Ask for Rescue</button>
             </div>
           </div>
@@ -1636,6 +1650,212 @@ export default {
 
     .footer-bottom {
       text-align: center;
+    }
+  }
+}
+
+.content-below {
+  background: linear-gradient(135deg, #bfd3f8 0%, #095dfa 100%);
+  padding: 60px 20px;
+  color: white;
+
+  > * {
+    transition: opacity 0.2s linear, transform 0.2s linear;
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  .section-header {
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    text-align: center;
+
+    h3 {
+      font-size: 48px;
+      margin-bottom: 25px;
+    }
+
+    p {
+      font-size: 24px;
+      line-height: 1.6;
+    }
+  }
+}
+
+// 新的横向长条卡片容器样式
+.horizontal-section-wrapper {
+  background: rgba(255, 255, 255, 0.03) !important;
+  box-shadow: 0 10px 30px rgba(39, 3, 58, 0.25) !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 24px;
+  padding: 50px 40px;
+  margin: 0 auto 60px;
+  max-width: 1200px;
+  transition: all 0.3s;
+
+  .section-header {
+    h3 {
+      font-weight: bold !important;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+    }
+    p {
+      text-shadow: 0 1px 5px rgba(0, 0, 0, 0.4) !important;
+    }
+  }
+}
+
+.horizontal-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+
+  &.four-cards {
+    max-width: 1000px;
+  }
+}
+
+.horizontal-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 2px solid #aad0e8 !important;
+  border-radius: 16px;
+  padding: 20px 30px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateX(10px);
+    background: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .card-icon {
+    flex-shrink: 0;
+    width: 60px;
+    text-align: center;
+
+    i {
+      font-size: 48px;
+      color: #ffd966;
+      transition: transform 0.3s;
+    }
+  }
+
+  &:hover .card-icon i {
+    transform: scale(1.1);
+  }
+
+  .card-content {
+    flex: 1;
+    padding: 0 30px;
+
+    h4 {
+      font-size: 24px !important;
+      font-weight: normal !important;
+      margin: 0 0 8px 0;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.45) !important;
+    }
+
+    p {
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      margin: 0;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35) !important;
+      opacity: 0.9;
+    }
+  }
+
+  .btn {
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #2317c8 !important;
+    border: none !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    padding: 10px 24px !important;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+
+    &:hover {
+      background: white !important;
+      color: #ff1c1c !important;
+      transform: scale(1.05);
+    }
+  }
+}
+
+// 紧急救助卡片特殊样式（横向长条版）
+.horizontal-card.emergency-first-aid {
+  background: rgba(225, 16, 46, 0.75) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 20px rgba(87, 0, 17, 0.5) !important;
+
+  &:hover {
+    box-shadow: 0 10px 30px rgba(214, 39, 78, 0.6) !important;
+    transform: translateX(10px);
+  }
+
+  .card-icon i {
+    color: #ffffff !important;
+  }
+
+  .card-content h4,
+  .card-content p {
+    color: #ffffff !important;
+  }
+
+  .btn {
+    background: #ffffff !important;
+    color: #d80027 !important;
+
+    &:hover {
+      background: #f8f8f8 !important;
+      color: #ff006a !important;
+    }
+  }
+}
+
+// 响应式调整：移动端改为垂直布局
+@media (max-width: 768px) {
+  .horizontal-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 25px 20px;
+
+    .card-icon {
+      margin-bottom: 15px;
+    }
+
+    .card-content {
+      padding: 0 0 15px 0;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 200px;
+    }
+  }
+
+  .horizontal-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .horizontal-section-wrapper {
+    padding: 30px 20px;
+  }
+
+  .section-header {
+    h3 {
+      font-size: 36px;
+    }
+    p {
+      font-size: 18px;
     }
   }
 }
