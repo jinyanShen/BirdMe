@@ -253,7 +253,7 @@ export default {
     // Report methods
     loadReports() {
       this.loading = true;
-      getReportsBySubmitter("user").then(response => {
+      getReportsBySubmitter(this.form.id).then(response => {
         if (response.code === 200) {
           this.reports = response.data || [];
         } else {

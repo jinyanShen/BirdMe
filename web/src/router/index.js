@@ -74,6 +74,21 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/rescueStation',
+    component: () => import('@/views/rescueStation/index'),
+    redirect: '/rescueStation/index',
+    hidden: true,
+    meta: { title: 'RescueStation' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/rescueStation/index'),
+        name: 'RescueStation',
+        meta: { title: 'RescueStation' }
+      }
+    ]
+  },
+  {
     path: '/game',
     // component: Layout,
     component: () => import('@/views/game/GameContainer'),

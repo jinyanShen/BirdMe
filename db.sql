@@ -1,6 +1,7 @@
 -- BirdME Database Schema
 
 -- Create users table
+DROP TABLE IF EXISTS user;
 CREATE TABLE IF NOT EXISTS user (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                                     username VARCHAR(50) NOT NULL UNIQUE,
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS user (
 );
 
 -- Create rescue_stations table
+DROP TABLE IF EXISTS rescue_station;
 CREATE TABLE IF NOT EXISTS rescue_station (
                                                id INTEGER PRIMARY KEY AUTOINCREMENT,
                                                name VARCHAR(100) NOT NULL,
@@ -30,6 +32,7 @@ CREATE TABLE IF NOT EXISTS rescue_station (
 );
 
 -- Create reports table
+DROP TABLE IF EXISTS report;
 CREATE TABLE IF NOT EXISTS report (
                                        id INTEGER PRIMARY KEY AUTOINCREMENT,
                                        bird_name VARCHAR(100) NOT NULL,
@@ -48,13 +51,6 @@ CREATE TABLE IF NOT EXISTS report (
                                        notes TEXT,
                                        FOREIGN KEY (rescue_station_id) REFERENCES rescue_station(id)
 );
-
--- Insert sample rescue stations
-INSERT INTO rescue_station (name, address, latitude, longitude, phone, email, opening_hours, description, contact_person)
-VALUES
-    ('Wildlife Rescue Center', '123 Main St, City Center', 40.7128, -74.0060, '123-456-7890', 'info@wildliferescue.org', '9am-5pm daily', 'Professional wildlife rescue and rehabilitation center', 'John Smith'),
-    ('Bird Rescue Sanctuary', '456 Oak Ave, Suburb', 34.0522, -118.2437, '987-654-3210', 'contact@birdsanctuary.org', '10am-4pm daily', 'Specialized in bird rescue and rehabilitation', 'Jane Doe'),
-    ('Animal Welfare League', '789 Pine Rd, Countryside', 41.8781, -87.6298, '555-123-4567', 'support@animalwelfare.org', '8am-6pm daily', 'Comprehensive animal welfare organization', 'Mike Johnson');
 
 -- Insert sample users
 INSERT INTO "user"
@@ -91,47 +87,10 @@ INSERT INTO "user"
 (id, username, password, "role", name, age, phone, avatar_url, created_at)
 VALUES(12, 'user11', '123456', 0, '111', 11, '11', '', '2026-03-29 14:20:25');
 
--- Insert rescue station users (role=2)
-INSERT INTO "user"
-(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
-VALUES(20, 'rescue1', '123456', 2, 'Wildlife Rescue Center Manager', 35, '13900000001', '', 1, '2026-04-14 10:00:00');
 
-INSERT INTO "user"
-(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
-VALUES(21, 'rescue2', '123456', 2, 'Bird Rescue Sanctuary Manager', 28, '13900000002', '', 2, '2026-04-14 10:00:00');
-
-INSERT INTO "user"
-(id, username, password, "role", name, age, phone, avatar_url, rescue_station_id, created_at)
-VALUES(22, 'rescue3', '123456', 2, 'Animal Welfare League Manager', 42, '13900000003', '', 3, '2026-04-14 10:00:00');
-
-
-
--- Report table insert statements
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Sparrow', 'Passer domesticus', 39.9042, 116.4074, 'Central Park', 'Broken wing', 'The bird has a broken wing and cannot fly', NULL, 'PENDING', datetime('now'), datetime('now'), 'user', 1, 'Found near the park entrance');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Pigeon', 'Columba livia', 39.9142, 116.4174, 'City Square', 'Foot injury', 'The bird has an injured foot and cannot stand properly', NULL, 'PROCESSING', datetime('now'), datetime('now'), 'user', 2, 'Found near the fountain');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Crow', 'Corvus brachyrhynchos', 39.9242, 116.4274, 'Riverside Park', 'Head injury', 'The bird has a head injury and appears disoriented', NULL, 'COMPLETED', datetime('now'), datetime('now'), 'user', 1, 'Found near the river bank');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Robin', 'Turdus migratorius', 39.9342, 116.4374, 'Suburban Area', 'Starvation', 'The bird is weak and malnourished', NULL, 'PENDING', datetime('now'), datetime('now'), 'user', 2, 'Found in a backyard');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Hawk', 'Buteo jamaicensis', 39.9442, 116.4474, 'Mountain Area', 'Poisoning', 'The bird appears to have been poisoned', NULL, 'PROCESSING', datetime('now'), datetime('now'), 'user', 1, 'Found near a farm');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Eagle', 'Aquila chrysaetos', 39.9542, 116.4574, 'Forest Area', 'Wing injury', 'The bird has a damaged wing feather', NULL, 'CANCELLED', datetime('now'), datetime('now'), 'user', 2, 'Found in the forest');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Owl', 'Bubo virginianus', 39.9642, 116.4674, 'Woodland Park', 'Eye injury', 'The bird has an injured eye', NULL, 'PENDING', datetime('now'), datetime('now'), 'user', 1, 'Found near the old oak tree');
-
-INSERT INTO report (bird_name, species, latitude, longitude, location, injury_type, injury_description, image_url, status, created_at, updated_at, submitter_id, rescue_station_id, notes)
-VALUES ('Duck', 'Anas platyrhynchos', 39.9742, 116.4774, 'Lake Side', 'Leg injury', 'The bird has a broken leg', NULL, 'PROCESSING', datetime('now'), datetime('now'), 'user', 2, 'Found near the lake shore');
 
 -- Create forum_post table
+DROP TABLE IF EXISTS forum_post;
 CREATE TABLE IF NOT EXISTS forum_post (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title VARCHAR(200) NOT NULL,
@@ -151,6 +110,7 @@ CREATE TABLE IF NOT EXISTS forum_post (
 );
 
 -- Create forum_reply table
+DROP TABLE IF EXISTS forum_reply;
 CREATE TABLE IF NOT EXISTS forum_reply (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     post_id INTEGER NOT NULL,
@@ -167,7 +127,7 @@ CREATE TABLE IF NOT EXISTS forum_reply (
 DELETE FROM forum_post;
 DELETE FROM forum_reply;
 
-INSERT INTO forum_post (title, content, tag, category, author_id, author_name, author_avatar, is_pinned, view_count, reply_count) VALUES 
+INSERT INTO forum_post (title, content, tag, category, author_id, author_name, author_avatar, is_pinned, view_count, reply_count) VALUES
 ('Best Bird Watching Spots in Spring', 'Hello everyone! Spring is here. I want to share some of my favorite bird watching locations. First is the Wetland Park in the city center, where many migratory birds gather...', 'Bird Watching', 'birdwatching', 1, 'Zhang San', 'http://localhost:8080/file/download?id=cb7cd1ec17624b27bafc3b63a53310a4', 1, 120, 15),
 ('How to Distinguish Sparrows from Tits?', 'Newbie here! I saw two types of small birds in the park that look very similar. How can I tell them apart? Any experts can help?', 'Bird Watching', 'birdwatching', 2, 'Li Si', 'http://localhost:8080/file/download?id=bc0a475b0d7d4fbeac5106d2015f631c', 0, 85, 8),
 ('Important Notes on Keeping Kestrels', 'Some friends asked if kestrels can be kept as pets. Let me clarify: Kestrels are national second-class protected animals, and private ownership is illegal...', 'Education', 'birdwatching', 3, 'Admin', 'http://localhost:8080/file/download?id=0c58187449134bf8ac4bbeaeda45da1b', 1, 256, 32),

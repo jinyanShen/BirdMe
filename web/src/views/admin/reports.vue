@@ -45,6 +45,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="createdAt" label="Created At" width="180" />
+        <el-table-column prop="userLocation" label="User Location" width="180" />
         <el-table-column label="Operations" width="250" fixed="right">
           <template slot-scope="scope">
             <button class="action-btn view-btn" @click="handleView(scope.row)">
@@ -145,9 +146,18 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="Notes" prop="notes">
-          <el-input v-model="form.notes" type="textarea" :rows="2" placeholder="Add notes" />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="UserLocation" prop="userLocation">
+              <el-input v-model="form.userLocation" type="textarea" :rows="2" placeholder="Add userLocation" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="Notes" prop="notes">
+              <el-input v-model="form.notes" type="textarea" :rows="2" placeholder="Add notes" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
@@ -199,6 +209,7 @@ export default {
         status: 'PENDING',
         submitterId: '',
         submitter: '',
+        userLocation: '',
         notes: ''
       },
       rules: {
@@ -357,6 +368,7 @@ export default {
         status: 'PENDING',
         submitterId: '',
         submitter: '',
+        userLocation: '',
         notes: ''
       }
       if (this.$refs.reportForm) {

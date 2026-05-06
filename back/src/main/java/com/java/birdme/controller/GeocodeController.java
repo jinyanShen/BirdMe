@@ -3,15 +3,19 @@ package com.java.birdme.controller;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.java.birdme.bean.ReturnResp;
 import com.java.birdme.bean.RescueStation;
 import com.java.birdme.bean.User;
 import com.java.birdme.dao.RescueStationMapper;
 import com.java.birdme.dao.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -167,7 +171,7 @@ public class GeocodeController {
         return null;
     }
 
-    private String translate(String address){
+    private String translate(String address) {
         try {
             // 构建润色请求参数
             GenerationParam param = GenerationParam.builder()
@@ -332,5 +336,56 @@ public class GeocodeController {
             e.printStackTrace();
             return new ReturnResp(500, "Server error: " + e.getMessage(), null);
         }
+    }
+
+    @PostMapping("/reverseGeocode")
+    public ReturnResp reverseGeocode(@RequestBody Map<String, Object> request) {
+        try {
+            Double latitude = (Double) request.get("latitude");
+            Double longitude = (Double) request.get("longitude");
+
+            RestTemplate restTemplate = new RestTemplate();
+
+            Map<String, String> params = new HashMap<>();
+            params.put("key", WEB_SERVICE_KEY);
+            params.put("location", longitude + "," + latitude);
+            params.put("extensions", "base");
+            params.put("output", "JSON");
+
+            String signature = generateSignature(params, SECRET);
+            params.put("sig", signature);
+
+            StringBuilder urlBuilder = new StringBuilder("https://restapi.amap.com/v3/geocode/regeo").append("?");
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                urlBuilder.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+            }
+            String url = urlBuilder.substring(0, urlBuilder.length() - 1);
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            String body = response.getBody();
+
+            if (body != null) {
+                JSONObject json = JSON.parseObject(body);
+                String status = json.getString("status");
+                if ("1".equals(status)) {
+                    JSONObject regeocode = json.getJSONObject("regeocode");
+                    if (regeocode != null) {
+                        String formattedAddress = regeocode.getString("formatted_address");
+                        if (formattedAddress != null && !formattedAddress.isEmpty()) {
+                            return ReturnResp.success(translate(formattedAddress));
+                        }
+                    }
+                } else {
+                    String info = json.getString("info");
+                    String infocode = json.getString("infocode");
+                    System.err.println("AMap API error: status=" + status + ", info=" + info + ", infocode=" + infocode);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("AMap API error: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return ReturnResp.fail();
     }
 }

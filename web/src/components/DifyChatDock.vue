@@ -103,7 +103,7 @@ import { sendDifyChatAndNavigate } from '@/api/dify'
 import UploadImg from '@/components/UploadImg/index.vue'
 import { insertReport } from '@/api/report'
 import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
-import { geocode, searchNearbyPetHospitals } from '@/api/help'
+import { reverseGeocode, searchNearbyPetHospitals } from '@/api/help'
 
 export default {
   name: 'DifyChatDock',
@@ -132,7 +132,8 @@ export default {
       },
       userLocation: {
         latitude: null,
-        longitude: null
+        longitude: null,
+        location: null
       },
       rescueDialogVisible: false,
       submitLoading: false,
@@ -168,6 +169,7 @@ export default {
           const answer = typeof res.data.answer === 'string' ? res.data.answer : ''
 
           if("help process" === answer){
+            this.messages.push({ role: 'assistant', text: 'Currently processing, please wait.' })
             this.getCurrentLocation()
             return
           }
@@ -198,8 +200,21 @@ export default {
             this.userLocation.latitude = position.coords.latitude
             this.userLocation.longitude = position.coords.longitude
 
-            // Check nearby pet hospitals
-            this.checkAndAddNearbyPetHospitals()
+            try {
+              reverseGeocode(
+                this.userLocation.latitude,
+                this.userLocation.longitude
+              ).then(res => {
+                if (res.code === 200) {
+                  this.userLocation.location = res.data;
+
+                  // Check nearby pet hospitals
+                  this.checkAndAddNearbyPetHospitals()
+                }
+              })
+            } catch (error) {
+              console.error('Get location error:', error);
+            }
           },
           (error) => {
             console.error('Error getting location:', error)
@@ -228,8 +243,8 @@ export default {
                   )
                   return {
                     ...station,
-                    distance: distance, // 距离（米）
-                    distanceKm: (distance / 1000).toFixed(2) // 距离（千米）
+                    distance: distance,
+                    distanceKm: (distance / 1000).toFixed(2)
                   }
                 })
 
@@ -334,17 +349,21 @@ export default {
           injuryDescription: this.rescueForm.injuryDescription,
           imageUrl: this.rescueForm.imageUrl,
           submitterId: userId ? userId.toString() : null,
+          userLocation: this.userLocation.location,
+          userLatitude: this.userLocation.latitude,
+          userLongitude: this.userLocation.longitude,
           rescueStationId: this.rescueForm.rescueStationId
         }
 
-        const response = await insertReport(reportData)
-        if (response.code === 200) {
-          this.messages.push({ role: 'assistant', text: 'Submitted successfully. Please view your report later.' })
-          this.rescueDialogVisible = false
-          this.resetRescueForm()
-        } else {
-          this.$message.error(response.msg || 'Failed to submit rescue report')
-        }
+        insertReport(reportData).then(response => {
+          if (response.code === 200) {
+            this.messages.push({ role: 'assistant', text: 'Submitted successfully. Please view your report later.' })
+            this.rescueDialogVisible = false
+            this.resetRescueForm()
+          } else {
+            this.$message.error(response.msg || 'Failed to submit rescue report')
+          }
+        })
       } catch (error) {
         console.error('Error submitting rescue report:', error)
         this.$message.error('Failed to submit rescue report')

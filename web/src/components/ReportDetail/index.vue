@@ -71,6 +71,10 @@
             <span class="timeline-value">{{ formatDate(report.createdAt) }}</span>
           </div>
           <div class="timeline-item">
+            <span class="timeline-label">UserLocation:</span>
+            <span class="timeline-value">{{ report.userLocation }}</span>
+          </div>
+          <div class="timeline-item">
             <span class="timeline-label">Last Updated:</span>
             <span class="timeline-value">{{ formatDate(report.updatedAt) }}</span>
           </div>
