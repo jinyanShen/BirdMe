@@ -110,7 +110,7 @@
 <script>
 import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
 import { insertReport } from '@/api/report'
-import { geocode, searchNearbyPetHospitals } from '@/api/help'
+import { geocode, searchNearbyPetHospitals, reverseGeocode  } from '@/api/help'
 import NavBar from '@/components/NavBar/navbar.vue'
 import UploadImg from '@/components/UploadImg/index.vue'
 

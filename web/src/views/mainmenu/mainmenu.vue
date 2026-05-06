@@ -87,9 +87,9 @@ export default {
     },
     goToReportInjury() {
       if (this.isLoggedIn) {
-        this.$router.push('/rescueStation/index')
+        this.$router.push('/help/index')
       } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/rescueStation/index')
+        window.$showLoginDialog('/help/index')
       }
     },
 
@@ -103,9 +103,9 @@ export default {
 
     goToFirstAid() {
       if (this.isLoggedIn) {
-        this.$router.push('/help/index')
+        this.$router.push('/rescueStation/index')
       } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/help/index')
+        window.$showLoginDialog('/rescueStation/index')
       }
     },
 
