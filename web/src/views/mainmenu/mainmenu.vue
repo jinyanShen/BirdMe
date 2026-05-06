@@ -519,7 +519,7 @@ export default {
                 <h4>Injury & Rescue</h4>
                 <p>Submit rescue reports and find rescue centers.</p>
               </div>
-              <button class="btn" @click="goToReportInjury">Report Now</button>
+              <button class="btn" @click="goToReportInjury">Learn More</button>
             </div>
             <div class="horizontal-card emergency-first-aid fade-in-up">
               <div class="card-icon"><i class="el-icon-first-aid-kit"></i></div>
@@ -527,7 +527,7 @@ export default {
                 <h4>First Aid</h4>
                 <p>Contact directly in case of emergency. No need Login!</p>
               </div>
-              <button class="btn" @click="goToFirstAid">Go First Aid</button>
+              <button class="btn" @click="goToFirstAid">Find Rescue!</button>
             </div>
           </div>
         </div>
@@ -546,7 +546,7 @@ export default {
                 <h4>Identification</h4>
                 <p>AI bird species recognition</p>
               </div>
-              <button class="btn" @click="goToIdentification">Start Identifying</button>
+              <button class="btn" @click="goToIdentification">Learn More</button>
             </div>
 
             <div class="horizontal-card fade-in-up">
@@ -555,11 +555,11 @@ export default {
                 <h4>Migration Map</h4>
                 <p>Bird migration route map</p>
               </div>
-              <button class="btn" @click="goToMigrationMap">View Map</button>
+              <button class="btn" @click="goToMigrationMap">Learn More</button>
             </div>
 
             <div class="horizontal-card fade-in-up">
-              <div class="card-icon"><i class="el-icon-info"></i></div>
+              <div class="card-icon"><i class="el-icon-star-off"></i></div>
               <div class="card-content">
                 <h4>Fun facts</h4>
                 <p>Know more about birds!</p>
@@ -568,12 +568,12 @@ export default {
             </div>
 
             <div class="horizontal-card fade-in-up">
-              <div class="card-icon"><i class="el-icon-info"></i></div>
+              <div class="card-icon"><i class="el-icon-menu"></i></div>
               <div class="card-content">
                 <h4>Heat Map</h4>
                 <p>Injury condition about birds</p>
               </div>
-              <button class="btn" @click="goToHeatMap">View Diagram</button>
+              <button class="btn" @click="goToHeatMap">Learn More</button>
             </div>
           </div>
         </div>
@@ -592,7 +592,7 @@ export default {
                 <h4>Bird & Life</h4>
                 <p>Share daily sightings, bird photos, and casual conversations</p>
               </div>
-              <button class="btn" @click="goToBirdwatching">Join Discussion</button>
+              <button class="btn" @click="goToBirdwatching">Learn More</button>
             </div>
 
             <div class="horizontal-card fade-in-up">
@@ -601,7 +601,7 @@ export default {
                 <h4>Rescue Help</h4>
                 <p>Post urgent rescue requests or ask for help with injured birds</p>
               </div>
-              <button class="btn" @click="goToRescueHelp">Ask for Rescue</button>
+              <button class="btn" @click="goToRescueHelp">Learn More</button>
             </div>
           </div>
         </div>
@@ -1772,7 +1772,7 @@ export default {
   .btn {
     flex-shrink: 0;
     background: rgba(255, 255, 255, 0.95) !important;
-    color: #2317c8 !important;
+    color: #283c8c !important;
     border: none !important;
     font-weight: 900 !important;
     font-size: 16px !important;
