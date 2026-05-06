@@ -80,9 +80,9 @@ export default {
 
     goToBirdingTips() {
       if (this.isLoggedIn) {
-        this.$router.push('/knowledge/index?tab=tips')
+        this.$router.push('/knowledge/index?tab=funFacts')
       } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/knowledge/index?tab=tips')
+        window.$showLoginDialog('/knowledge/index?tab=funFacts')
       }
     },
     goToReportInjury() {
@@ -134,31 +134,7 @@ export default {
       }
     },
 
-    // ========== Game 板块 ==========
-    goToFlappyBird() {
-      if (this.isLoggedIn) {
-        this.$router.push('/game/flappy')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/game/flappy')
-      }
-    },
 
-    goTo2048Bird() {
-      if (this.isLoggedIn) {
-        this.$router.push('/game/2048')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/game/2048')
-      }
-    },
-
-    toggleDropdown(dropdown) {
-      Object.keys(this.dropdowns).forEach(key => {
-        if (key !== dropdown) {
-          this.dropdowns[key] = false
-        }
-      })
-      this.dropdowns[dropdown] = !this.dropdowns[dropdown]
-    },
     goToKnowledgePage(tab) {
       if (this.isLoggedIn) {
         this.$router.push(`/knowledge/index?tab=${tab}`)
@@ -170,10 +146,19 @@ export default {
     },
     goToFunFacts() {
       if (this.isLoggedIn) {
-        this.$router.push('/knowledge/facts')
+        this.$router.push('/knowledge/index?tab=funFacts')
       } else {
         if (window.$showLoginDialog) {
-          window.$showLoginDialog('/knowledge/facts')
+          window.$showLoginDialog('/knowledge/index?tab=funFacts')
+        }
+      }
+    },
+    goToHeatMap() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/index?tab=injuryHeatmap')
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge/index?tab=injuryHeatmap')
         }
       }
     },
@@ -473,6 +458,7 @@ export default {
                 <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
                 <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
                 <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+                <div class="dropdown-item" @click="goToHeatMap">Injury Heatmap</div>
               </div>
             </div>
 
@@ -482,6 +468,7 @@ export default {
               <div class="dropdown-menu">
                 <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
                 <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
+                <div class="dropdown-item" @click="goToForumPage('feedback')">Feedback</div>
               </div>
             </div>
             <span class="nav-item" @click="goToPersonalPage">About</span>
@@ -565,9 +552,16 @@ export default {
 
             <div class="card fade-in-up">
               <i class="el-icon-info"></i>
-              <h4>Birding Tips</h4>
-              <p>Bird conservation tips</p>
+              <h4>Fun facts</h4>
+              <p>Know more about birds!</p>
               <button class="btn" @click="goToBirdingTips">Learn More</button>
+            </div>
+
+            <div class="card fade-in-up">
+              <i class="el-icon-info"></i>
+              <h4>Heat Map</h4>
+              <p>Injury condition about birds</p>
+              <button class="btn" @click="goToBirdingTips">View Diagram</button>
             </div>
           </div>
         </div>
@@ -834,8 +828,8 @@ export default {
     justify-content: center;
     gap: 30px;
     flex-wrap: wrap;
-    max-width: 1200px;
-    margin: 0 auto 60px;
+    max-width: 1400px;
+    margin: 0 auto 40px;
 
     .card {
       background: rgba(255, 255, 255, 0.15);
@@ -886,7 +880,7 @@ export default {
   .knowledge-cards-wrapper {
     background: rgba(255, 255, 255, 0.03) !important;
     box-shadow: 0 10px 30px rgba(39, 3, 58, 0.25) !important;
-    border: 2px solid #60d7ff !important;
+    border: 2px solid #ffffff !important;
     border-radius: 24px;
     padding: 50px 40px;
     margin: 0 auto 60px;
@@ -906,7 +900,7 @@ export default {
 
     .card {
       background: rgba(255, 255, 255, 0.1) !important;
-      border: 2px solid #40add3 !important;
+      border: 2px solid #aad0e8 !important;
       box-shadow: 0 0 12px rgba(122, 138, 255, 0.25) !important;
     }
 
@@ -1434,7 +1428,7 @@ export default {
 /* 优化版：First Aid 急救卡片（半透明 + 融洽版） */
 .knowledge-cards-wrapper .cards-container .card.emergency-first-aid {
   background: rgba(225, 16, 46, 0.75) !important; // 透明度设为 0.7
-  border: 2px solid #60d7ff !important;
+  border: 2px solid #ffffff !important;
   box-shadow: 0 0 20px rgba(87, 0, 17, 0.5) !important;
 }
 
@@ -1449,7 +1443,7 @@ export default {
 }
 
 .knowledge-cards-wrapper .cards-container .card.emergency-first-aid .btn {
-  background: #d3fffa !important;
+  background: #ffffff !important;
   color: #ff006a !important;
   font-weight: bold !important;
 }

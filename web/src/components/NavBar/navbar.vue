@@ -16,8 +16,8 @@
           <div class="dropdown-menu">
             <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
             <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-            <div class="dropdown-item" @click="goToKnowledgePage('funFacts')">Fun Facts</div>
-            <div class="dropdown-item" @click="goToKnowledgePage('injuryHeatmap')">Injury Heatmap</div>
+            <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+            <div class="dropdown-item" @click="goToHeatMap">Injury Heatmap</div>
           </div>
         </div>
 
@@ -27,6 +27,7 @@
           <div class="dropdown-menu">
             <div class="dropdown-item" @click="goToForumPage('birdwatching')">Bird Watching</div>
             <div class="dropdown-item" @click="goToForumPage('qa')">Q&A</div>
+            <div class="dropdown-item" @click="goToForumPage('feedback')">Feedback</div>
           </div>
         </div>
 
@@ -85,15 +86,28 @@ export default {
     goToKnowledgePage(tab) {
       if (this.isLoggedIn) {
         this.$router.push(`/knowledge/index?tab=${tab}`)
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog(`/knowledge/index?tab=${tab}`)
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog(`/knowledge/index?tab=${tab}`)
+        }
       }
     },
     goToFunFacts() {
       if (this.isLoggedIn) {
-        this.$router.push('/knowledge/facts')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/knowledge/facts')
+        this.$router.push('/knowledge/index?tab=funFacts')
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge/index?tab=funFacts')
+        }
+      }
+    },
+    goToHeatMap() {
+      if (this.isLoggedIn) {
+        this.$router.push('/knowledge/index?tab=injuryHeatmap')
+      } else {
+        if (window.$showLoginDialog) {
+          window.$showLoginDialog('/knowledge/index?tab=injuryHeatmap')
+        }
       }
     },
     goToForum() {
@@ -108,19 +122,6 @@ export default {
         this.$router.push(`/forum/${tab}`)
       } else if (window.$showLoginDialog) {
         window.$showLoginDialog(`/forum/${tab}`)
-      }
-    },
-    goToGame() {
-      if (this.isLoggedIn) {
-        this.$router.push('/game/index')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/game/index')
-      }
-    },
-    selectGameFromNav(gameKey) {
-      const targetPath = `/game/${gameKey}`
-      if (this.$route.path !== targetPath) {
-        this.$router.push(targetPath)
       }
     },
     goToPersonalPage() {
