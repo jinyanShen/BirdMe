@@ -28,6 +28,14 @@
           <i class="el-icon-facts"></i>
           <span>Fun facts</span>
         </div>
+        <div
+          class="tab-item"
+          :class="{ active: currentTab === 'injuryHeatmap' }"
+          @click="switchTab('injuryHeatmap')"
+        >
+          <i class="el-icon-warning"></i>
+          <span>Injury Heatmap</span>
+        </div>
       </div>
 
       <!-- Subpage content -->
@@ -41,6 +49,7 @@ import BirdMigration from './BirdMigration.vue'
 import BirdIdentification from './BirdIdentification.vue'
 import NavBar from '@/components/NavBar/navbar.vue'
 import FunFacts from "@/views/knowledge/FunFacts.vue";
+import BirdInjuryHeatmap from "./BirdInjuryHeatmap.vue";
 
 export default {
   name: 'Knowledge',
@@ -48,7 +57,8 @@ export default {
     BirdMigration,
     BirdIdentification,
     FunFacts,
-    NavBar
+    NavBar,
+    BirdInjuryHeatmap
   },
   data() {
     return {
@@ -61,8 +71,11 @@ export default {
         return BirdMigration
       } else if (this.currentTab === 'identification') {
         return BirdIdentification
-      } else if (this.currentTab === 'funFacts')
-      return FunFacts
+      } else if (this.currentTab === 'funFacts'){
+        return FunFacts
+      } else if (this.currentTab === 'injuryHeatmap')
+      return BirdInjuryHeatmap
+
     }
   },
   methods: {
@@ -72,7 +85,7 @@ export default {
     },
     updateTabFromRoute() {
       const tab = this.$route.query.tab
-      if (tab === 'migration' || tab === 'identification' || tab === 'funFacts') {
+      if (tab === 'migration' || tab === 'identification' || tab === 'funFacts' || tab === 'injuryHeatmap') {
         this.currentTab = tab
       } else {
         this.currentTab = 'migration'

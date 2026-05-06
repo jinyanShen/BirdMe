@@ -16,7 +16,8 @@
           <div class="dropdown-menu">
             <div class="dropdown-item" @click="goToKnowledgePage('migration')">Migration Map</div>
             <div class="dropdown-item" @click="goToKnowledgePage('identification')">Identification</div>
-            <div class="dropdown-item" @click="goToFunFacts">Fun Facts</div>
+            <div class="dropdown-item" @click="goToKnowledgePage('funFacts')">Fun Facts</div>
+            <div class="dropdown-item" @click="goToKnowledgePage('injuryHeatmap')">Injury Heatmap</div>
           </div>
         </div>
 
