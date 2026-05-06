@@ -155,12 +155,19 @@ export const constantRoutes = [
         meta: { title: 'Q&A' }
       },
       {
+        path: 'feedback',
+        component: () => import('@/views/forum/Forum'),
+        name: 'ForumFeedback',
+        meta: { title: 'Feedback' }
+      },
+      {
         path: 'post/:id',
         component: () => import('@/views/forum/PostDetail'),
         name: 'PostDetail',
         hidden: true,
         meta: { title: 'Post Detail' }
       }
+
     ]
   },
 ]

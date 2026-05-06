@@ -37,6 +37,11 @@
           :class="{ active: currentCategory === 'qa' }"
           @click="switchCategory('qa')"
         >Q&A</span>
+        <span
+          class="tab-item"
+          :class="{ active: currentCategory === 'feedback' }"
+          @click="switchCategory('feedback')"
+        >💬 Feedback</span>
       </div>
 
       <!-- Post list -->
@@ -58,6 +63,7 @@
                 <div class="post-title">
                   <span v-if="post.isPinned === 1" class="pinned-badge">📌 Pinned</span>
                   <span v-if="post.category === 'qa'" class="qa-badge">❓ Q&A</span>
+                  <span v-if="post.category === 'feedback'" class="feedback-badge">💬 Feedback</span>
                   {{ post.title }}
                 </div>
                 <div class="post-meta">
@@ -108,6 +114,7 @@
             <select v-model="newPost.category" class="form-control">
               <option value="birdwatching">Bird Watching</option>
               <option value="qa">Q&A</option>
+              <option value="feedback">Feedback</option>
             </select>
           </div>
           <div class="form-group" v-if="isAdmin">
@@ -132,7 +139,7 @@
               type="text"
               v-model="newPost.tag"
               class="form-control"
-              placeholder="e.g., Bird Watching, Help, Identification"
+              placeholder="e.g., Bird Watching, Help, Identification, Suggestion"
               maxlength="50"
             />
           </div>
@@ -166,10 +173,7 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import NavBar from '@/components/NavBar/navbar.vue'
 
-
-
 export default {
-
   name: 'Forum',
   components: {
     quillEditor,
@@ -238,6 +242,8 @@ export default {
         this.currentCategory = 'birdwatching'
       } else if (path.includes('/forum/qa')) {
         this.currentCategory = 'qa'
+      } else if (path.includes('/forum/feedback')) {
+        this.currentCategory = 'feedback'
       } else {
         this.currentCategory = 'all'
       }
@@ -327,7 +333,7 @@ export default {
         content: post.content,
         tag: post.tag,
         category: post.category,
-        isPinned: post.isPinned
+        isPinned: post.isPinned || 0
       }
       this.showPostDialog = true
     },
@@ -349,7 +355,6 @@ export default {
           authorId: parseInt(userId),
           authorName: username,
           authorAvatar: userAvatar,
-          isPinned: 0,
           viewCount: 0,
           replyCount: 0
         }
@@ -414,7 +419,6 @@ export default {
 .forum-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f6e6d1 0%, #fa9209 100%);
-
 }
 
 .forum-content {
@@ -592,6 +596,10 @@ export default {
   color: #333;
   margin-bottom: 10px;
   line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .pinned-badge {
@@ -600,7 +608,6 @@ export default {
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 16px;
-  margin-right: 8px;
 }
 
 .qa-badge {
@@ -609,7 +616,14 @@ export default {
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 16px;
-  margin-right: 8px;
+}
+
+.feedback-badge {
+  background: #9b59b6;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 16px;
 }
 
 .post-meta {
