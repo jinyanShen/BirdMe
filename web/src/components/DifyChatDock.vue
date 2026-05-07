@@ -124,10 +124,8 @@
 </template>
 
 <script>
-import { sendDifyChatAndNavigate, uploadDifyFile } from '@/api/dify'
-
 const MAX_CHAT_IMAGES = 4
-import { sendDifyChatAndNavigate } from '@/api/dify'
+import { sendDifyChatAndNavigate, uploadDifyFile } from '@/api/dify'
 import UploadImg from '@/components/UploadImg/index.vue'
 import { insertReport } from '@/api/report'
 import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
@@ -145,8 +143,7 @@ export default {
       loading: false,
       conversationId: '',
       messages: [],
-      pendingFiles: []
-      messages: [],
+      pendingFiles: [],
       rescueForm: {
         birdName: '',
         species: '',
