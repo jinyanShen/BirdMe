@@ -514,11 +514,11 @@ export default {
   height: 52px;
   border-radius: 50%;
   border: none;
-  background: #1c64f2;
+  background:rgb(242, 28, 231);
   color: #fff;
   font-size: 22px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(28, 100, 242, 0.45);
+  box-shadow: 0 8px 24px rgba(116, 27, 117, 0.91);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -526,7 +526,7 @@ export default {
 
   &:hover {
     transform: scale(1.05);
-    box-shadow: 0 10px 28px rgba(28, 100, 242, 0.55);
+    box-shadow: 0 10px 28px rgba(116, 27, 117, 0.91);
   }
 }
 
@@ -551,7 +551,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 12px 14px;
-  background: linear-gradient(90deg, #1c64f2, #3b82f6);
+  background: linear-gradient(90deg, rgb(28, 235, 242), rgba(246, 59, 212, 0.44));
   color: #fff;
   font-weight: 600;
 }
@@ -608,7 +608,7 @@ export default {
 }
 
 .is-user .dock-bubble {
-  background: #1c64f2;
+  background: #1ce0f2;
   color: #fff;
   border-bottom-right-radius: 4px;
 }
