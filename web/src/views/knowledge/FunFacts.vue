@@ -266,12 +266,16 @@ export default {
       currentPage: 1,
       pageSize: 6,
       presetBirds: [
-        { name: 'American Robin', category: 'Songbird', searchTerm: 'robin' },
-        { name: 'Blue Jay', category: 'Songbird', searchTerm: 'blue jay' },
-        { name: 'Northern Cardinal', category: 'Songbird', searchTerm: 'cardinal' },
-        { name: 'Bald Eagle', category: 'Raptor', searchTerm: 'bald eagle' },
-        { name: 'Great Horned Owl', category: 'Owl', searchTerm: 'great horned owl' },
-        { name: 'Red-tailed Hawk', category: 'Raptor', searchTerm: 'red-tailed hawk' }
+        { name: 'American Robin', category: 'Songbird', searchTerm: 'American Robin' },
+        { name: 'Blue Jay', category: 'Songbird', searchTerm: 'Blue Jay' },
+        { name: 'Northern Cardinal', category: 'Songbird', searchTerm: 'Northern Cardinal' },
+        { name: 'Bald Eagle', category: 'Raptor', searchTerm: 'Bald Eagle' },
+        { name: 'Great Horned Owl', category: 'Owl', searchTerm: 'Great Horned Owl' },
+        { name: 'Red-tailed Hawk', category: 'Raptor', searchTerm: 'Red-tailed Hawk' },
+        { name: 'Peregrine Falcon', category: 'Raptor', searchTerm: 'Peregrine Falcon' },
+        { name: 'Eastern Bluebird', category: 'Songbird', searchTerm: 'Eastern Bluebird' },
+        { name: 'Black-capped Chickadee', category: 'Songbird', searchTerm: 'Black-capped Chickadee' },
+        { name: 'Downy Woodpecker', category: 'Woodpecker', searchTerm: 'Downy Woodpecker' }
       ]
     }
   },
@@ -410,17 +414,53 @@ export default {
 
     async fetchAudioForPresetBird(index) {
       const bird = this.presetBirdsList[index]
+
       try {
-        const response = await fetch(`https://xeno-canto.org/api/3/recordings?query=en:"=${bird.searchTerm}"&key=${XENO_CANTO_API_KEY}&per_page=3`)
+        // 使用精确匹配搜索
+        const searchTerm = `en:"=${bird.searchTerm}"`
+        const response = await fetch(
+          `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchTerm)}&key=${XENO_CANTO_API_KEY}&per_page=5`
+        )
+
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`)
+        }
+
         const data = await response.json()
+
+        // 添加日志查看返回的数据
+        console.log(`Searching for ${bird.searchTerm}:`, data)
+
         if (data.recordings && data.recordings.length > 0) {
-          const recording = data.recordings[0]
-          bird.audioUrl = `${BACKEND_PROXY_URL}?url=${encodeURIComponent(`https://cdn.xeno-canto.org/${recording.id}/download.mp3`)}`
-          bird.location = recording.cnt || 'Various locations'
+          // 确保找到匹配的录音
+          let recording = null
+          for (const rec of data.recordings) {
+            if (rec.en === bird.searchTerm || rec.en.includes(bird.searchTerm)) {
+              recording = rec
+              break
+            }
+          }
+          // 如果没有精确匹配，使用第一个
+          if (!recording && data.recordings[0]) {
+            recording = data.recordings[0]
+          }
+
+          if (recording && recording.id) {
+            bird.audioId = recording.id
+            const directAudioUrl = `https://cdn.xeno-canto.org/${recording.id}/download`
+            bird.audioUrl = `${BACKEND_PROXY_URL}?url=${encodeURIComponent(directAudioUrl)}`
+            bird.location = recording.cnt || 'Various locations'
+            console.log(`Found audio for ${bird.name}: ID=${recording.id}`)
+          } else {
+            console.warn(`No valid recording ID for ${bird.name}`)
+            bird.location = 'No audio ID found'
+          }
         } else {
+          console.warn(`No recordings found for ${bird.searchTerm}`)
           bird.location = 'No audio found'
         }
       } catch (error) {
+        console.error(`Failed to fetch audio for ${bird.name}:`, error)
         bird.location = 'Audio unavailable'
       }
     },
@@ -445,59 +485,132 @@ export default {
     },
 
     playSearchBird(bird) {
+      console.log('Playing search bird:', bird)
       this.playBirdSound(bird)
     },
 
     playBirdSound(bird) {
-      if (!bird.audioUrl) return
+      console.log('playBirdSound called with:', {
+        name: bird.name,
+        audioId: bird.audioId,
+        audioUrl: bird.audioUrl
+      })
+
+      // Check if audioId exists
+      if (!bird.audioId) {
+        this.$message.warning(`No audio available for ${bird.name}`)
+        return
+      }
+
+      // If clicking the same bird that is currently playing, stop it
+      if (this.currentPlayingId === bird.id && this.currentAudio && !this.currentAudio.paused) {
+        this.currentAudio.pause()
+        this.currentAudio.currentTime = 0
+        this.currentPlayingId = null
+        this.currentAudio = null
+        console.log('Audio stopped')
+        return
+      }
+
+      // Stop any other currently playing audio
       if (this.currentAudio) {
         this.currentAudio.pause()
         this.currentAudio.currentTime = 0
       }
-      const audio = new Audio(bird.audioUrl)
-      audio.play().catch(() => this.$message.error(`Cannot play ${bird.name} sound`))
+
+      // Build audio URL using audioId (original working approach)
+      const audioUrl = `https://xeno-canto.org/${bird.audioId}/download`
+      console.log('Playing URL:', audioUrl)
+
+      const audio = new Audio(audioUrl)
+
+      audio.play().catch(err => {
+        console.error('Play failed:', err)
+        // Fallback to CDN link if primary fails
+        const fallbackUrl = `https://cdn.xeno-canto.org/${bird.audioId}/download`
+        audio.src = fallbackUrl
+        audio.play().catch(e => {
+          this.$message.error(`Cannot play ${bird.name} sound`)
+        })
+      })
+
       audio.onended = () => {
+        console.log('Audio ended naturally')
         this.currentPlayingId = null
         this.currentAudio = null
       }
-      audio.onerror = () => {
+
+      audio.onerror = (e) => {
+        console.error('Audio error:', e)
         this.$message.error(`Failed to load audio for ${bird.name}`)
         this.currentPlayingId = null
         this.currentAudio = null
       }
+
       this.currentPlayingId = bird.id
       this.currentAudio = audio
+      console.log('Audio started')
     },
 
     async searchBirds() {
-      if (!this.searchQuery.trim()) return this.$message.warning('Please enter a bird name')
+      if (!this.searchQuery.trim()) {
+        this.$message.warning('Please enter a bird name')
+        return
+      }
+
       this.searching = true
       this.searchedOnce = true
       this.searchResults = []
+
       try {
         const query = this.searchQuery.trim().toLowerCase()
-        const res = await fetch(`https://xeno-canto.org/api/3/recordings?query=en:"=${query}"&key=${XENO_CANTO_API_KEY}&per_page=10`)
-        const data = await res.json()
+
+        // 修改这里：去掉 = 号，使用模糊搜索
+        // 原来：en:"=${query}"  （精确匹配）
+        // 现在：en:${query}     （模糊搜索）
+        const searchTerm = `en:${query}`
+
+        const response = await fetch(
+          `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchTerm)}&key=${XENO_CANTO_API_KEY}&per_page=15`
+        )
+
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`)
+        }
+
+        const data = await response.json()
+        console.log('Search results:', data)
+
         if (data.recordings && data.recordings.length > 0) {
-          const unique = new Map()
-          for (const rec of data.recordings.slice(0, 8)) {
-            if (!unique.has(rec.en)) {
-              const imgUrl = await this.fetchBirdImage(rec.en)
-              unique.set(rec.en, {
+          const uniqueBirds = new Map()
+
+          for (const rec of data.recordings.slice(0, 12)) {
+            const birdName = rec.en
+            if (!uniqueBirds.has(birdName) && birdName) {
+              const imageUrl = await this.fetchBirdImage(birdName)
+              const audioId = rec.id
+              const directAudioUrl = `https://cdn.xeno-canto.org/${audioId}/download.mp3`
+              const audioUrl = `${BACKEND_PROXY_URL}?url=${encodeURIComponent(directAudioUrl)}`
+
+              uniqueBirds.set(birdName, {
                 id: rec.id,
-                name: rec.en,
-                audioUrl: `${BACKEND_PROXY_URL}?url=${encodeURIComponent(`https://cdn.xeno-canto.org/${rec.id}/download.mp3`)}`,
-                location: rec.cnt || 'Unknown',
-                imageUrl: imgUrl
+                name: birdName,
+                audioId: audioId,
+                audioUrl: audioUrl,
+                location: rec.cnt || 'Unknown location',
+                imageUrl: imageUrl
               })
             }
           }
-          this.searchResults = Array.from(unique.values())
+          this.searchResults = Array.from(uniqueBirds.values())
+          this.$message.success(`Found ${this.searchResults.length} bird species`)
         } else {
-          this.$message.info(`No recordings found for "${query}"`)
+          this.searchResults = []
+          this.$message.info(`No birds found for "${query}"`)
         }
       } catch (error) {
-        this.$message.error('Search failed')
+        console.error('Search failed:', error)
+        this.$message.error('Search failed. Please try again.')
       } finally {
         this.searching = false
       }
