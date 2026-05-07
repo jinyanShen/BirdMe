@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:sqlite:back/birdme.db
+    driver-class-name: org.sqlite.JDBC
+    username:
+    password:
+  servlet:
+    multipart:
+      max-file-size: 10MB      # 单个文件最大大小
+      max-request-size: 10MB  # 单次请求最大总大小
+      enabled: true            # 启用文件上传
+
+mybatis-plus:
+  typeAliasesPackage: com.java.birdme.bean
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+uploadPath: d:/uploads/birdme
+
+# Dify：仅服务端保存 API Key，前端通过 /dify/chat-messages 代理调用
+# 在 Dify 控制台「应用 → API 访问」复制 App API Key（形如 app-xxx），填到下方，勿提交到公开仓库
+#
+# 若返回 Cloudflare Error 1010：Java 服务端 TLS 指纹易被拦截。可尝试配置 http-proxy，或将 api-base 改为自建 Dify。
+dify:
+  api-base: https://api.dify.ai/v1
+  api-key: app-dynitsVgAx5GF5sePk4Zo1TW
+  # user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/131.0.0.0 Safari/537.36
+  # http-proxy-host: proxy.example.com
+  # http-proxy-port: 8080

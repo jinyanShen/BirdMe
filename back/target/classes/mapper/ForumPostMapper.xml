@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.java.birdme.dao.ForumPostMapper">
+
+    <select id="selectByCategory" resultType="com.java.birdme.bean.ForumPost">
+        SELECT * FROM forum_post
+        <where>
+            <if test="category != null and category != ''">
+                AND category = #{category}
+            </if>
+        </where>
+        ORDER BY is_pinned DESC, created_at DESC
+    </select>
+
+    <select id="selectPinned" resultType="com.java.birdme.bean.ForumPost">
+        SELECT * FROM forum_post
+        WHERE is_pinned = 1
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="incrementViewCount">
+        UPDATE forum_post
+        SET view_count = view_count + 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>
