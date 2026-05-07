@@ -78,6 +78,18 @@ public class Report {
     @TableField(exist = false)
     private String submitter;
     /**
+     * Latitude
+     */
+    private Double userLatitude;
+    /**
+     * Longitude
+     */
+    private Double userLongitude;
+    /**
+     * Location
+     */
+    private String userLocation;
+    /**
      * Rescue station ID
      */
     private Integer rescueStationId;
@@ -205,6 +217,30 @@ public class Report {
 
     public void setSubmitter(String submitter) {
         this.submitter = submitter;
+    }
+
+    public Double getUserLatitude() {
+        return userLatitude;
+    }
+
+    public void setUserLatitude(Double userLatitude) {
+        this.userLatitude = userLatitude;
+    }
+
+    public Double getUserLongitude() {
+        return userLongitude;
+    }
+
+    public void setUserLongitude(Double userLongitude) {
+        this.userLongitude = userLongitude;
+    }
+
+    public String getUserLocation() {
+        return userLocation;
+    }
+
+    public void setUserLocation(String userLocation) {
+        this.userLocation = userLocation;
     }
 
     public Integer getRescueStationId() {

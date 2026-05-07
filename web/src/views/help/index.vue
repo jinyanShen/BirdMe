@@ -110,7 +110,7 @@
 <script>
 import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
 import { insertReport } from '@/api/report'
-import { geocode, searchNearbyPetHospitals } from '@/api/help'
+import { geocode, searchNearbyPetHospitals, reverseGeocode  } from '@/api/help'
 import NavBar from '@/components/NavBar/navbar.vue'
 import UploadImg from '@/components/UploadImg/index.vue'
 
@@ -129,7 +129,8 @@ export default {
       selectedLocation: null,
       userLocation: {
         latitude: null,
-        longitude: null
+        longitude: null,
+        location: null
       },
       nearbyStations: [],
       displayStations: [],
@@ -232,8 +233,21 @@ export default {
               })
               marker.setMap(this.map)
 
-              // Check nearby pet hospitals
-              this.checkAndAddNearbyPetHospitals()
+              try {
+                reverseGeocode(
+                  this.userLocation.latitude,
+                  this.userLocation.longitude
+                ).then(res => {
+                  if (res.code === 200) {
+                    this.userLocation.location = res.data;
+
+                    // Check nearby pet hospitals
+                    this.checkAndAddNearbyPetHospitals()
+                  }
+                })
+              } catch (error) {
+                console.error('Get location error:', error);
+              }
             }
           },
           (error) => {
@@ -602,6 +616,7 @@ export default {
       this.rescueForm.species = ''
       this.rescueForm.injuryType = ''
       this.rescueForm.injuryDescription = ''
+      this.rescueForm.imageUrl = ''
       this.rescueDialogVisible = true
 
       this.$nextTick(() => {
@@ -683,6 +698,9 @@ export default {
           injuryDescription: this.rescueForm.injuryDescription,
           imageUrl: this.rescueForm.imageUrl,
           submitterId: userId ? userId.toString() : null,
+          userLocation: this.userLocation.location,
+          userLatitude: this.userLocation.latitude,
+          userLongitude: this.userLocation.longitude,
           rescueStationId: rescueStationId
         }
 

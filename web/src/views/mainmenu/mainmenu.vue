@@ -103,9 +103,9 @@ export default {
 
     goToFirstAid() {
       if (this.isLoggedIn) {
-        this.$router.push('/help/index')
+        this.$router.push('/rescueStation/index')
       } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/help/index')
+        window.$showLoginDialog('/rescueStation/index')
       }
     },
 
