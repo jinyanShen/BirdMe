@@ -102,11 +102,8 @@ export default {
     },
 
     goToFirstAid() {
-      if (this.isLoggedIn) {
-        this.$router.push('/rescueStation/index')
-      } else if (window.$showLoginDialog) {
-        window.$showLoginDialog('/rescueStation/index')
-      }
+      // 直接跳转，不需要登录
+      this.$router.push('/rescueStation/index')
     },
 
     // ========== Forum 板块 ==========
