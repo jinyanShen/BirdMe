@@ -223,6 +223,37 @@
           <p class="empty-hint">Try: robin, blue jay, cardinal, eagle, owl</p>
         </div>
       </div>
+
+      <!-- Bird Videos Section - YouTube Embed -->
+      <div class="videos-section">
+        <div class="section-header">
+          <h2>🎬 Bird Fun Facts Videos</h2>
+          <p>Watch and learn amazing bird facts from YouTube</p>
+        </div>
+
+        <div class="videos-grid">
+          <div v-for="(video, index) in birdVideos" :key="index" class="video-card">
+            <div class="video-wrapper">
+              <iframe
+                :src="`https://www.youtube.com/embed/${video.youtubeId}?rel=0`"
+                :title="video.title"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe>
+            </div>
+            <div class="video-info">
+              <h4>{{ video.title }}</h4>
+              <p>{{ video.description }}</p>
+              <div class="video-meta">
+                <span class="video-duration">{{ video.duration }}</span>
+                <span class="video-source">Source: YouTube</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -276,6 +307,51 @@ export default {
         { name: 'Eastern Bluebird', category: 'Songbird', searchTerm: 'Eastern Bluebird' },
         { name: 'Black-capped Chickadee', category: 'Songbird', searchTerm: 'Black-capped Chickadee' },
         { name: 'Downy Woodpecker', category: 'Woodpecker', searchTerm: 'Downy Woodpecker' }
+      ],
+      // YouTube Videos - replace YouTube IDs with actual video IDs
+      birdVideos: [
+        {
+          title: '10 Amazing Facts About Hummingbirds',
+          youtubeId: 'wREEyPs0d1s',
+          description: 'Did you know hummingbirds can fly backward? Learn more amazing facts about these tiny wonders!',
+          duration: '3:24',
+          source: 'YouTube'
+        },
+        {
+          title: 'Why Owls Are Masters of the Night',
+          youtubeId: '4u5cfwf0GCE',
+          description: 'Discover the special adaptations that make owls incredible hunters.',
+          duration: '4:12',
+          source: 'YouTube'
+        },
+        {
+          title: 'The Incredible Migration of Arctic Terns',
+          youtubeId: 'bte7MCSBZvo',
+          description: 'These birds travel from the Arctic to Antarctica every year - the longest migration on Earth!',
+          duration: '3:45',
+          source: 'YouTube'
+        },
+        {
+          title: 'Crows: The Smartest Birds on Earth',
+          youtubeId: '9Td-S0fTIGY',
+          description: 'Crows can solve puzzles, use tools, and remember human faces for years.',
+          duration: '5:02',
+          source: 'YouTube'
+        },
+        {
+          title: 'Penguin Facts You Never Knew',
+          youtubeId: '_WgbHKtizro',
+          description: 'Learn about the amazing lives of penguins in Antarctica and beyond.',
+          duration: '4:30',
+          source: 'YouTube'
+        },
+        {
+          title: 'The Secret Life of Woodpeckers',
+          youtubeId: 'mnWbyQLOqTQ',
+          description: "How woodpeckers peck without getting a headache - nature's shock absorbers!",
+          duration: '3:18',
+          source: 'YouTube'
+        }
       ]
     }
   },
@@ -416,7 +492,6 @@ export default {
       const bird = this.presetBirdsList[index]
 
       try {
-        // 使用精确匹配搜索
         const searchTerm = `en:"=${bird.searchTerm}"`
         const response = await fetch(
           `https://xeno-canto.org/api/3/recordings?query=${encodeURIComponent(searchTerm)}&key=${XENO_CANTO_API_KEY}&per_page=5`
@@ -428,11 +503,9 @@ export default {
 
         const data = await response.json()
 
-        // 添加日志查看返回的数据
         console.log(`Searching for ${bird.searchTerm}:`, data)
 
         if (data.recordings && data.recordings.length > 0) {
-          // 确保找到匹配的录音
           let recording = null
           for (const rec of data.recordings) {
             if (rec.en === bird.searchTerm || rec.en.includes(bird.searchTerm)) {
@@ -440,7 +513,6 @@ export default {
               break
             }
           }
-          // 如果没有精确匹配，使用第一个
           if (!recording && data.recordings[0]) {
             recording = data.recordings[0]
           }
@@ -496,13 +568,11 @@ export default {
         audioUrl: bird.audioUrl
       })
 
-      // Check if audioId exists
       if (!bird.audioId) {
         this.$message.warning(`No audio available for ${bird.name}`)
         return
       }
 
-      // If clicking the same bird that is currently playing, stop it
       if (this.currentPlayingId === bird.id && this.currentAudio && !this.currentAudio.paused) {
         this.currentAudio.pause()
         this.currentAudio.currentTime = 0
@@ -512,13 +582,11 @@ export default {
         return
       }
 
-      // Stop any other currently playing audio
       if (this.currentAudio) {
         this.currentAudio.pause()
         this.currentAudio.currentTime = 0
       }
 
-      // Build audio URL using audioId (original working approach)
       const audioUrl = `https://xeno-canto.org/${bird.audioId}/download`
       console.log('Playing URL:', audioUrl)
 
@@ -526,7 +594,6 @@ export default {
 
       audio.play().catch(err => {
         console.error('Play failed:', err)
-        // Fallback to CDN link if primary fails
         const fallbackUrl = `https://cdn.xeno-canto.org/${bird.audioId}/download`
         audio.src = fallbackUrl
         audio.play().catch(e => {
@@ -564,10 +631,6 @@ export default {
 
       try {
         const query = this.searchQuery.trim().toLowerCase()
-
-        // 修改这里：去掉 = 号，使用模糊搜索
-        // 原来：en:"=${query}"  （精确匹配）
-        // 现在：en:${query}     （模糊搜索）
         const searchTerm = `en:${query}`
 
         const response = await fetch(
@@ -944,6 +1007,76 @@ export default {
   }
 }
 
+/* YouTube Videos Section */
+.videos-section {
+  max-width: 1000px;
+  margin: 60px auto 0;
+}
+
+.videos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 30px;
+}
+
+.video-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  }
+
+  .video-info {
+    padding: 16px 20px;
+
+    h4 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin: 0 0 8px 0;
+    }
+
+    p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+      margin: 0 0 12px 0;
+    }
+
+    .video-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #999;
+
+      .video-source {
+        color: #44bce1;
+      }
+    }
+  }
+}
+
 .expand-enter-active, .expand-leave-active { transition: all 0.3s ease; }
 .expand-enter, .expand-leave-to { opacity: 0; transform: translateY(-10px); }
 
@@ -966,5 +1099,11 @@ export default {
   .preset-birds .preset-grid { grid-template-columns: repeat(2, 1fr); }
   .sounds-grid { grid-template-columns: 1fr; }
   .sound-card { flex-direction: column; gap: 12px; text-align: center; }
+  .videos-grid {
+    grid-template-columns: 1fr;
+  }
+  .video-card .video-wrapper {
+    padding-bottom: 56.25%;
+  }
 }
 </style>
