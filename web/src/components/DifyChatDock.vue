@@ -7,7 +7,13 @@
           <button type="button" class="dock-icon-btn" title="Close" @click="panelOpen = false">×</button>
         </div>
         <div ref="scrollRef" class="dock-messages">
-          <div v-if="!messages.length" class="dock-empty">Ask anything. Replies may include navigation tags like [/knowledge].</div>
+          <div v-if="!messages.length" class="dock-empty">
+            Hi, I am BirdMe Assistant. I can help you with navigation, bird rescue, and bird knowledge Q&amp;A.<br>
+            Try asking:<br>
+            1. Navigation: "I want to go to the knowledge page."<br>
+            2. Rescue: "I found an injured bird and I want to help."<br>
+            3. Q&amp;A: "Can you tell me what the common bird species in China are?"
+          </div>
           <div
             v-for="(m, idx) in messages"
             :key="idx"
