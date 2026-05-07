@@ -27,6 +27,62 @@
               <span v-if="m.text">{{ m.text }}</span>
             </div>
           </div>
+
+          <el-dialog :visible.sync="rescueDialogVisible" title="Submit Rescue Request" width="600px" @close="resetRescueForm"
+                     @focusout="resetRescueForm" append-to-body>
+            <el-form :model="rescueForm" label-width="140px" :rules="rescueFormRules" ref="rescueFormRef">
+              <el-form-item label="name" prop="name">
+                <el-select v-model="rescueForm.name"
+                           placeholder="Select rescue station"
+                           style="width: 100%;"
+                           :popper-append-to-body="false"
+                           @change="selectStation"
+                           clearable>
+                  <el-option v-for="item in displayStations" :label="item.name" :value="item.name" :key="item.id"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Location" prop="location">
+                <el-input v-model="rescueForm.location" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="Latitude" prop="latitude">
+                <el-input v-model="rescueForm.latitude" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="Longitude" prop="longitude">
+                <el-input v-model="rescueForm.longitude" disabled></el-input>
+              </el-form-item>
+              <el-form-item label="Bird Name" prop="birdName">
+                <el-input v-model="rescueForm.birdName" placeholder="Enter bird name"></el-input>
+              </el-form-item>
+              <el-form-item label="Species" prop="species">
+                <el-input v-model="rescueForm.species" placeholder="Enter species (optional)"></el-input>
+              </el-form-item>
+              <el-form-item label="Injury Type" prop="injuryType">
+                <el-select v-model="rescueForm.injuryType" placeholder="Select injury type" style="width: 100%;">
+                  <el-option label="Unable to Fly" value="Unable to Fly"></el-option>
+                  <el-option label="Wing Injury" value="Wing Injury"></el-option>
+                  <el-option label="Leg Injury" value="Leg Injury"></el-option>
+                  <el-option label="Eye Injury" value="Eye Injury"></el-option>
+                  <el-option label="Poisoning" value="Poisoning"></el-option>
+                  <el-option label="Exhaustion" value="Exhaustion"></el-option>
+                  <el-option label="Other" value="Other"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="Description" prop="injuryDescription">
+                <el-input type="textarea" v-model="rescueForm.injuryDescription" rows="4" placeholder="Describe the bird's condition"></el-input>
+              </el-form-item>
+              <el-form-item label="Image" prop="imageUrl">
+                <UploadImg
+                  ref="uploadImg"
+                  buttonText="Upload image"
+                  @image-uploaded="handleAvatarUploaded"
+                />
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+        <el-button @click="rescueDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="submitRescueForm" :loading="submitLoading">Submit</el-button>
+      </span>
+          </el-dialog>
         </div>
         <div class="dock-compose">
           <div v-if="pendingFiles.length" class="dock-pending-images">
@@ -74,12 +130,18 @@
 </template>
 
 <script>
-import { sendDifyChatAndNavigate, uploadDifyFile } from '@/api/dify'
-
 const MAX_CHAT_IMAGES = 4
+import { sendDifyChatAndNavigate, uploadDifyFile } from '@/api/dify'
+import UploadImg from '@/components/UploadImg/index.vue'
+import { insertReport } from '@/api/report'
+import { getNearbyStations, allRescueStation } from '@/api/rescueStation'
+import { reverseGeocode, searchNearbyPetHospitals } from '@/api/help'
 
 export default {
   name: 'DifyChatDock',
+  components: {
+    UploadImg
+  },
   data() {
     return {
       panelOpen: false,
@@ -87,7 +149,34 @@ export default {
       loading: false,
       conversationId: '',
       messages: [],
-      pendingFiles: []
+      pendingFiles: [],
+      rescueForm: {
+        birdName: '',
+        species: '',
+        name: '',
+        location: '',
+        latitude: '',
+        longitude: '',
+        injuryType: '',
+        injuryDescription: '',
+        imageUrl: '',
+        submitterId: '',
+        rescueStationId: ''
+      },
+      userLocation: {
+        latitude: null,
+        longitude: null,
+        location: null
+      },
+      rescueDialogVisible: false,
+      submitLoading: false,
+      rescueFormRules: {
+        birdName: [{ required: true, message: 'Please enter bird name', trigger: 'blur' }],
+        injuryType: [{ required: true, message: 'Please select injury type', trigger: 'change' }],
+        injuryDescription: [{ required: true, message: 'Please enter description', trigger: 'blur' }]
+      },
+      nearbyStations: [],
+      displayStations: [],
     }
   },
   beforeDestroy() {
@@ -181,6 +270,13 @@ export default {
             this.conversationId = res.data.conversationId
           }
           const answer = typeof res.data.answer === 'string' ? res.data.answer : ''
+
+          if("help process" === answer){
+            this.messages.push({ role: 'assistant', text: 'Currently processing, please wait.' })
+            this.getCurrentLocation()
+            return
+          }
+
           this.messages.push({ role: 'assistant', text: answer || '(empty reply)' })
         } else if (res && res.msg) {
           this.$message.error(res.msg)
@@ -199,7 +295,204 @@ export default {
       if (el) {
         el.scrollTop = el.scrollHeight
       }
-    }
+    },
+    getCurrentLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            this.userLocation.latitude = position.coords.latitude
+            this.userLocation.longitude = position.coords.longitude
+
+            try {
+              reverseGeocode(
+                this.userLocation.latitude,
+                this.userLocation.longitude
+              ).then(res => {
+                if (res.code === 200) {
+                  this.userLocation.location = res.data;
+
+                  // Check nearby pet hospitals
+                  this.checkAndAddNearbyPetHospitals()
+                }
+              })
+            } catch (error) {
+              console.error('Get location error:', error);
+            }
+          },
+          (error) => {
+            console.error('Error getting location:', error)
+            this.$message.error('Failed to get your location. Please search for a location manually.')
+          }
+        )
+      } else {
+        this.$message.error('Geolocation is not supported by your browser.')
+      }
+    },
+    checkAndAddNearbyPetHospitals() {
+      const radius = 30000
+      if (this.userLocation.latitude && this.userLocation.longitude) {
+          allRescueStation()
+            .then(response => {
+              if (response.code === 200 && response.data) {
+                this.nearbyStations = response.data
+                console.log(this.nearbyStations)
+
+                const stationsWithDistance = this.nearbyStations.map(station => {
+                  const distance = this.calculateDistance(
+                    this.userLocation.latitude,
+                    this.userLocation.longitude,
+                    station.latitude,
+                    station.longitude
+                  )
+                  return {
+                    ...station,
+                    distance: distance,
+                    distanceKm: (distance / 1000).toFixed(2)
+                  }
+                })
+
+                if (stationsWithDistance.length < 3) {
+                  this.searchAndAddPetHospitals(stationsWithDistance)
+                }else {
+                  const sortedStations = stationsWithDistance.sort((a, b) => a.distance - b.distance)
+                  this.displayStations = sortedStations.slice(0, 3);
+                  this.rescueDialogVisible = true
+                  this.messages.push({ role: 'assistant', text: 'Please complete the bird injury report.' })
+                }
+              }
+            })
+            .catch(error => {
+              console.error('Error loading all stations:', error)
+            })
+      }
+    },
+    calculateDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000
+      const dLat = this.deg2rad(lat2 - lat1)
+      const dLon = this.deg2rad(lon2 - lon1)
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2)
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      return R * c
+    },
+    deg2rad(deg) {
+      return deg * (Math.PI / 180)
+    },
+    searchAndAddPetHospitals(stationsWithDistance) {
+      searchNearbyPetHospitals(this.userLocation.latitude, this.userLocation.longitude, 30000)
+        .then(response => {
+          if (response.code === 200 && response.data) {
+            stationsWithDistance = [...stationsWithDistance, ...response.data]
+          } else {
+            console.log('No pet hospitals found or error:', response)
+          }
+
+          const sortedStations = stationsWithDistance.sort((a, b) => a.distance - b.distance)
+          this.displayStations = sortedStations.slice(0, 3);
+          this.rescueDialogVisible = true
+          this.messages.push({ role: 'assistant', text: 'Please complete the bird injury report.' })
+        })
+        .catch(error => {
+          console.error('Error searching pet hospitals:', error)
+        })
+    },
+    selectStation(){
+      for (const station of this.nearbyStations) {
+        if (station.name === this.rescueForm.name) {
+          this.rescueForm.rescueStationId = station.id
+          this.rescueForm.location = station.address
+          this.rescueForm.latitude = station.latitude
+          this.rescueForm.longitude = station.longitude
+          break
+        }
+      }
+    },
+    handleAvatarUploaded(data) {
+      const { file } = data;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      fetch('http://localhost:8080/file/upload', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          if(data.code === 200){
+            this.rescueForm.imageUrl = 'http://localhost:8080/file/download?id=' + data.data.id;
+            this.$message.success('Image uploaded successfully');
+          }else{
+            this.$message.error(data.msg);
+          }
+        })
+        .catch(error => {
+          this.$message.error('Image upload failed');
+        });
+    },
+    async submitRescueForm() {
+      if (!this.rescueForm.birdName || !this.rescueForm.injuryType || !this.rescueForm.injuryDescription) {
+        this.$message.error('Please fill all required fields')
+        return
+      }
+
+      this.submitLoading = true
+      try {
+        let userId = parseInt(sessionStorage.getItem('id'))
+
+        const reportData = {
+          birdName: this.rescueForm.birdName,
+          species: this.rescueForm.species || 'Unknown',
+          name: this.rescueForm.name,
+          location: this.rescueForm.location,
+          latitude: this.rescueForm.latitude,
+          longitude: this.rescueForm.longitude,
+          injuryType: this.rescueForm.injuryType,
+          injuryDescription: this.rescueForm.injuryDescription,
+          imageUrl: this.rescueForm.imageUrl,
+          submitterId: userId ? userId.toString() : null,
+          userLocation: this.userLocation.location,
+          userLatitude: this.userLocation.latitude,
+          userLongitude: this.userLocation.longitude,
+          rescueStationId: this.rescueForm.rescueStationId
+        }
+
+        insertReport(reportData).then(response => {
+          if (response.code === 200) {
+            this.messages.push({ role: 'assistant', text: 'Submitted successfully. Please view your report later.' })
+            this.rescueDialogVisible = false
+            this.resetRescueForm()
+          } else {
+            this.$message.error(response.msg || 'Failed to submit rescue report')
+          }
+        })
+      } catch (error) {
+        console.error('Error submitting rescue report:', error)
+        this.$message.error('Failed to submit rescue report')
+      } finally {
+        this.submitLoading = false
+      }
+    },
+    resetRescueForm() {
+      this.rescueForm = {
+        name: '',
+        location: '',
+        latitude: '',
+        longitude: '',
+        birdName: '',
+        species: '',
+        injuryType: '',
+        injuryDescription: '',
+        imageUrl: ''
+      }
+      if (this.$refs.rescueFormRef) {
+        this.$refs.rescueFormRef.resetFields()
+      }
+      this.rescueDialogVisible = false
+
+      this.messages.push({ role: 'assistant', text: 'The user has canceled the rescue.' })
+    },
   }
 }
 </script>
@@ -439,6 +732,10 @@ export default {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(8px);
+}
+
+.el-select-dropdown {
+  z-index: 9999 !important;
 }
 
 @media (max-width: 480px) {

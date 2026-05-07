@@ -28,3 +28,14 @@ export function getAllStations() {
     method: 'get'
   })
 }
+
+export function reverseGeocode(latitude, longitude) {
+  return request({
+    url: '/reverseGeocode',
+    method: 'post',
+    data: {
+      latitude,
+      longitude
+    }
+  })
+}
